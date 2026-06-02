@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+.npm
+.pnp.*
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Build output
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# Uploads (student documents — never commit)
+uploads/
+packages/api/uploads/
+
+# Logs
+*.log
+logs/
+backup.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Test data is allowed in git EXCEPT real personal docs
+test-data/real/
+
+# Coverage / cache
+coverage/
+.turbo/
+.cache/

@@ -1,0 +1,38 @@
+{
+  "name": "applyonce",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev --workspace=packages/api",
+    "dev:portal": "npm run dev --workspace=packages/portal",
+    "dev:admin": "npm run dev --workspace=packages/admin",
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:portal\" \"npm run dev:admin\"",
+    "build": "npm run build --workspaces",
+    "lint": "npm run lint --workspaces",
+    "typecheck": "npm run typecheck --workspaces",
+    "test": "npm run test --workspaces",
+    "db:up": "docker compose up postgres redis -d",
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "setup": "bash scripts/setup.sh"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "typescript": "^5.3.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.50.0",
+    "prettier": "^3.1.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.0.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": ["eslint --fix", "prettier --write"]
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

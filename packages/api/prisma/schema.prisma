@@ -1,0 +1,234 @@
+// backend/prisma/schema.prisma
+// ApplyOnce database schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── STUDENT ─────────────────────────────────────────────────────────────────
+
+model Student {
+  id           String   @id @default(cuid())
+  idNumber     String   @unique
+  email        String   @unique
+  phone        String
+  passwordHash String
+
+  firstName    String
+  lastName     String
+  dateOfBirth  DateTime
+  gender       String
+  race         String
+  nationality  String
+  homeLanguage String
+  disability   String?
+
+  address   Json
+  guardian  Json?
+
+  matricYear Int
+  school     String
+
+  subjectResults SubjectResult[]
+  documents      Document[]
+  applications   Application[]
+  payments       Payment[]
+  refreshTokens  RefreshToken[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("students")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+// ─── UNIVERSITY ADMIN ─────────────────────────────────────────────────────────
+// Pre-seeded — one account per university.
+// Not self-registered. Created by ApplyOnce during setup.
+
+model UniversityAdmin {
+  id           String @id @default(cuid())
+  email        String @unique
+  passwordHash String
+  name         String  // e.g. "UCT Admin"
+  universityId String  // matches University.id (e.g. 'uct')
+  university   University @relation(fields: [universityId], references: [id])
+
+  refreshTokens UniversityAdminRefreshToken[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("university_admins")
+}
+
+model UniversityAdminRefreshToken {
+  id        String          @id @default(cuid())
+  token     String          @unique
+  adminId   String
+  admin     UniversityAdmin @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime        @default(now())
+
+  @@map("university_admin_refresh_tokens")
+}
+
+// ─── UNIVERSITY ───────────────────────────────────────────────────────────────
+// All 26 SA public universities — seeded from constants/universities.ts
+
+model University {
+  id                  String  @id  // e.g. 'uct', 'wits', 'uj'
+  name                String
+  abbreviation        String
+  type                String  // 'traditional' | 'university_of_technology' | 'comprehensive'
+  city                String
+  province            String
+  website             String
+  applicationPortal   String
+  applicationFeeZAR   Int
+  applicationOpenDate String  // MM-DD format
+  applicationCloseDate String
+  isIntegrated        Boolean @default(false)
+  integrationStatus   String  @default("mock")
+
+  admins       UniversityAdmin[]
+  applications Application[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("universities")
+}
+
+// ─── MATRIC RESULTS ───────────────────────────────────────────────────────────
+
+model SubjectResult {
+  id        String  @id @default(cuid())
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  subject String
+  mark    Int
+  level   Int
+  year    Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, subject])
+  @@map("subject_results")
+}
+
+// ─── DOCUMENTS ────────────────────────────────────────────────────────────────
+
+model Document {
+  id        String  @id @default(cuid())
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  type       String
+  fileName   String
+  mimeType   String
+  storageKey String
+  sizeBytes  Int
+
+  uploadedAt DateTime @default(now())
+
+  @@map("documents")
+}
+
+// ─── APPLICATIONS ─────────────────────────────────────────────────────────────
+
+model Application {
+  id        String @id @default(cuid())
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id])
+
+  universityId   String
+  university     University @relation(fields: [universityId], references: [id])
+  universityName String
+  programmeId    String
+  programmeName  String
+  facultyName    String
+
+  status              String   @default("draft")
+  universityReference String?
+  submittedAt         DateTime?
+
+  // University admin decision
+  decision       String?   // 'accepted' | 'rejected' | 'waitlisted'
+  decisionReason String?
+  decisionAt     DateTime?
+  decidedBy      String?   // UniversityAdmin.id
+
+  universityResponse Json?
+  notes              String?
+
+  paymentId String?
+  payment   Payment? @relation(fields: [paymentId], references: [id])
+
+  events ApplicationEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("applications")
+}
+
+// ─── PAYMENTS ─────────────────────────────────────────────────────────────────
+
+model Payment {
+  id        String  @id @default(cuid())
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id])
+
+  totalAmountZAR    Decimal @db.Decimal(10, 2)
+  universityFeesZAR Decimal @db.Decimal(10, 2)
+  serviceFeesZAR    Decimal @db.Decimal(10, 2)
+
+  status           String @default("pending")
+  gateway          String @default("mock")
+  gatewayReference String?
+  gatewayPayload   Json?
+  breakdown        Json
+
+  applications Application[]
+
+  paidAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("payments")
+}
+
+// ─── APPLICATION EVENTS (audit trail) ─────────────────────────────────────────
+
+model ApplicationEvent {
+  id            String      @id @default(cuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id])
+
+  eventType  String
+  fromStatus String?
+  toStatus   String?
+  data       Json?
+
+  createdAt DateTime @default(now())
+
+  @@map("application_events")
+}

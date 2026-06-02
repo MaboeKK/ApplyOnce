@@ -1,0 +1,46 @@
+# docker-compose.yml
+# ApplyOnce infrastructure on the SHARED kmaboe sandbox.
+# SAFETY:
+#   - container names prefixed "kmaboe-"
+#   - isolated on "kmaboe-net" (never go-turbo-deploy_internal)
+#   - Postgres + Redis bound to 127.0.0.1 ONLY (UFW is off — must not expose DB to internet)
+#   - ports avoid all taken ports: 22, 53, 80, 3000, 3200, 6379, 8090, 32947
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: kmaboe-applyonce-postgres
+    environment:
+      POSTGRES_USER: applyonce
+      POSTGRES_PASSWORD: applyonce_dev_password
+      POSTGRES_DB: applyonce
+    ports:
+      - "127.0.0.1:3610:5432"   # localhost ONLY — not reachable from internet
+    volumes:
+      - kmaboe_applyonce_pgdata:/var/lib/postgresql/data
+    networks:
+      - kmaboe-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U applyonce"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: kmaboe-applyonce-redis
+    ports:
+      - "127.0.0.1:3611:6379"   # localhost ONLY — 6379 belongs to GoTurbo
+    volumes:
+      - kmaboe_applyonce_redisdata:/data
+    networks:
+      - kmaboe-net
+
+networks:
+  kmaboe-net:
+    name: kmaboe-net
+    driver: bridge
+
+volumes:
+  kmaboe_applyonce_pgdata:
+  kmaboe_applyonce_redisdata:
