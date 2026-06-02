@@ -20,6 +20,11 @@ model Student {
   phone        String
   passwordHash String
 
+  // Email verification
+  emailVerified       Boolean   @default(false)
+  emailVerifyToken    String?
+  emailVerifyExpires  DateTime?
+
   firstName    String
   lastName     String
   dateOfBirth  DateTime

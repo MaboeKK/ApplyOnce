@@ -355,6 +355,7 @@ crontab -e
 - Remote URL: git@github-personal:MaboeKK/ApplyOnce.git
 - The Google Drive backup still runs for the DATABASE (GitHub does not store the DB)
 - Never commit .env, uploads/, or test-data/real/ (the .gitignore handles this)
+- Never add Claude attribution, co-author trailers, or "Generated with Claude Code" text to commit messages
 
 ---
 
