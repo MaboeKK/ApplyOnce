@@ -37,12 +37,12 @@ echo ""
 
 # ─── Start ONLY our Docker infra (postgres + redis) ─────────────────────────
 echo "▶ Starting kmaboe-applyonce Postgres + Redis (localhost-only)..."
-docker compose up postgres redis -d
+sudo docker compose up postgres redis -d
 echo "  ✓ Containers starting"
 
 echo ""
 echo "▶ Waiting for PostgreSQL..."
-until docker exec kmaboe-applyonce-postgres pg_isready -U applyonce &>/dev/null; do
+until sudo docker exec kmaboe-applyonce-postgres pg_isready -U applyonce &>/dev/null; do
   printf "."
   sleep 1
 done
