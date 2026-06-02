@@ -3,7 +3,7 @@
 // Based on official DHET/DBE guidelines
 
 import { SubjectResult, NSCSubject } from '../types/student';
-import { Programme, University, UniversityMatch } from '../types/university';
+import { Programme, University, UniversityMatch, ChoiceStrategy } from '../types/university';
 
 // ─── APS POINT CONVERSION ───────────────────────────────────────────────────
 // Official NSC percentage → APS level conversion
@@ -114,7 +114,7 @@ export function calculateAPS(
 export function matchStudentToProgramme(
   studentResults: SubjectResult[],
   programme: Programme,
-  university: University
+  _university: University
 ): { meets: boolean; studentAPS: number; missing: string[] } {
   const loHandling: LOHandling = programme.apsWithLO ? 'cap_at_4' : 'exclude';
   const apsResult = calculateAPS(studentResults, loHandling);
@@ -157,7 +157,6 @@ export function findAllMatches(
   universities: University[]
 ): UniversityMatch[] {
   const matches: UniversityMatch[] = [];
-  const apsResult = calculateAPS(studentResults, 'exclude');
 
   for (const university of universities) {
     for (const faculty of university.faculties) {
@@ -182,6 +181,39 @@ export function findAllMatches(
   });
 }
 
+// ─── CHOICE STRATEGY CLASSIFICATION ─────────────────────────────────────────
+// Tags programmes as reach/match/safety based on student APS vs programme minimum
+
+export function classifyChoice(
+  studentAPS: number,
+  programme: Programme
+): ChoiceStrategy {
+  const gap = studentAPS - programme.apsMinimum;
+
+  // Does not meet minimum (unless ECP, which may still be reachable)
+  if (gap < 0) {
+    return programme.isECP ? 'reach' : 'not_qualified';
+  }
+
+  // ECPs are always safety (lower entry point + foundation year)
+  if (programme.isECP) {
+    return 'safety';
+  }
+
+  // Reach (Dream): meets minimum but tight (0-2 points above)
+  if (gap >= 0 && gap <= 2) {
+    return 'reach';
+  }
+
+  // Match (Strong fit): comfortably above minimum (3-5 points)
+  if (gap >= 3 && gap <= 5) {
+    return 'match';
+  }
+
+  // Safety (Secure): well above minimum (6+ points)
+  return 'safety';
+}
+
 // ─── CONVENIENCE EXPORT ─────────────────────────────────────────────────────
 
 export const APSCalculator = {
@@ -189,4 +221,5 @@ export const APSCalculator = {
   calculateAPS,
   matchStudentToProgramme,
   findAllMatches,
+  classifyChoice,
 };

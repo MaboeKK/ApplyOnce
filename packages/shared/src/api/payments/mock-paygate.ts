@@ -127,8 +127,8 @@ export function getPaymentsByStudent(studentId: string): Payment[] {
 // 4. POST to https://www.paygate.co.za/eng/process
 
 export function buildPayGateSignature(
-  params: Record<string, string>,
-  passphrase: string
+  _params: Record<string, string>,
+  _passphrase: string
 ): string {
   // Placeholder — implement before going live
   throw new Error('Real PayGate signature not implemented — use mock gateway in development');

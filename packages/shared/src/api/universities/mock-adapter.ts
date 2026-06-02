@@ -7,7 +7,7 @@ import {
   UniversityAdapter,
   ApplicationPayload,
   SubmissionResult,
-  ApplicationStatus,
+  UniversityApplicationStatus,
   ValidationResult,
 } from './index';
 
@@ -25,7 +25,7 @@ function generateReference(universityId: string): string {
 // Mock status store — tracks submissions in memory for the session
 const mockSubmissions = new Map<string, {
   reference: string;
-  status: ApplicationStatus['status'];
+  status: UniversityApplicationStatus['status'];
   submittedAt: string;
 }>();
 
@@ -55,7 +55,7 @@ export class MockUniversityAdapter implements UniversityAdapter {
     if (!payload.email?.includes('@')) errors.push('Valid email address is required');
     if (!payload.phone?.trim()) errors.push('Phone number is required');
     if (!payload.programmeId) errors.push('Programme selection is required');
-    if (!payload.matricCertificate && !payload.documents?.matricCertificate) {
+    if (!payload.documents?.matricCertificate) {
       warnings.push('Matric certificate not uploaded — most universities require this');
     }
     if (payload.subjects.length < 6) {
@@ -112,7 +112,7 @@ export class MockUniversityAdapter implements UniversityAdapter {
     };
   }
 
-  async checkStatus(universityReference: string): Promise<ApplicationStatus> {
+  async checkStatus(universityReference: string): Promise<UniversityApplicationStatus> {
     await MOCK_DELAY(100, 400);
 
     const submission = mockSubmissions.get(universityReference);

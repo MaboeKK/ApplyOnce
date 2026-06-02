@@ -23,3 +23,6 @@ export interface AuthenticatedRequest extends Request {
   student?: StudentJWTPayload;
   admin?: UniversityAdminJWTPayload;
 }
+
+// Alias for consistency with controller code
+export type AuthRequest = AuthenticatedRequest;

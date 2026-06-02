@@ -26,6 +26,7 @@ export const UNIVERSITIES: University[] = [
         id: 'uct-commerce', name: 'Commerce', programmes: [
           { id: 'uct-bcom', name: 'Bachelor of Commerce', qualification: 'bachelor', duration: 3, apsMinimum: 36, apsWithLO: false, subjectRequirements: [{ subject: 'mathematics', minimumMark: 50 }] },
           { id: 'uct-bba', name: 'Bachelor of Business Administration', qualification: 'bachelor', duration: 3, apsMinimum: 34, apsWithLO: false, subjectRequirements: [{ subject: 'mathematics', minimumMark: 50 }] },
+          { id: 'uct-bcom-ecp', name: 'Bachelor of Commerce (Extended)', qualification: 'bachelor', duration: 4, apsMinimum: 28, apsWithLO: false, isECP: true, subjectRequirements: [{ subject: 'mathematics', minimumMark: 40 }], notes: 'Extended Curriculum Programme with foundation year' },
         ]
       },
       {
@@ -36,11 +37,13 @@ export const UNIVERSITIES: University[] = [
       {
         id: 'uct-humanities', name: 'Humanities', programmes: [
           { id: 'uct-ba', name: 'Bachelor of Arts', qualification: 'bachelor', duration: 3, apsMinimum: 33, apsWithLO: false, subjectRequirements: [] },
+          { id: 'uct-ba-ecp', name: 'Bachelor of Arts (Extended)', qualification: 'bachelor', duration: 4, apsMinimum: 26, apsWithLO: false, isECP: true, subjectRequirements: [], notes: 'Extended Curriculum Programme with foundation year' },
         ]
       },
       {
         id: 'uct-science', name: 'Science', programmes: [
           { id: 'uct-bsc', name: 'Bachelor of Science', qualification: 'bachelor', duration: 3, apsMinimum: 36, apsWithLO: false, subjectRequirements: [{ subject: 'mathematics', minimumMark: 60 }, { subject: 'physical_sciences', minimumMark: 50 }] },
+          { id: 'uct-bsc-ecp', name: 'Bachelor of Science (Extended)', qualification: 'bachelor', duration: 4, apsMinimum: 30, apsWithLO: false, isECP: true, subjectRequirements: [{ subject: 'mathematics', minimumMark: 50 }, { subject: 'physical_sciences', minimumMark: 40 }], notes: 'Extended Curriculum Programme with foundation year' },
         ]
       },
       {
@@ -73,6 +76,7 @@ export const UNIVERSITIES: University[] = [
       {
         id: 'wits-commerce', name: 'Commerce, Law & Management', programmes: [
           { id: 'wits-bcom', name: 'Bachelor of Commerce', qualification: 'bachelor', duration: 3, apsMinimum: 35, apsWithLO: false, subjectRequirements: [{ subject: 'mathematics', minimumMark: 50 }] },
+          { id: 'wits-bcom-ecp', name: 'Bachelor of Commerce (Extended)', qualification: 'bachelor', duration: 4, apsMinimum: 28, apsWithLO: false, isECP: true, subjectRequirements: [{ subject: 'mathematics', minimumMark: 40 }], notes: 'Extended Curriculum Programme with foundation year' },
         ]
       },
       {
@@ -175,6 +179,7 @@ export const UNIVERSITIES: University[] = [
       {
         id: 'uj-humanities', name: 'Humanities', programmes: [
           { id: 'uj-ba', name: 'BA', qualification: 'bachelor', duration: 3, apsMinimum: 24, apsWithLO: false, subjectRequirements: [] },
+          { id: 'uj-ba-ecp', name: 'BA (Extended)', qualification: 'bachelor', duration: 4, apsMinimum: 20, apsWithLO: false, isECP: true, subjectRequirements: [], notes: 'Extended Curriculum Programme with foundation year' },
         ]
       },
     ],

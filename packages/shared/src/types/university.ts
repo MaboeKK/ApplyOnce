@@ -31,6 +31,7 @@ export interface Programme {
   duration: number;          // years
   apsMinimum: number;
   apsWithLO: boolean;        // whether LO is included in APS calc
+  isECP?: boolean;           // Extended Curriculum Programme (foundation year)
   subjectRequirements: SubjectRequirement[];
   applicationFeeOverride?: number;
   availableSpaces?: number;
@@ -56,4 +57,7 @@ export interface UniversityMatch {
   studentAPS: number;
   meetsRequirements: boolean;
   missingRequirements: string[];
+  choiceStrategy?: 'reach' | 'match' | 'safety' | 'not_qualified';
 }
+
+export type ChoiceStrategy = 'reach' | 'match' | 'safety' | 'not_qualified';

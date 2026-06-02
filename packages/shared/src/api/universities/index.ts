@@ -67,7 +67,7 @@ export interface SubmissionResult {
   submittedAt: string;
 }
 
-export interface ApplicationStatus {
+export interface UniversityApplicationStatus {
   universityReference: string;
   status: 'received' | 'under_review' | 'accepted' | 'rejected' | 'waitlisted' | 'unknown';
   message?: string;
@@ -92,7 +92,7 @@ export interface UniversityAdapter {
   submitApplication(payload: ApplicationPayload): Promise<SubmissionResult>;
 
   /** Check the status of a previously submitted application */
-  checkStatus(universityReference: string): Promise<ApplicationStatus>;
+  checkStatus(universityReference: string): Promise<UniversityApplicationStatus>;
 }
 
 // Registry of all available adapters
