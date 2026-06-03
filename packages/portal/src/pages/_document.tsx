@@ -2,7 +2,7 @@
 // Next.js custom document for MUI SSR
 
 import Document, { Html, Head, Main, NextScript, DocumentContext } from 'next/document';
-import createEmotionServer from '@emotion/server/create-instance';
+import createEmotionServer from '@emotion/server';
 import createEmotionCache from '@/utils/createEmotionCache';
 import { theme } from '@/theme';
 
