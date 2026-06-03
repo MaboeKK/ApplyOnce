@@ -7,6 +7,8 @@ import studentsRoutes from './students';
 import documentsRoutes from './documents';
 import universitiesRoutes from './universities';
 import apsRoutes from './aps';
+import applicationsRoutes from './applications';
+import paymentsRoutes from './payments';
 
 const router = Router();
 
@@ -26,5 +28,7 @@ router.use('/students', studentsRoutes);
 router.use('/documents', documentsRoutes);
 router.use('/universities', universitiesRoutes);
 router.use('/aps', apsRoutes);
+router.use('/applications', applicationsRoutes);
+router.use('/payments', paymentsRoutes);
 
 export default router;
