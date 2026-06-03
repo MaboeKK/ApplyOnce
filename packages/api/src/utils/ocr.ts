@@ -56,7 +56,7 @@ export async function parseMatricCertificate(filePath: string): Promise<OCRResul
     if (subjects.length >= 6) {
       // Filter out Life Orientation and take best 6 subjects based on level
       const nonLO = subjects.filter(
-        (s) => !s.subject.toLowerCase().includes('life orientation') && s.level !== null
+        (s) => s.subject !== 'life_orientation' && s.level !== null
       );
       const sorted = [...nonLO].sort((a, b) => (b.level || 0) - (a.level || 0));
       const best6 = sorted.slice(0, 6);
@@ -130,16 +130,43 @@ function parseSubjects(text: string, warnings: string[]): ExtractedSubject[] {
     if (!subjectMatch) continue;
     const subjectName = subjectMatch[0];
 
-    // Look for percentage and achievement level in the same line or next few lines
-    const contextLines = [line, lines[i + 1] || '', lines[i + 2] || ''].join(' ');
+    // Parse line positionally: Subject name | Percentage | Achievement Level
+    // Example: "English First Additional Language    71     6"
+    // Strategy: Take the LAST single digit (1-7) as the level,
+    // then look backward for the percentage (1-3 digits, 0-100)
 
-    // Extract percentage (2-3 digits)
-    const percentMatch = contextLines.match(/\b(\d{2,3})\b/);
-    const mark = percentMatch ? parseInt(percentMatch[1], 10) : null;
+    // Remove the subject name from the line to isolate the numbers
+    const numbersSection = line.substring(subjectMatch.index! + subjectName.length).trim();
 
-    // Extract achievement level (1-7) - prefer this over calculating from percentage
-    const levelMatch = contextLines.match(/\b([1-7])\b/);
-    const level = levelMatch ? parseInt(levelMatch[1], 10) : (mark !== null ? markToAPS(mark) : null);
+    // Extract all digit sequences from the numbers section
+    const digitSequences = numbersSection.match(/\b\d+\b/g) || [];
+
+    let mark: number | null = null;
+    let level: number | null = null;
+
+    // Find the LAST single digit 1-7 in the line — this is the achievement level
+    for (let j = digitSequences.length - 1; j >= 0; j--) {
+      const num = parseInt(digitSequences[j], 10);
+
+      if (digitSequences[j].length === 1 && num >= 1 && num <= 7) {
+        level = num;
+
+        // Now look backward from the level for the percentage
+        for (let k = j - 1; k >= 0; k--) {
+          const markNum = parseInt(digitSequences[k], 10);
+          if (markNum >= 0 && markNum <= 100) {
+            mark = markNum;
+            break;
+          }
+        }
+        break; // Found the level, stop searching
+      }
+    }
+
+    // Fallback: if no level extracted, try to derive from percentage
+    if (level === null && mark !== null) {
+      level = markToAPS(mark);
+    }
 
     // Determine confidence
     let confidence: 'high' | 'medium' | 'low' = 'low';
