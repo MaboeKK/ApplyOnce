@@ -2,7 +2,7 @@
 // Next.js custom document for MUI SSR
 
 import Document, { Html, Head, Main, NextScript, DocumentContext } from 'next/document';
-import createEmotionServer from '@emotion/server';
+import { createEmotionServer } from '@emotion/server/create-instance';
 import createEmotionCache from '@/utils/createEmotionCache';
 import { theme } from '@/theme';
 
@@ -18,6 +18,8 @@ export default class MyDocument extends Document {
             href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap"
             rel="stylesheet"
           />
+          {/* Inject MUI emotion styles for SSR */}
+          {(this.props as any).emotionStyleTags}
         </Head>
         <body>
           <Main />
