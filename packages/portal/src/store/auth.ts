@@ -78,7 +78,7 @@ export const useAuthStore = create<AuthState>()(
       verifyEmail: async (email: string, code: string) => {
         set({ isLoading: true, error: null });
         try {
-          await api.post('/auth/verify-email', { email, code });
+          await api.post('/auth/verify', { email, code });
           set({ isLoading: false });
         } catch (error: any) {
           const message = error.response?.data?.error?.message || 'Verification failed';
