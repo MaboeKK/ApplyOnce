@@ -47,43 +47,43 @@ export function requireAuth(
 
 export function requireStudent(
   req: AuthenticatedRequest,
-  _res: Response,
+  res: Response,
   next: NextFunction
 ) {
-  if (!req.user) {
-    return next(
-      new UnauthorizedError('Authentication required', 'NO_TOKEN')
-    );
-  }
+  // First authenticate
+  requireAuth(req, res, (err) => {
+    if (err) return next(err);
 
-  if (req.user.role !== 'student') {
-    return next(
-      new ForbiddenError('Student access only', 'ROLE_FORBIDDEN')
-    );
-  }
+    // Then check role
+    if (req.user?.role !== 'student') {
+      return next(
+        new ForbiddenError('Student access only', 'ROLE_FORBIDDEN')
+      );
+    }
 
-  next();
+    next();
+  });
 }
 
 export function requireUniversityAdmin(
   req: AuthenticatedRequest,
-  _res: Response,
+  res: Response,
   next: NextFunction
 ) {
-  if (!req.user) {
-    return next(
-      new UnauthorizedError('Authentication required', 'NO_TOKEN')
-    );
-  }
+  // First authenticate
+  requireAuth(req, res, (err) => {
+    if (err) return next(err);
 
-  if (req.user.role !== 'university_admin') {
-    return next(
-      new ForbiddenError(
-        'University admin access only',
-        'ROLE_FORBIDDEN'
-      )
-    );
-  }
+    // Then check role
+    if (req.user?.role !== 'university_admin') {
+      return next(
+        new ForbiddenError(
+          'University admin access only',
+          'ROLE_FORBIDDEN'
+        )
+      );
+    }
 
-  next();
+    next();
+  });
 }
