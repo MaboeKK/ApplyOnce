@@ -15,9 +15,9 @@ datasource db {
 
 model Student {
   id           String   @id @default(cuid())
-  idNumber     String   @unique
+  idNumber     String?  @unique // Collected in profile wizard, not at registration
   email        String   @unique
-  phone        String
+  phone        String?  // Collected in profile wizard
   passwordHash String
 
   // Email verification
@@ -27,18 +27,18 @@ model Student {
 
   firstName    String
   lastName     String
-  dateOfBirth  DateTime
-  gender       String
-  race         String
-  nationality  String
-  homeLanguage String
+  dateOfBirth  DateTime? // Extracted from ID number in profile wizard
+  gender       String?   // Extracted from ID number in profile wizard
+  race         String?
+  nationality  String?
+  homeLanguage String?
   disability   String?
 
-  address   Json
+  address   Json?
   guardian  Json?
 
-  matricYear Int
-  school     String
+  matricYear Int?
+  school     String?
 
   subjectResults SubjectResult[]
   documents      Document[]

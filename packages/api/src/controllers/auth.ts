@@ -55,25 +55,17 @@ export async function register(
   const verificationCode = generateVerificationCode();
   const verifyExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
-  // Create student (ID number, phone, DOB, gender filled in profile wizard)
+  // Create student (minimal info - profile fields collected in wizard)
   const student = await prisma.student.create({
     data: {
-      idNumber: '', // Will be filled in profile wizard
       email: input.email,
-      phone: '', // Will be filled in profile wizard
       passwordHash,
       firstName: input.firstName,
       lastName: input.lastName,
-      dateOfBirth: new Date(), // Placeholder, will be extracted from ID number in profile wizard
-      gender: 'prefer_not_to_say', // Will be extracted from ID number in profile wizard
-      race: '', // Will be filled in profile wizard
-      nationality: 'South African', // Default for SA-focused platform
-      homeLanguage: '', // Will be filled in profile wizard
-      address: {},
-      matricYear: new Date().getFullYear(),
-      school: '',
       emailVerifyToken: verificationCode,
       emailVerifyExpires: verifyExpires,
+      // All other fields (idNumber, phone, DOB, gender, etc.) are nullable
+      // and will be filled during profile wizard
     },
   });
 

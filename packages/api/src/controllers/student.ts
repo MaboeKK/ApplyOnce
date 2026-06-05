@@ -5,8 +5,9 @@ import { Response } from 'express';
 import { AuthRequest } from '../types/express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { prisma } from '../utils/prisma';
-import { NotFoundError } from '../utils/errors';
+import { NotFoundError, ConflictError } from '../utils/errors';
 import { markToAPS } from '@applyonce/shared';
+import { Prisma } from '@prisma/client';
 
 /**
  * GET /v1/students/me
@@ -43,7 +44,7 @@ export const getMyProfile = asyncHandler(async (req: AuthRequest, res: Response)
   res.json({
     student: {
       ...studentData,
-      dateOfBirth: student.dateOfBirth.toISOString().split('T')[0],
+      dateOfBirth: student.dateOfBirth ? student.dateOfBirth.toISOString().split('T')[0] : null,
       createdAt: student.createdAt.toISOString(),
       updatedAt: student.updatedAt.toISOString(),
     },
@@ -59,27 +60,38 @@ export const updateMyProfile = asyncHandler(async (req: AuthRequest, res: Respon
   const updates = req.body;
 
   // Cannot update certain fields via this endpoint
-  const { id, idNumber, email, passwordHash, dateOfBirth, gender, emailVerified, ...allowedUpdates } = updates;
+  const { id, email, passwordHash, emailVerified, ...allowedUpdates } = updates;
 
-  const student = await prisma.student.update({
-    where: { id: studentId },
-    data: allowedUpdates,
-    include: {
-      subjectResults: true,
-    },
-  });
+  try {
+    const student = await prisma.student.update({
+      where: { id: studentId },
+      data: allowedUpdates,
+      include: {
+        subjectResults: true,
+      },
+    });
 
-  const { passwordHash: _, emailVerifyToken, emailVerifyExpires, ...studentData } = student;
+    const { passwordHash: _, emailVerifyToken, emailVerifyExpires, ...studentData } = student;
 
-  res.json({
-    message: 'Profile updated successfully',
-    student: {
-      ...studentData,
-      dateOfBirth: student.dateOfBirth.toISOString().split('T')[0],
-      createdAt: student.createdAt.toISOString(),
-      updatedAt: student.updatedAt.toISOString(),
-    },
-  });
+    res.json({
+      message: 'Profile updated successfully',
+      student: {
+        ...studentData,
+        dateOfBirth: student.dateOfBirth ? student.dateOfBirth.toISOString().split('T')[0] : null,
+        createdAt: student.createdAt.toISOString(),
+        updatedAt: student.updatedAt.toISOString(),
+      },
+    });
+  } catch (error) {
+    // Handle unique constraint violation for idNumber
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      throw new ConflictError(
+        'This ID number is already registered with another account',
+        'ID_NUMBER_EXISTS'
+      );
+    }
+    throw error;
+  }
 });
 
 /**
