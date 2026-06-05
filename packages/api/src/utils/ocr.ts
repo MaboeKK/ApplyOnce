@@ -221,3 +221,45 @@ function normalizeSubjectName(raw: string): string {
   // Return as-is if no mapping
   return normalized.replace(/\s+/g, '_');
 }
+
+/**
+ * Parse SA ID document to extract ID number
+ */
+export async function parseIdDocument(filePath: string): Promise<{ idNumber: string | null; confidence: 'high' | 'medium' | 'low'; warnings: string[] }> {
+  const warnings: string[] = [];
+
+  try {
+    logger.info({ filePath }, 'Starting OCR on ID document');
+    const { data: { text } } = await Tesseract.recognize(filePath, 'eng', {
+      logger: (m) => {
+        if (m.status === 'recognizing text') {
+          logger.debug({ progress: m.progress }, 'OCR progress');
+        }
+      },
+    });
+
+    logger.info('OCR complete, extracting ID number');
+
+    // Extract ID number (13 digits)
+    const idMatch = text.match(/\b(\d{13})\b/);
+    const idNumber = idMatch ? idMatch[1] : null;
+
+    if (!idNumber) {
+      warnings.push('Could not extract ID number from ID document');
+      return { idNumber: null, confidence: 'low', warnings };
+    }
+
+    // Basic validation: check if it looks like a valid SA ID
+    const yy = parseInt(idNumber.substring(0, 2));
+    const mm = parseInt(idNumber.substring(2, 4));
+    const dd = parseInt(idNumber.substring(4, 6));
+
+    const isValidDate = mm >= 1 && mm <= 12 && dd >= 1 && dd <= 31;
+    const confidence: 'high' | 'medium' | 'low' = isValidDate ? 'high' : 'medium';
+
+    return { idNumber, confidence, warnings };
+  } catch (error) {
+    logger.error({ error, filePath }, 'ID document OCR failed');
+    throw new Error('ID document OCR processing failed');
+  }
+}

@@ -23,14 +23,9 @@ import AuthLayout from '@/components/Layout/AuthLayout';
 import { useAuthStore } from '@/store/auth';
 
 const registerSchema = z.object({
-  idNumber: z
-    .string()
-    .length(13, 'SA ID number must be exactly 13 digits')
-    .regex(/^\d{13}$/, 'ID number must contain only digits'),
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
   email: z.string().email('Invalid email address'),
-  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
   password: z
     .string()
     .min(8, 'Password must be at least 8 characters')
@@ -38,6 +33,10 @@ const registerSchema = z.object({
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
       'Password must contain uppercase, lowercase, number, and special character'
     ),
+  confirmPassword: z.string().min(1, 'Please confirm your password'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword'],
 });
 
 type RegisterForm = z.infer<typeof registerSchema>;
@@ -163,16 +162,6 @@ export default function RegisterPage() {
       )}
 
       <Box component="form" onSubmit={handleSubmit(onRegisterSubmit)}>
-        <TextField
-          fullWidth
-          label="SA ID Number"
-          {...register('idNumber')}
-          error={!!errors.idNumber}
-          helperText={errors.idNumber?.message}
-          sx={{ mb: 2 }}
-          autoFocus
-        />
-
         <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
           <TextField
             fullWidth
@@ -180,6 +169,7 @@ export default function RegisterPage() {
             {...register('firstName')}
             error={!!errors.firstName}
             helperText={errors.firstName?.message}
+            autoFocus
           />
           <TextField
             fullWidth
@@ -202,20 +192,30 @@ export default function RegisterPage() {
 
         <TextField
           fullWidth
-          label="Phone Number"
-          {...register('phone')}
-          error={!!errors.phone}
-          helperText={errors.phone?.message}
-          sx={{ mb: 2 }}
-        />
-
-        <TextField
-          fullWidth
           label="Password"
           type={showPassword ? 'text' : 'password'}
           {...register('password')}
           error={!!errors.password}
           helperText={errors.password?.message}
+          sx={{ mb: 2 }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        <TextField
+          fullWidth
+          label="Confirm Password"
+          type={showPassword ? 'text' : 'password'}
+          {...register('confirmPassword')}
+          error={!!errors.confirmPassword}
+          helperText={errors.confirmPassword?.message}
           sx={{ mb: 3 }}
           InputProps={{
             endAdornment: (

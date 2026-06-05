@@ -28,9 +28,7 @@ interface AuthState {
 }
 
 interface RegisterData {
-  idNumber: string;
   email: string;
-  phone: string;
   firstName: string;
   lastName: string;
   password: string;

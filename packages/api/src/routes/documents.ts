@@ -9,6 +9,7 @@ import { uploadDocumentSchema } from '../schemas/document';
 import {
   uploadDocument,
   scanMatricCertificate,
+  scanIdDocument,
   listMyDocuments,
   downloadDocument,
   deleteDocument,
@@ -90,6 +91,35 @@ router.post(
   requireStudent,
   upload.single('file'),
   scanMatricCertificate
+);
+
+/**
+ * @openapi
+ * /documents/scan-id:
+ *   post:
+ *     summary: OCR scan of ID document to extract ID number
+ *     tags: [Documents]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: ID document scanned, ID number extracted
+ */
+router.post(
+  '/scan-id',
+  requireStudent,
+  upload.single('file'),
+  scanIdDocument
 );
 
 /**

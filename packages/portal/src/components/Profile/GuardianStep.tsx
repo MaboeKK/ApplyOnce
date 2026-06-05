@@ -11,18 +11,14 @@ import {
   Button,
   Grid,
   Typography,
-  FormControlLabel,
-  Switch,
 } from '@mui/material';
-import { useState } from 'react';
 
 const guardianSchema = z.object({
   firstName: z.string().min(1, 'Guardian first name is required'),
   lastName: z.string().min(1, 'Guardian last name is required'),
   relationship: z.string().min(1, 'Relationship is required'),
-  phone: z.string().regex(/^(\+27|0)[6-8]\d{8}$/, 'Invalid SA phone number'),
+  phone: z.string().regex(/^\d{9}$/, 'Phone number must be exactly 9 digits'),
   email: z.string().email('Invalid email').optional().or(z.literal('')),
-  employed: z.boolean(),
   annualIncome: z.number().int().positive().optional(),
 });
 
@@ -35,8 +31,6 @@ interface Props {
 }
 
 export default function GuardianStep({ data, onNext, onBack }: Props) {
-  const [employed, setEmployed] = useState(data.employed ?? false);
-
   const {
     control,
     handleSubmit,
@@ -47,15 +41,19 @@ export default function GuardianStep({ data, onNext, onBack }: Props) {
       firstName: data.firstName || '',
       lastName: data.lastName || '',
       relationship: data.relationship || 'parent',
-      phone: data.phone || '',
+      phone: data.phone?.replace(/^\+27/, '') || '', // Remove +27 prefix if present
       email: data.email || '',
-      employed: data.employed ?? false,
       annualIncome: data.annualIncome,
     },
   });
 
   const onSubmit = (formData: GuardianData) => {
-    onNext(formData);
+    // Convert phone to +27 format for storage
+    const phoneWithPrefix = `+27${formData.phone}`;
+    onNext({
+      ...formData,
+      phone: phoneWithPrefix,
+    });
   };
 
   return (
@@ -133,9 +131,12 @@ export default function GuardianStep({ data, onNext, onBack }: Props) {
                 {...field}
                 label="Guardian Phone"
                 fullWidth
-                placeholder="0821234567"
+                placeholder="821234567"
                 error={!!errors.phone}
-                helperText={errors.phone?.message}
+                helperText={errors.phone?.message || 'Enter 9 digits after +27'}
+                InputProps={{
+                  startAdornment: <Box component="span" sx={{ mr: 1, color: 'text.secondary', fontWeight: 600 }}>+27</Box>,
+                }}
               />
             )}
           />
@@ -158,46 +159,23 @@ export default function GuardianStep({ data, onNext, onBack }: Props) {
           />
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid item xs={12} sm={6}>
           <Controller
-            name="employed"
+            name="annualIncome"
             control={control}
             render={({ field }) => (
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={field.value}
-                    onChange={(e) => {
-                      field.onChange(e.target.checked);
-                      setEmployed(e.target.checked);
-                    }}
-                  />
-                }
-                label="Guardian is employed"
+              <TextField
+                {...field}
+                label="Annual Income (ZAR, optional)"
+                fullWidth
+                type="number"
+                placeholder="350000"
+                helperText="Used for bursary eligibility"
+                onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
               />
             )}
           />
         </Grid>
-
-        {employed && (
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="annualIncome"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Annual Income (ZAR, optional)"
-                  fullWidth
-                  type="number"
-                  placeholder="350000"
-                  helperText="Used for bursary eligibility"
-                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                />
-              )}
-            />
-          </Grid>
-        )}
       </Grid>
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>

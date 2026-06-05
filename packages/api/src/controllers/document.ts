@@ -8,7 +8,7 @@ import { AuthRequest } from '../types/express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { prisma } from '../utils/prisma';
 import { ValidationError, NotFoundError } from '../utils/errors';
-import { parseMatricCertificate } from '../utils/ocr';
+import { parseMatricCertificate, parseIdDocument } from '../utils/ocr';
 import { logger } from '../utils/logger';
 import { UPLOAD_DIR } from '../config/multer';
 
@@ -142,6 +142,96 @@ export const scanMatricCertificate = asyncHandler(async (req: AuthRequest, res: 
         idNumber: ocrResult.idNumber,
         confidence: ocrResult.confidence,
         warnings: ocrResult.warnings,
+      },
+    });
+  } catch (error) {
+    // Clean up uploaded file on error
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+    throw error;
+  }
+});
+
+/**
+ * POST /v1/documents/scan-id
+ * OCR scan of ID document to extract ID number
+ */
+export const scanIdDocument = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const studentId = req.student!.studentId;
+
+  if (!req.file) {
+    throw new ValidationError('No file uploaded');
+  }
+
+  const file = req.file;
+  const filePath = file.path;
+
+  try {
+    logger.info({ studentId, fileName: file.originalname }, 'Scanning ID document');
+
+    // Run OCR
+    const ocrResult = await parseIdDocument(filePath);
+
+    // Get student's current ID for cross-check
+    const student = await prisma.student.findUnique({
+      where: { id: studentId },
+      select: { idNumber: true },
+    });
+
+    if (!student) {
+      throw new NotFoundError('Student not found');
+    }
+
+    // Cross-check ID number if student has one registered
+    let warning: string | null = null;
+    if (student.idNumber && ocrResult.idNumber && ocrResult.idNumber !== student.idNumber) {
+      warning = 'ID number on document does not match your profile. Please verify.';
+    }
+
+    // Save the file as id_document
+    const existing = await prisma.document.findFirst({
+      where: { studentId, type: 'id_document' },
+    });
+
+    if (existing) {
+      const oldPath = path.join(UPLOAD_DIR, existing.storageKey);
+      if (fs.existsSync(oldPath)) {
+        fs.unlinkSync(oldPath);
+      }
+      await prisma.document.delete({
+        where: { id: existing.id },
+      });
+    }
+
+    const document = await prisma.document.create({
+      data: {
+        studentId,
+        type: 'id_document',
+        fileName: file.originalname,
+        mimeType: file.mimetype,
+        storageKey: file.filename,
+        sizeBytes: file.size,
+      },
+    });
+
+    // Clean up temp file
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    res.json({
+      message: 'ID document scanned successfully',
+      document: {
+        id: document.id,
+        type: document.type,
+        fileName: document.fileName,
+        uploadedAt: document.uploadedAt.toISOString(),
+      },
+      ocr: {
+        idNumber: ocrResult.idNumber,
+        confidence: ocrResult.confidence,
+        warnings: warning ? [warning, ...ocrResult.warnings] : ocrResult.warnings,
       },
     });
   } catch (error) {

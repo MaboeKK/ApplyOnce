@@ -30,17 +30,19 @@ const guardianSchema = z.object({
   firstName: z.string().min(1, 'Guardian first name is required'),
   lastName: z.string().min(1, 'Guardian last name is required'),
   relationship: z.string().min(1, 'Relationship is required'),
-  phone: z.string().regex(/^(\+27|0)[6-8]\d{8}$/, 'Invalid SA phone number'),
+  phone: z.string().regex(/^\+27[6-8]\d{8}$/, 'Phone must be in format +27XXXXXXXXX'),
   email: z.string().email('Invalid email').optional(),
-  employed: z.boolean(),
   annualIncome: z.number().int().positive().optional(),
 });
 
 // Update profile schema
 export const updateStudentProfileSchema = z.object({
+  idNumber: z.string().regex(/^\d{13}$/, 'SA ID number must be 13 digits').optional(),
+  dateOfBirth: z.date().optional(),
+  gender: z.enum(['male', 'female', 'prefer_not_to_say']).optional(),
   firstName: z.string().min(1).optional(),
   lastName: z.string().min(1).optional(),
-  phone: z.string().regex(/^(\+27|0)[6-8]\d{8}$/).optional(),
+  phone: z.string().regex(/^\+27[6-8]\d{8}$/, 'Phone must be in format +27XXXXXXXXX').optional(),
   race: z.enum(['african', 'coloured', 'indian', 'white', 'other', 'prefer_not_to_say']).optional(),
   nationality: z.string().min(1).optional(),
   homeLanguage: z.string().min(1).optional(),

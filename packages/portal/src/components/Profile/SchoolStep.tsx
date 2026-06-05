@@ -50,7 +50,7 @@ export default function SchoolStep({ data, onNext, onBack }: Props) {
         Matric School
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        Where did you complete your matric (NSC)?
+        When did you complete your matric (NSC)?
       </Typography>
 
       <Grid container spacing={3}>

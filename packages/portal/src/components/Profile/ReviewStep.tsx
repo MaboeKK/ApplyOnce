@@ -9,6 +9,7 @@ import {
   Grid,
   Divider,
   Alert,
+  Chip,
 } from '@mui/material';
 
 interface Props {
@@ -208,16 +209,25 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
             APS: {data.results.aps}
           </Typography>
           <Grid container spacing={1}>
-            {data.results.subjects.map((subject: any, index: number) => (
-              <Grid item xs={12} key={index}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2">{subject.subject}</Typography>
-                  <Typography variant="body2" fontWeight={600}>
-                    {subject.mark}% (Level {subject.level})
-                  </Typography>
-                </Box>
-              </Grid>
-            ))}
+            {data.results.subjects.map((subject: any, index: number) => {
+              const isLifeOrientation = subject.subject.toLowerCase().includes('life orientation') ||
+                                       subject.subject.toLowerCase().includes('life_orientation');
+              return (
+                <Grid item xs={12} key={index}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography variant="body2">{subject.subject}</Typography>
+                      {isLifeOrientation && (
+                        <Chip label="Not Considered" size="small" color="default" sx={{ fontSize: '0.7rem', height: 20 }} />
+                      )}
+                    </Box>
+                    <Typography variant="body2" fontWeight={600}>
+                      {subject.mark}% (Level {subject.level})
+                    </Typography>
+                  </Box>
+                </Grid>
+              );
+            })}
           </Grid>
         </Paper>
       )}

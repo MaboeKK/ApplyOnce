@@ -40,9 +40,10 @@ interface Props {
   };
   onNext: (data: any) => void;
   onBack: () => void;
+  profileData?: any; // To get the ID number typed in PersonalStep
 }
 
-export default function ResultsStep({ data, onNext, onBack }: Props) {
+export default function ResultsStep({ data, onNext, onBack, profileData }: Props) {
   const [step, setStep] = useState<'upload' | 'confirm' | 'id-doc'>(
     data.subjects.length > 0 ? 'id-doc' : 'upload'
   );
@@ -51,8 +52,11 @@ export default function ResultsStep({ data, onNext, onBack }: Props) {
   const [ocrResult, setOcrResult] = useState<any>(data.subjects.length > 0 ? { subjects: data.subjects, aps: data.aps } : null);
   const [editedSubjects, setEditedSubjects] = useState<Subject[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
+  const [matricIdNumber, setMatricIdNumber] = useState<string | null>(null); // ID from matric cert
+  const [idDocIdNumber, setIdDocIdNumber] = useState<string | null>(null); // ID from ID doc
   const [idDocUploaded, setIdDocUploaded] = useState(false);
   const [idDocUploading, setIdDocUploading] = useState(false);
+  const [idMismatchWarning, setIdMismatchWarning] = useState<string | null>(null);
 
   const currentYear = new Date().getFullYear();
 
@@ -82,6 +86,7 @@ export default function ResultsStep({ data, onNext, onBack }: Props) {
       setOcrResult({ ...ocr, subjects });
       setEditedSubjects(subjects);
       setWarnings(ocr.warnings || []);
+      setMatricIdNumber(ocr.idNumber); // Store matric cert ID number
       setStep('confirm');
     } catch (err: any) {
       const message = err.response?.data?.error?.message || 'Failed to scan certificate';
@@ -119,19 +124,42 @@ export default function ResultsStep({ data, onNext, onBack }: Props) {
 
     setIdDocUploading(true);
     setError('');
+    setIdMismatchWarning(null);
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('type', 'id_document');
 
     try {
-      await api.post('/documents/upload', formData, {
+      const response = await api.post('/documents/scan-id', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
+      const { ocr } = response.data;
+      setIdDocIdNumber(ocr.idNumber); // Store ID doc ID number
+
+      // Cross-check all three ID numbers
+      const typedId = profileData?.personal?.idNumber;
+      const matricId = matricIdNumber;
+      const idDocId = ocr.idNumber;
+
+      const ids = [
+        { source: 'Personal Information', id: typedId },
+        { source: 'Matric Certificate', id: matricId },
+        { source: 'ID Document', id: idDocId },
+      ].filter(item => item.id); // Only include IDs that exist
+
+      // Check if all are the same
+      const uniqueIds = new Set(ids.map(item => item.id));
+      if (uniqueIds.size > 1) {
+        const mismatchDetails = ids.map(item => `${item.source}: ${item.id}`).join(', ');
+        setIdMismatchWarning(
+          `The ID numbers don't match across your documents. ${mismatchDetails}. Please double-check and correct if needed.`
+        );
+      }
+
       setIdDocUploaded(true);
     } catch (err: any) {
-      const message = err.response?.data?.error?.message || 'Failed to upload ID document';
+      const message = err.response?.data?.error?.message || 'Failed to scan ID document';
       setError(message);
     } finally {
       setIdDocUploading(false);
@@ -327,6 +355,12 @@ export default function ResultsStep({ data, onNext, onBack }: Props) {
         </Alert>
       )}
 
+      {idMismatchWarning && (
+        <Alert severity="warning" sx={{ mb: 3 }} onClose={() => setIdMismatchWarning(null)}>
+          {idMismatchWarning}
+        </Alert>
+      )}
+
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Paper sx={{ p: 3, bgcolor: 'success.50' }}>
@@ -378,7 +412,7 @@ export default function ResultsStep({ data, onNext, onBack }: Props) {
                   <>
                     <CircularProgress size={48} sx={{ mb: 2 }} />
                     <Typography variant="body1" color="text.secondary">
-                      Uploading ID...
+                      Uploading and scanning ID...
                     </Typography>
                   </>
                 ) : (

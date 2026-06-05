@@ -37,28 +37,16 @@ export async function register(
   const input = req.body as RegisterInput;
 
   // Check if student already exists
-  const existing = await prisma.student.findFirst({
-    where: {
-      OR: [{ email: input.email }, { idNumber: input.idNumber }],
-    },
+  const existing = await prisma.student.findUnique({
+    where: { email: input.email },
   });
 
   if (existing) {
-    if (existing.email === input.email) {
-      throw new ConflictError(
-        'Email already registered',
-        'EMAIL_EXISTS'
-      );
-    } else {
-      throw new ConflictError(
-        'ID number already registered',
-        'ID_NUMBER_EXISTS'
-      );
-    }
+    throw new ConflictError(
+      'Email already registered',
+      'EMAIL_EXISTS'
+    );
   }
-
-  // Parse SA ID number for DOB and gender
-  const idInfo = parseSAIdNumber(input.idNumber);
 
   // Hash password
   const passwordHash = await bcrypt.hash(input.password, 10);
@@ -67,19 +55,19 @@ export async function register(
   const verificationCode = generateVerificationCode();
   const verifyExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
-  // Create student
+  // Create student (ID number, phone, DOB, gender filled in profile wizard)
   const student = await prisma.student.create({
     data: {
-      idNumber: input.idNumber,
+      idNumber: '', // Will be filled in profile wizard
       email: input.email,
-      phone: input.phone,
+      phone: '', // Will be filled in profile wizard
       passwordHash,
       firstName: input.firstName,
       lastName: input.lastName,
-      dateOfBirth: idInfo.dateOfBirth,
-      gender: idInfo.gender,
+      dateOfBirth: new Date(), // Placeholder, will be extracted from ID number in profile wizard
+      gender: 'prefer_not_to_say', // Will be extracted from ID number in profile wizard
       race: '', // Will be filled in profile wizard
-      nationality: idInfo.citizen ? 'South African' : 'Other',
+      nationality: 'South African', // Default for SA-focused platform
       homeLanguage: '', // Will be filled in profile wizard
       address: {},
       matricYear: new Date().getFullYear(),

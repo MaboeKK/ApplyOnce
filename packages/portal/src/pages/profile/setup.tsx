@@ -42,7 +42,58 @@ export default function ProfileSetup() {
   useEffect(() => {
     if (!isAuthenticated) {
       router.replace('/login');
+      return;
     }
+
+    // Fetch existing profile data to allow resuming
+    const fetchExistingProfile = async () => {
+      try {
+        const response = await api.get('/students/me');
+        const student = response.data.student;
+
+        // Pre-fill profile data if it exists
+        if (student) {
+          setProfileData({
+            personal: {
+              idNumber: student.idNumber || '',
+              phone: student.phone || '',
+              race: student.race || 'prefer_not_to_say',
+              homeLanguage: student.homeLanguage || '',
+              disability: student.disability || '',
+            },
+            address: student.address || {},
+            guardian: student.guardian || {},
+            school: {
+              matricYear: student.matricYear || new Date().getFullYear(),
+              school: student.school || '',
+            },
+            results: {
+              subjects: student.subjectResults || [],
+              aps: student.aps || null,
+            },
+          });
+
+          // Determine which step to start on based on what's completed
+          // If they have results, go to review; if they have school, go to results, etc.
+          if (student.subjectResults && student.subjectResults.length > 0) {
+            setActiveStep(5); // Review
+          } else if (student.school) {
+            setActiveStep(4); // Results
+          } else if (student.guardian?.firstName) {
+            setActiveStep(3); // School
+          } else if (student.address?.street) {
+            setActiveStep(2); // Guardian
+          } else if (student.idNumber) {
+            setActiveStep(1); // Address
+          }
+          // Otherwise start at step 0 (Personal)
+        }
+      } catch (err) {
+        console.error('Failed to fetch existing profile:', err);
+      }
+    };
+
+    fetchExistingProfile();
   }, [isAuthenticated, router]);
 
   const handleNext = (stepData: any) => {
@@ -86,11 +137,13 @@ export default function ProfileSetup() {
       };
 
       const profilePayload = cleanData({
+        idNumber: profileData.personal.idNumber,
+        dateOfBirth: profileData.personal.dateOfBirth ? new Date(profileData.personal.dateOfBirth) : undefined,
+        gender: profileData.personal.gender,
         firstName: profileData.personal.firstName || user?.firstName,
         lastName: profileData.personal.lastName || user?.lastName,
         phone: profileData.personal.phone,
         race: profileData.personal.race,
-        nationality: profileData.personal.nationality,
         homeLanguage: profileData.personal.homeLanguage,
         disability: profileData.personal.disability,
         address: profileData.address,
@@ -171,6 +224,7 @@ export default function ProfileSetup() {
             data={profileData.results}
             onNext={handleNext}
             onBack={handleBack}
+            profileData={profileData}
           />
         );
       case 5:
