@@ -68,8 +68,24 @@ export default function ProfileSetup() {
     setError('');
 
     try {
-      // Update profile
-      await api.put('/students/me', {
+      // Clean data: convert empty strings to undefined for optional fields
+      const cleanData = (obj: any): any => {
+        if (!obj || typeof obj !== 'object') return obj;
+        const cleaned: any = {};
+        for (const [key, value] of Object.entries(obj)) {
+          if (value === '') {
+            // Omit empty strings (let optional fields be undefined)
+            continue;
+          } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+            cleaned[key] = cleanData(value);
+          } else {
+            cleaned[key] = value;
+          }
+        }
+        return cleaned;
+      };
+
+      const profilePayload = cleanData({
         firstName: profileData.personal.firstName || user?.firstName,
         lastName: profileData.personal.lastName || user?.lastName,
         phone: profileData.personal.phone,
@@ -83,6 +99,9 @@ export default function ProfileSetup() {
         school: profileData.school.school,
       });
 
+      // Update profile
+      await api.put('/students/me', profilePayload);
+
       // Update subjects if uploaded
       if (profileData.results.subjects && profileData.results.subjects.length > 0) {
         await api.put('/students/me/subjects', {
@@ -93,8 +112,20 @@ export default function ProfileSetup() {
       // Redirect to dashboard
       router.push('/dashboard');
     } catch (err: any) {
-      const message = err.response?.data?.error?.message || 'Failed to save profile';
+      // Extract validation details if available
+      const errorData = err.response?.data?.error;
+      let message = errorData?.message || 'Failed to save profile';
+
+      // Append validation details if present
+      if (errorData?.details && Array.isArray(errorData.details)) {
+        const fieldErrors = errorData.details
+          .map((d: any) => `${d.path}: ${d.message}`)
+          .join(', ');
+        message = `${message} — ${fieldErrors}`;
+      }
+
       setError(message);
+      console.error('Profile save error:', errorData);
     } finally {
       setLoading(false);
     }
