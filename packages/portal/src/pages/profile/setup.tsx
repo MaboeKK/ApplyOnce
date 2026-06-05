@@ -138,7 +138,7 @@ export default function ProfileSetup() {
 
       const profilePayload = cleanData({
         idNumber: profileData.personal.idNumber,
-        dateOfBirth: profileData.personal.dateOfBirth ? new Date(profileData.personal.dateOfBirth) : undefined,
+        dateOfBirth: profileData.personal.dateOfBirth, // Send as YYYY-MM-DD string, not Date object
         gender: profileData.personal.gender,
         firstName: profileData.personal.firstName || user?.firstName,
         lastName: profileData.personal.lastName || user?.lastName,

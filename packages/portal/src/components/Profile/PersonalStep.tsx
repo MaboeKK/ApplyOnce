@@ -41,7 +41,7 @@ const personalSchema = z.object({
   lastName: z.string().optional(),
   dateOfBirth: z.string().optional(), // Auto-extracted, display only
   gender: z.string().optional(), // Auto-extracted, display only
-  phone: z.string().regex(/^\d{9}$/, 'Phone number must be exactly 9 digits'),
+  phone: z.string().regex(/^[6-8]\d{8}$/, 'Phone number must be 9 digits starting with 6, 7, or 8 (e.g., 821234567)'),
   race: z.enum(['african', 'coloured', 'indian', 'white', 'other', 'prefer_not_to_say']),
   homeLanguage: z.string().min(1, 'Home language is required'),
   disability: z.string().optional(),

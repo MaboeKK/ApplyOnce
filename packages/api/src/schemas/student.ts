@@ -38,7 +38,7 @@ const guardianSchema = z.object({
 // Update profile schema
 export const updateStudentProfileSchema = z.object({
   idNumber: z.string().regex(/^\d{13}$/, 'SA ID number must be 13 digits').optional(),
-  dateOfBirth: z.date().optional(),
+  dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date of birth must be in YYYY-MM-DD format').transform((str) => new Date(str)).optional(),
   gender: z.enum(['male', 'female', 'prefer_not_to_say']).optional(),
   firstName: z.string().min(1).optional(),
   lastName: z.string().min(1).optional(),

@@ -17,7 +17,7 @@ const guardianSchema = z.object({
   firstName: z.string().min(1, 'Guardian first name is required'),
   lastName: z.string().min(1, 'Guardian last name is required'),
   relationship: z.string().min(1, 'Relationship is required'),
-  phone: z.string().regex(/^\d{9}$/, 'Phone number must be exactly 9 digits'),
+  phone: z.string().regex(/^[6-8]\d{8}$/, 'Phone number must be 9 digits starting with 6, 7, or 8 (e.g., 821234567)'),
   email: z.string().email('Invalid email').optional().or(z.literal('')),
   annualIncome: z.number().int().positive().optional(),
 });
