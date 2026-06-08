@@ -1,14 +1,24 @@
 // src/services/aps-calculator.ts
-// NSC Admission Point Score (APS) Calculator
-// Based on official DHET/DBE guidelines
+// NSC Admission Point Score (APS) Calculator — Per-University
 
 import { SubjectResult, NSCSubject } from '../types/student';
-import { Programme, University, UniversityMatch, ChoiceStrategy } from '../types/university';
+import {
+  University,
+  Programme,
+  UniversityMatch,
+  ChoiceStrategy,
+  Rating,
+  MatchOutcome,
+  SubjectKey,
+  matchesSubjectKey,
+  getStudentMathsType,
+  ApsMinimum
+} from '../types/university';
 
 // ─── APS POINT CONVERSION ───────────────────────────────────────────────────
-// Official NSC percentage → APS level conversion
+// Official NSC percentage → APS level conversion (1-7 scale)
 
-export function markToAPS(mark: number): number {
+export function markToAPS(mark: number): Rating {
   if (mark >= 80) return 7;
   if (mark >= 70) return 6;
   if (mark >= 60) return 5;
@@ -18,37 +28,34 @@ export function markToAPS(mark: number): number {
   return 1;
 }
 
-// ─── LIFE ORIENTATION HANDLING ──────────────────────────────────────────────
-// LO is treated inconsistently across SA universities:
-// - Some exclude it entirely (most common for competitive programmes)
-// - Some include it but cap at 4 points
-// - Some include it at full value (uncommon)
-
-export type LOHandling = 'exclude' | 'cap_at_4' | 'full';
-
-// ─── CORE APS CALCULATION ───────────────────────────────────────────────────
+// ─── CORE APS CALCULATION (PER-UNIVERSITY) ──────────────────────────────────
 
 export interface APSResult {
-  totalAPS: number;                  // Final APS score
-  totalAPSWithLO: number;            // Score including LO at full value
-  totalAPSWithLOCapped: number;      // Score including LO capped at 4
+  universityId: string;
+  totalAPS: number;
   subjects: SubjectAPSBreakdown[];
-  subjectCount: number;              // How many subjects contributed
-  isValid: boolean;                  // Has minimum required subjects
+  subjectCount: number;
+  isValid: boolean;
   validationErrors: string[];
 }
 
 export interface SubjectAPSBreakdown {
   subject: NSCSubject;
   mark: number;
-  apsPoints: number;
+  rating: Rating;
   included: boolean;
   isLO: boolean;
 }
 
+/**
+ * Calculate APS for a specific university using that university's apsRule.
+ *
+ * UJ: 6 subjects, LO excluded
+ * Wits: 7 subjects, LO included
+ */
 export function calculateAPS(
   results: SubjectResult[],
-  loHandling: LOHandling = 'exclude'
+  university: University
 ): APSResult {
   const errors: string[] = [];
 
@@ -59,51 +66,50 @@ export function calculateAPS(
   const breakdown: SubjectAPSBreakdown[] = results.map(r => ({
     subject: r.subject,
     mark: r.mark,
-    apsPoints: markToAPS(r.mark),
-    included: true,
+    rating: markToAPS(r.mark),
+    included: false,
     isLO: r.subject === 'life_orientation',
   }));
+
+  const { subjectsCounted, includesLifeOrientation } = university.apsRule;
 
   // Separate LO from other subjects
   const loEntry = breakdown.find(b => b.isLO);
   const otherSubjects = breakdown.filter(b => !b.isLO);
 
-  // Take best 6 non-LO subjects (some students take more than 7 subjects)
-  const sortedOthers = [...otherSubjects].sort((a, b) => b.apsPoints - a.apsPoints);
-  const top6 = sortedOthers.slice(0, 6);
-  
-  // Mark excluded subjects
-  breakdown.forEach(b => {
-    if (!b.isLO && !top6.includes(b)) {
-      b.included = false;
-    }
-  });
+  // Sort by rating descending
+  const sortedOthers = [...otherSubjects].sort((a, b) => b.rating - a.rating);
 
-  const baseAPS = top6.reduce((sum, s) => sum + s.apsPoints, 0);
-
-  // LO variants
-  const loPoints = loEntry ? loEntry.apsPoints : 0;
-  const loCapped = loEntry ? Math.min(loEntry.apsPoints, 4) : 0;
-
+  let topSubjects: SubjectAPSBreakdown[];
   let totalAPS: number;
-  switch (loHandling) {
-    case 'full':
-      totalAPS = baseAPS + loPoints;
-      break;
-    case 'cap_at_4':
-      totalAPS = baseAPS + loCapped;
-      break;
-    case 'exclude':
-    default:
-      totalAPS = baseAPS;
+
+  if (includesLifeOrientation) {
+    // Take best (subjectsCounted - 1) non-LO subjects + LO
+    const countWithoutLO = subjectsCounted - 1;
+    topSubjects = sortedOthers.slice(0, countWithoutLO);
+
+    topSubjects.forEach(s => { s.included = true; });
+
+    const baseAPS = topSubjects.reduce((sum, s) => sum + s.rating, 0);
+    const loPoints = loEntry ? loEntry.rating : 0;
+
+    if (loEntry) {
+      loEntry.included = true;
+    }
+
+    totalAPS = baseAPS + loPoints;
+  } else {
+    // Take best subjectsCounted non-LO subjects, LO excluded
+    topSubjects = sortedOthers.slice(0, subjectsCounted);
+    topSubjects.forEach(s => { s.included = true; });
+    totalAPS = topSubjects.reduce((sum, s) => sum + s.rating, 0);
   }
 
   return {
+    universityId: university.id,
     totalAPS,
-    totalAPSWithLO: baseAPS + loPoints,
-    totalAPSWithLOCapped: baseAPS + loCapped,
     subjects: breakdown,
-    subjectCount: top6.length + (loEntry ? 1 : 0),
+    subjectCount: topSubjects.length + (includesLifeOrientation && loEntry ? 1 : 0),
     isValid: errors.length === 0,
     validationErrors: errors,
   };
@@ -111,43 +117,209 @@ export function calculateAPS(
 
 // ─── PROGRAMME MATCHING ─────────────────────────────────────────────────────
 
+/**
+ * Check if a student qualifies for a programme.
+ * Returns one of: qualifies | waitlist | below_minimum | requirements_not_available
+ */
 export function matchStudentToProgramme(
   studentResults: SubjectResult[],
   programme: Programme,
-  _university: University
-): { meets: boolean; studentAPS: number; missing: string[] } {
-  const loHandling: LOHandling = programme.apsWithLO ? 'cap_at_4' : 'exclude';
-  const apsResult = calculateAPS(studentResults, loHandling);
+  university: University
+): UniversityMatch {
+  // Check if this is a placeholder programme
+  if (programme.admission.note?.includes('requirements not yet available') ||
+      programme.admission.note?.includes('Placeholder')) {
+    return {
+      university,
+      programme,
+      outcome: 'requirements_not_available',
+      studentAPS: 0,
+      requiredAPS: 0,
+      meetsRequirements: false,
+      missingRequirements: ['Programme requirements not yet available'],
+      choiceStrategy: 'not_qualified',
+    };
+  }
+
+  // Calculate student's APS for THIS university
+  const apsResult = calculateAPS(studentResults, university);
   const studentAPS = apsResult.totalAPS;
+
+  // Detect student's maths type
+  const mathsType = getStudentMathsType(studentResults);
+
+  // Select the applicable APS minimum
+  const requiredAPS = getApplicableApsMinimum(programme.admission.apsMinimum, mathsType);
+
+  if (requiredAPS === null) {
+    // No applicable branch (e.g., programme requires Maths but student only has Maths Lit)
+    return {
+      university,
+      programme,
+      outcome: 'below_minimum',
+      studentAPS,
+      requiredAPS: 0,
+      meetsRequirements: false,
+      missingRequirements: ['This programme requires a specific maths type you do not have'],
+      choiceStrategy: 'not_qualified',
+    };
+  }
 
   const missing: string[] = [];
 
   // Check APS minimum
-  if (studentAPS < programme.apsMinimum) {
-    missing.push(
-      `APS too low: you have ${studentAPS}, need ${programme.apsMinimum}`
-    );
+  const meetsAPS = studentAPS >= requiredAPS;
+  if (!meetsAPS) {
+    missing.push(`APS: need ${requiredAPS}, you have ${studentAPS}`);
   }
 
-  // Check subject-specific requirements
-  for (const req of programme.subjectRequirements) {
-    const result = studentResults.find(r =>
-      r.subject.toLowerCase().replace(/_/g, ' ') === req.subject.toLowerCase()
-    );
-    if (!result) {
-      missing.push(`Missing required subject: ${req.subject}`);
-    } else if (result.mark < req.minimumMark) {
-      missing.push(
-        `${req.subject}: need ${req.minimumMark}%, you have ${result.mark}%`
-      );
+  // Check subject requirements
+  const subjectCheck = evaluateSubjectRequirements(
+    studentResults,
+    programme.admission.subjectRequirements
+  );
+
+  missing.push(...subjectCheck.missing);
+
+  // Determine outcome
+  let outcome: MatchOutcome;
+  let waitlistInfo;
+
+  if (missing.length === 0) {
+    outcome = 'qualifies';
+  } else if (programme.admission.waitlistBand) {
+    // Check if student falls in waitlist band
+    const [min, max] = programme.admission.waitlistBand.apsRange;
+    if (studentAPS >= min && studentAPS <= max && subjectCheck.missing.length === 0) {
+      outcome = 'waitlist';
+      waitlistInfo = {
+        inBand: true,
+        conditions: programme.admission.waitlistBand.conditions,
+      };
+    } else {
+      outcome = 'below_minimum';
+    }
+  } else {
+    outcome = 'below_minimum';
+  }
+
+  // Classify choice strategy
+  const strategy = classifyChoice(studentAPS, requiredAPS, programme);
+
+  return {
+    university,
+    programme,
+    outcome,
+    studentAPS,
+    requiredAPS,
+    meetsRequirements: outcome === 'qualifies',
+    missingRequirements: missing,
+    choiceStrategy: strategy,
+    waitlistInfo,
+  };
+}
+
+/**
+ * Get the applicable APS minimum based on the student's maths type.
+ */
+function getApplicableApsMinimum(
+  apsMin: ApsMinimum,
+  mathsType: 'mathematics' | 'mathematicalLiteracy' | 'technicalMathematics' | null
+): number | null {
+  if (!mathsType) {
+    // Student has no maths subject — use default if available
+    return apsMin.default ?? null;
+  }
+
+  switch (mathsType) {
+    case 'mathematics':
+      return apsMin.withMathematics ?? apsMin.default ?? null;
+    case 'mathematicalLiteracy':
+      return apsMin.withMathematicalLiteracy ?? apsMin.default ?? null;
+    case 'technicalMathematics':
+      return apsMin.withTechnicalMathematics ?? apsMin.default ?? null;
+  }
+}
+
+/**
+ * Evaluate subject requirements.
+ * Returns missing requirements as strings.
+ */
+function evaluateSubjectRequirements(
+  studentResults: SubjectResult[],
+  requirements: { subject: SubjectKey; status: string; minRating?: Rating; homeLanguageRating?: Rating; additionalLanguageRating?: Rating; altGroup?: string }[]
+): { missing: string[] } {
+  const missing: string[] = [];
+
+  // Group requirements by altGroup
+  const altGroups = new Map<string, typeof requirements>();
+  const requiredReqs: typeof requirements = [];
+
+  for (const req of requirements) {
+    if (req.status === 'required') {
+      requiredReqs.push(req);
+    } else if (req.status === 'alternative' && req.altGroup) {
+      if (!altGroups.has(req.altGroup)) {
+        altGroups.set(req.altGroup, []);
+      }
+      altGroups.get(req.altGroup)!.push(req);
+    } else if (req.status === 'not_accepted') {
+      // Check if student has this subject — if yes, fail
+      const hasSubject = studentResults.some(r => matchesSubjectKey(r.subject, req.subject));
+      if (hasSubject) {
+        // Check if there's an acceptable alternative
+        const hasAcceptableAlternative = requirements.some(alt =>
+          (alt.status === 'required' || alt.status === 'alternative') &&
+          studentResults.some(r => matchesSubjectKey(r.subject, alt.subject))
+        );
+        if (!hasAcceptableAlternative) {
+          missing.push(`${req.subject} is not accepted for this programme`);
+        }
+      }
     }
   }
 
-  return {
-    meets: missing.length === 0,
-    studentAPS,
-    missing,
-  };
+  // Check required subjects
+  for (const req of requiredReqs) {
+    const studentSubj = studentResults.find(r => matchesSubjectKey(r.subject, req.subject));
+
+    if (!studentSubj) {
+      missing.push(`Missing required subject: ${req.subject}`);
+    } else {
+      const rating = markToAPS(studentSubj.mark);
+      let requiredRating: Rating | undefined;
+
+      // For language subjects, check if it's home or additional
+      if (req.homeLanguageRating || req.additionalLanguageRating) {
+        const isHome = studentSubj.subject.toLowerCase().endsWith('_home');
+        requiredRating = isHome ? req.homeLanguageRating : req.additionalLanguageRating;
+      } else {
+        requiredRating = req.minRating;
+      }
+
+      if (requiredRating && rating < requiredRating) {
+        missing.push(`${req.subject}: need Level ${requiredRating}, you have Level ${rating}`);
+      }
+    }
+  }
+
+  // Check alternative groups (at least ONE must be satisfied)
+  for (const [groupName, alts] of altGroups) {
+    const satisfied = alts.some(req => {
+      const studentSubj = studentResults.find(r => matchesSubjectKey(r.subject, req.subject));
+      if (!studentSubj) return false;
+      const rating = markToAPS(studentSubj.mark);
+      return req.minRating ? rating >= req.minRating : true;
+    });
+
+    if (!satisfied) {
+      const altNames = alts.map(a => a.subject).join(' OR ');
+      const minRatings = alts.map(a => a.minRating ? `Level ${a.minRating}` : '').filter(Boolean).join(' or ');
+      missing.push(`Need one of: ${altNames} ${minRatings ? `at ${minRatings}` : ''}`);
+    }
+  }
+
+  return { missing };
 }
 
 // ─── BULK MATCHING ──────────────────────────────────────────────────────────
@@ -159,17 +331,9 @@ export function findAllMatches(
   const matches: UniversityMatch[] = [];
 
   for (const university of universities) {
-    for (const faculty of university.faculties) {
-      for (const programme of faculty.programmes) {
-        const match = matchStudentToProgramme(studentResults, programme, university);
-        matches.push({
-          university,
-          programme,
-          studentAPS: match.studentAPS,
-          meetsRequirements: match.meets,
-          missingRequirements: match.missing,
-        });
-      }
+    for (const programme of university.programmes) {
+      const match = matchStudentToProgramme(studentResults, programme, university);
+      matches.push(match);
     }
   }
 
@@ -177,26 +341,29 @@ export function findAllMatches(
   return matches.sort((a, b) => {
     if (a.meetsRequirements && !b.meetsRequirements) return -1;
     if (!a.meetsRequirements && b.meetsRequirements) return 1;
-    return (a.programme.apsMinimum - a.studentAPS) - (b.programme.apsMinimum - b.studentAPS);
+    return (a.requiredAPS - a.studentAPS) - (b.requiredAPS - b.studentAPS);
   });
 }
 
 // ─── CHOICE STRATEGY CLASSIFICATION ─────────────────────────────────────────
-// Tags programmes as reach/match/safety based on student APS vs programme minimum
 
 export function classifyChoice(
   studentAPS: number,
+  requiredAPS: number,
   programme: Programme
 ): ChoiceStrategy {
-  const gap = studentAPS - programme.apsMinimum;
+  const gap = studentAPS - requiredAPS;
 
-  // Does not meet minimum (unless ECP, which may still be reachable)
+  // Does not meet minimum
   if (gap < 0) {
-    return programme.isECP ? 'reach' : 'not_qualified';
+    // ECPs might still be reachable with lower entry
+    const isECP = programme.qualificationType.includes('extended') || programme.firstTimeEntrantsOnly;
+    return isECP ? 'reach' : 'not_qualified';
   }
 
-  // ECPs are always safety (lower entry point + foundation year)
-  if (programme.isECP) {
+  // ECPs and first-time-only programmes are always safety
+  const isECP = programme.qualificationType.includes('extended') || programme.firstTimeEntrantsOnly;
+  if (isECP) {
     return 'safety';
   }
 
