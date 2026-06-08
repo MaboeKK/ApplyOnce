@@ -235,14 +235,14 @@ describe('Programme Matching', () => {
     });
 
     test('waitlists student in the band with subject requirements met', () => {
-      // Create a student with APS 36 at Wits
+      // Create a student with APS 36 at Wits (7 subjects incl LO: 6+5+5+5+5+5+5=36)
       const waitlistStudent: SubjectResult[] = [
-        { id: '1', studentId: 'test', subject: 'english_home', mark: 65, level: 5, year: 2024 },
-        { id: '2', studentId: 'test', subject: 'mathematics', mark: 62, level: 5, year: 2024 },
-        { id: '3', studentId: 'test', subject: 'accounting', mark: 60, level: 5, year: 2024 },
-        { id: '4', studentId: 'test', subject: 'business_studies', mark: 58, level: 4, year: 2024 },
-        { id: '5', studentId: 'test', subject: 'economics', mark: 56, level: 4, year: 2024 },
-        { id: '6', studentId: 'test', subject: 'geography', mark: 54, level: 4, year: 2024 },
+        { id: '1', studentId: 'test', subject: 'english_home', mark: 72, level: 6, year: 2024 },
+        { id: '2', studentId: 'test', subject: 'mathematics', mark: 65, level: 5, year: 2024 },
+        { id: '3', studentId: 'test', subject: 'accounting', mark: 62, level: 5, year: 2024 },
+        { id: '4', studentId: 'test', subject: 'business_studies', mark: 60, level: 5, year: 2024 },
+        { id: '5', studentId: 'test', subject: 'economics', mark: 60, level: 5, year: 2024 },
+        { id: '6', studentId: 'test', subject: 'geography', mark: 60, level: 5, year: 2024 },
         { id: '7', studentId: 'test', subject: 'life_orientation', mark: 65, level: 5, year: 2024 },
       ];
 
