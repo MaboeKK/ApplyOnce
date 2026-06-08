@@ -9,6 +9,7 @@ import universitiesRoutes from './universities';
 import apsRoutes from './aps';
 import applicationsRoutes from './applications';
 import paymentsRoutes from './payments';
+import adminRoutes from './admin';
 
 const router = Router();
 
@@ -30,5 +31,6 @@ router.use('/universities', universitiesRoutes);
 router.use('/aps', apsRoutes);
 router.use('/applications', applicationsRoutes);
 router.use('/payments', paymentsRoutes);
+router.use('/admin', adminRoutes);
 
 export default router;

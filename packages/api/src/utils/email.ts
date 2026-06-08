@@ -64,16 +64,18 @@ export async function sendVerificationEmail(
   }
 }
 
-export async function sendDecisionNotification(
-  email: string,
-  universityName: string,
-  programmeName: string,
-  decision: string,
-  reason: string
-): Promise<void> {
+export async function sendDecisionEmail(params: {
+  studentEmail: string;
+  studentName: string;
+  universityName: string;
+  programmeName: string;
+  decision: string;
+  reason: string;
+}): Promise<void> {
+  const { studentEmail, universityName, programmeName, decision, reason } = params;
   if (config.email.mode === 'dev') {
     logger.info(
-      { email, universityName, programmeName, decision, reason },
+      { email: studentEmail, universityName, programmeName, decision, reason },
       'DEV MODE: Decision notification (not sent)'
     );
     return;
@@ -93,7 +95,7 @@ export async function sendDecisionNotification(
   try {
     await transport.sendMail({
       from: config.email.smtp.from,
-      to: email,
+      to: studentEmail,
       subject,
       html: `
         <h2>Application Decision</h2>
@@ -108,11 +110,11 @@ export async function sendDecisionNotification(
     });
 
     logger.info(
-      { email, universityName, decision },
+      { email: studentEmail, universityName, decision },
       'Decision notification sent'
     );
   } catch (error) {
-    logger.error({ error, email }, 'Failed to send decision notification');
+    logger.error({ error: error, email: studentEmail }, 'Failed to send decision notification');
     throw error;
   }
 }
