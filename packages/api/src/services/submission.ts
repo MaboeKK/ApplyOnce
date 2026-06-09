@@ -2,7 +2,13 @@
 // Application submission engine - runs after payment confirms
 // Calls MockUniversityAdapter for each application
 
-import { getAdapter, ApplicationPayload } from '@applyonce/shared';
+import {
+  getAdapter,
+  ApplicationPayload,
+  calculateAPS,
+  getUniversityById,
+  SubjectResult
+} from '@applyonce/shared';
 import { prisma } from '../utils/prisma';
 import { logger } from '../utils/logger';
 
@@ -12,11 +18,22 @@ interface SubmissionInput {
 }
 
 /**
+ * Type-safe field validator that narrows nullable types to non-null
+ * Throws if value is missing, returns non-null typed value otherwise
+ */
+function requireField<T>(value: T | null | undefined, label: string): T {
+  if (value === null || value === undefined || value === '') {
+    throw new Error(`Cannot submit application — missing ${label}`);
+  }
+  return value;
+}
+
+/**
  * Submit a single application to its university
  * Called after payment is confirmed
  */
 export async function submitApplication(input: SubmissionInput): Promise<void> {
-  const { applicationId, studentId } = input;
+  const { applicationId } = input;
 
   // Fetch the application with all related data
   const application = await prisma.application.findUnique({
@@ -49,51 +66,133 @@ export async function submitApplication(input: SubmissionInput): Promise<void> {
     throw new Error(`No adapter found for university ${application.universityId}`);
   }
 
-  // Build the payload
+  // Validate required fields before building payload
   const student = application.student;
+
+  // Check all required-but-nullable fields
+  const missingFields: string[] = [];
+
+  if (!student.idNumber) missingFields.push('ID number');
+  if (!student.phone) missingFields.push('phone number');
+  if (!student.dateOfBirth) missingFields.push('date of birth');
+  if (!student.gender) missingFields.push('gender');
+  if (!student.race) missingFields.push('race');
+  if (!student.matricYear) missingFields.push('matric year');
+  if (!student.school) missingFields.push('school');
+  if (!student.address) missingFields.push('address');
+
+  if (missingFields.length > 0) {
+    const error = `Cannot submit application - student profile incomplete. Missing: ${missingFields.join(', ')}`;
+    logger.error({ applicationId, studentId: student.id, missingFields }, error);
+    throw new Error(error);
+  }
+
+  // Parse address from JSON
+  const address = student.address as {
+    street: string;
+    suburb?: string;
+    city: string;
+    province: string;
+    postalCode: string;
+  };
+
+  // Validate address has required fields
+  if (!address.street || !address.city || !address.province || !address.postalCode) {
+    const error = 'Cannot submit application - address is incomplete (missing street, city, province, or postal code)';
+    logger.error({ applicationId, studentId: student.id, address }, error);
+    throw new Error(error);
+  }
+
+  // Parse guardian from JSON if present (guardian is optional)
+  let guardian: ApplicationPayload['guardian'] = undefined;
+  if (student.guardian) {
+    const guardianData = student.guardian as {
+      firstName: string;
+      lastName: string;
+      relationship: string;
+      phone: string;
+      email?: string;
+      annualIncome?: number;
+    };
+
+    // If guardian exists, validate it has required fields
+    if (!guardianData.firstName || !guardianData.lastName || !guardianData.relationship || !guardianData.phone) {
+      const error = 'Cannot submit application - guardian information is incomplete';
+      logger.error({ applicationId, studentId: student.id, guardianData }, error);
+      throw new Error(error);
+    }
+
+    guardian = {
+      firstName: guardianData.firstName,
+      lastName: guardianData.lastName,
+      relationship: guardianData.relationship,
+      phone: guardianData.phone,
+      email: guardianData.email,
+      annualIncome: guardianData.annualIncome,
+    };
+  }
+
+  // Calculate APS for this university
+  const university = getUniversityById(application.universityId);
+  if (!university) {
+    const error = `University ${application.universityId} not found in constants`;
+    logger.error({ applicationId, universityId: application.universityId }, error);
+    throw new Error(error);
+  }
+
+  // Map Prisma subject results to SubjectResult type
+  // Note: Prisma stores subject as string, but we know it's one of the NSCSubject values
+  const subjectResults: SubjectResult[] = student.subjectResults.map((s) => ({
+    id: s.id,
+    studentId: s.studentId,
+    subject: s.subject as SubjectResult['subject'],
+    mark: s.mark,
+    level: s.level,
+    year: s.year,
+  }));
+
+  const apsResult = calculateAPS(subjectResults, university);
+  if (!apsResult.isValid) {
+    const error = `Cannot submit application - APS calculation failed: ${apsResult.validationErrors.join(', ')}`;
+    logger.error({ applicationId, studentId: student.id, apsErrors: apsResult.validationErrors }, error);
+    throw new Error(error);
+  }
+
+  // Build the payload - requireField ensures type narrowing at point of use
   const payload: ApplicationPayload = {
-    // Student identity
-    idNumber: student.idNumber,
+    // Student identity (validated via requireField for type narrowing)
+    idNumber: requireField(student.idNumber, 'ID number'),
     firstName: student.firstName,
     lastName: student.lastName,
     email: student.email,
-    phone: student.phone,
-    dateOfBirth: student.dateOfBirth.toISOString().split('T')[0],
-    gender: student.gender,
-    race: student.race,
+    phone: requireField(student.phone, 'phone number'),
+    dateOfBirth: requireField(student.dateOfBirth, 'date of birth').toISOString().split('T')[0],
+    gender: requireField(student.gender, 'gender'),
+    race: requireField(student.race, 'race'),
     nationality: student.nationality ?? 'South African',
     homeLanguage: student.homeLanguage ?? 'English',
     disability: student.disability ?? undefined,
 
-    // Address
+    // Address (validated above)
     address: {
-      street: student.addressStreet,
-      suburb: student.addressSuburb ?? undefined,
-      city: student.addressCity,
-      province: student.addressProvince,
-      postalCode: student.addressPostalCode,
+      street: address.street,
+      suburb: address.suburb,
+      city: address.city,
+      province: address.province,
+      postalCode: address.postalCode,
     },
 
-    // Guardian (optional)
-    guardian: student.guardianFirstName
-      ? {
-          firstName: student.guardianFirstName,
-          lastName: student.guardianLastName!,
-          relationship: student.guardianRelationship!,
-          phone: student.guardianPhone!,
-          email: student.guardianEmail ?? undefined,
-          annualIncome: student.guardianAnnualIncome ?? undefined,
-        }
-      : undefined,
+    // Guardian (optional, validated if present)
+    guardian,
 
-    // Academic
-    matricYear: student.matricYear,
-    school: student.school,
-    subjects: student.subjectResults.map((s) => ({
+    // Academic (validated via requireField for type narrowing)
+    matricYear: requireField(student.matricYear, 'matric year'),
+    school: requireField(student.school, 'school'),
+    subjects: subjectResults.map((s) => ({
       subject: s.subject,
       mark: s.mark,
     })),
-    apsScore: student.apsScore,
+    apsScore: apsResult.totalAPS,
 
     // Application
     programmeId: application.programmeId,
@@ -124,7 +223,12 @@ export async function submitApplication(input: SubmissionInput): Promise<void> {
         status: 'submitted',
         universityReference: result.universityReference,
         submittedAt: new Date(result.submittedAt),
-        universityResponse: result as any,
+        universityResponse: {
+          success: result.success,
+          message: result.message,
+          universityReference: result.universityReference,
+          submittedAt: result.submittedAt,
+        },
       },
     });
 

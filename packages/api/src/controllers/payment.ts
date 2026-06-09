@@ -22,9 +22,10 @@ import { logger } from '../utils/logger';
  * - Creates a Payment record and returns mock checkout URL
  */
 export const initiatePayment = asyncHandler(
-  async (req: AuthRequest<InitiatePaymentInput>, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     const studentId = req.student!.studentId;
-    const { applicationIds, returnUrl, cancelUrl } = req.body;
+    const input = req.body as InitiatePaymentInput;
+    const { applicationIds, returnUrl, cancelUrl } = input;
 
     // Fetch student to check documents
     const student = await prisma.student.findUnique({
@@ -144,8 +145,9 @@ export const initiatePayment = asyncHandler(
  * - Triggers submission engine to submit all paid applications
  */
 export const handlePaymentNotification = asyncHandler(
-  async (req: AuthRequest<PaymentNotificationInput>, res: Response) => {
-    const { paymentId, status, gatewayReference } = req.body;
+  async (req: AuthRequest, res: Response) => {
+    const input = req.body as PaymentNotificationInput;
+    const { paymentId, status, gatewayReference } = input;
 
     // Fetch payment with applications
     const payment = await prisma.payment.findUnique({
@@ -213,13 +215,13 @@ export const handlePaymentNotification = asyncHandler(
           logger.error({ paymentId, error }, 'Submission engine failed');
         });
 
-      res.json({
+      return res.json({
         success: true,
         message: 'Payment confirmed. Applications are being submitted.',
         submittedApplications: applicationIds.length,
       });
     } else {
-      res.json({
+      return res.json({
         success: true,
         message: `Payment ${newStatus}`,
       });

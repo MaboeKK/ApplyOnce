@@ -3,6 +3,7 @@
 
 import { Response } from 'express';
 import { AuthRequest } from '../types/express';
+import { asyncHandler } from '../utils/asyncHandler';
 import { prisma } from '../utils/prisma';
 import { NotFoundError, ForbiddenError, BadRequestError } from '../utils/errors';
 import { ApplicationDecisionInput } from '../schemas/admin';
@@ -14,7 +15,7 @@ import { sendDecisionEmail } from '../utils/email';
  * Get all applications for the authenticated admin's university
  * Isolation enforced: filters by req.admin.universityId
  */
-export async function getApplications(req: AuthRequest, res: Response): Promise<void> {
+export const getApplications = asyncHandler(async (req: AuthRequest, res: Response) => {
   const universityId = req.admin!.universityId;
   const statusFilter = req.query.status as string | undefined;
 
@@ -73,14 +74,14 @@ export async function getApplications(req: AuthRequest, res: Response): Promise<
       updatedAt: app.updatedAt,
     })),
   });
-}
+});
 
 /**
  * GET /v1/admin/applications/:id
  * Get a single application by ID
  * Isolation enforced: returns 403 if application.universityId !== req.admin.universityId
  */
-export async function getApplicationById(req: AuthRequest, res: Response): Promise<void> {
+export const getApplicationById = asyncHandler(async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
   const universityId = req.admin!.universityId;
 
@@ -141,7 +142,7 @@ export async function getApplicationById(req: AuthRequest, res: Response): Promi
           id: doc.id,
           type: doc.type,
           fileName: doc.fileName,
-          filePath: doc.filePath,
+          storageKey: doc.storageKey,
           uploadedAt: doc.uploadedAt,
         })),
       },
@@ -162,7 +163,7 @@ export async function getApplicationById(req: AuthRequest, res: Response): Promi
       updatedAt: application.updatedAt,
     },
   });
-}
+});
 
 /**
  * PATCH /v1/admin/applications/:id/decision
@@ -170,7 +171,7 @@ export async function getApplicationById(req: AuthRequest, res: Response): Promi
  * Isolation enforced: 403 if application.universityId !== req.admin.universityId
  * Notifies student in-app (via status update) AND by email
  */
-export async function updateApplicationDecision(req: AuthRequest, res: Response): Promise<void> {
+export const updateApplicationDecision = asyncHandler(async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
   const input = req.body as ApplicationDecisionInput;
   const universityId = req.admin!.universityId;
@@ -207,19 +208,19 @@ export async function updateApplicationDecision(req: AuthRequest, res: Response)
     );
   }
 
+  // Validate: no duplicate decisions (check this first - more specific error)
+  if (application.decision) {
+    throw new BadRequestError(
+      'This application has already been decided',
+      'ALREADY_DECIDED'
+    );
+  }
+
   // Validate application status (can only decide on submitted applications)
   if (application.status !== 'submitted') {
     throw new BadRequestError(
       `Cannot decide on application with status: ${application.status}`,
       'INVALID_STATUS'
-    );
-  }
-
-  // Validate: no duplicate decisions
-  if (application.decision) {
-    throw new BadRequestError(
-      'This application has already been decided',
-      'ALREADY_DECIDED'
     );
   }
 
@@ -286,4 +287,4 @@ export async function updateApplicationDecision(req: AuthRequest, res: Response)
       decisionAt: updatedApplication.decisionAt,
     },
   });
-}
+});
