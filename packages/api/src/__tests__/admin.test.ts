@@ -147,14 +147,19 @@ describe('University Admin API', () => {
   });
 
   afterAll(async () => {
-    // Clean up
+    // Clean up test data
     await prisma.applicationEvent.deleteMany({});
     await prisma.application.deleteMany({});
     await prisma.subjectResult.deleteMany({});
     await prisma.document.deleteMany({});
     await prisma.student.deleteMany({ where: { email: { contains: 'test-admin' } } });
     await prisma.universityAdmin.deleteMany({ where: { email: { contains: 'test-admin' } } });
+
+    // Disconnect Prisma to close all database connections
     await prisma.$disconnect();
+
+    // Give a small delay for any pending operations to complete
+    await new Promise(resolve => setTimeout(resolve, 100));
   });
 
   describe('GET /v1/admin/applications', () => {

@@ -2,10 +2,10 @@
 // Zod validation middleware
 
 import { Request, Response, NextFunction } from 'express';
-import { ZodSchema, ZodError } from 'zod';
+import { ZodType, ZodError } from 'zod';
 import { ValidationError } from '../utils/errors';
 
-export function validateBody<T>(schema: ZodSchema<T>) {
+export function validateBody<T extends ZodType<any, any, any>>(schema: T) {
   return (req: Request, _res: Response, next: NextFunction) => {
     try {
       req.body = schema.parse(req.body);
@@ -24,7 +24,7 @@ export function validateBody<T>(schema: ZodSchema<T>) {
   };
 }
 
-export function validateQuery<T>(schema: ZodSchema<T>) {
+export function validateQuery<T extends ZodType<any, any, any>>(schema: T) {
   return (req: Request, _res: Response, next: NextFunction) => {
     try {
       req.query = schema.parse(req.query) as any;
@@ -43,7 +43,7 @@ export function validateQuery<T>(schema: ZodSchema<T>) {
   };
 }
 
-export function validateParams<T>(schema: ZodSchema<T>) {
+export function validateParams<T extends ZodType<any, any, any>>(schema: T) {
   return (req: Request, _res: Response, next: NextFunction) => {
     try {
       req.params = schema.parse(req.params) as any;

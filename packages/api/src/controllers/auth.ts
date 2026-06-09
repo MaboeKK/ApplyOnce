@@ -13,7 +13,6 @@ import {
 } from '../utils/errors';
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt';
 import { sendVerificationEmail } from '../utils/email';
-import { parseSAIdNumber } from '../utils/saId';
 import { config } from '../config';
 import { logger } from '../utils/logger';
 

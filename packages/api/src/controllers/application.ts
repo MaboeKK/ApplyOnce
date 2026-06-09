@@ -6,7 +6,6 @@ import { AuthRequest } from '../types/express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { prisma } from '../utils/prisma';
 import { BadRequestError, NotFoundError, ForbiddenError } from '../utils/errors';
-import { CreateApplicationInput } from '../schemas/application';
 
 /**
  * POST /v1/applications
@@ -18,7 +17,7 @@ import { CreateApplicationInput } from '../schemas/application';
  * - Student must have uploaded matric certificate + ID before they can pay
  */
 export const createApplication = asyncHandler(
-  async (req: AuthRequest<CreateApplicationInput>, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     const studentId = req.student!.studentId;
     const { universityId, universityName, programmeId, programmeName, facultyName } = req.body;
 

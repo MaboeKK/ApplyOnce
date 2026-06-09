@@ -55,10 +55,8 @@ const limiter = rateLimit({
   legacyHeaders: false,
   handler: (_req, res) => {
     res.status(429).json({
-      error: {
-        message: 'Too many requests, please try again later',
-        code: 'RATE_LIMIT_EXCEEDED',
-      },
+      message: 'Too many requests, please try again later',
+      code: 'RATE_LIMIT_EXCEEDED',
     });
   },
 });
@@ -102,10 +100,8 @@ app.use('/v1', router);
 // 404 handler
 app.use((_req, res) => {
   res.status(404).json({
-    error: {
-      message: 'Route not found',
-      code: 'NOT_FOUND',
-    },
+    message: 'Route not found',
+    code: 'NOT_FOUND',
   });
 });
 

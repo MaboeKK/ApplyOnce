@@ -304,7 +304,7 @@ function evaluateSubjectRequirements(
   }
 
   // Check alternative groups (at least ONE must be satisfied)
-  for (const [groupName, alts] of altGroups) {
+  for (const [_, alts] of altGroups) {
     const satisfied = alts.some(req => {
       const studentSubj = studentResults.find(r => matchesSubjectKey(r.subject, req.subject));
       if (!studentSubj) return false;

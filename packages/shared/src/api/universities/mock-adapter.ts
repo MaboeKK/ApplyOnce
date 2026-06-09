@@ -144,11 +144,9 @@ import { registerAdapter } from './index';
 
 export function registerAllMockAdapters(): void {
   for (const university of UNIVERSITIES) {
-    if (university.integrationStatus === 'mock') {
-      registerAdapter(
-        new MockUniversityAdapter(university.id, university.name)
-      );
-    }
+    registerAdapter(
+      new MockUniversityAdapter(university.id, university.name)
+    );
   }
   console.log(`[University Registry] Registered ${UNIVERSITIES.length} mock adapters`);
 }

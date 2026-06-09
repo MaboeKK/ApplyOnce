@@ -30,7 +30,7 @@ export async function initiatePayment(
     // For mock, we derive it from the passed fee map
     const universityId = appId.split('_')[1]; // e.g. 'app_uct_123' → 'uct'
     const university = getUniversityById(universityId);
-    const applicationFee = universityApplicationFees[universityId] ?? (university?.applicationFeeZAR ?? 100);
+    const applicationFee = universityApplicationFees[universityId] ?? (university?.applicationFee ?? 100);
 
     breakdown.push({
       universityId: universityId,

@@ -3,7 +3,7 @@
 // UJ and Wits are fully detailed reference implementations
 // Other universities are placeholders pending prospectus data
 
-import { University, Programme } from '../types/university';
+import { University } from '../types/university';
 
 // ─── UNIVERSITY OF JOHANNESBURG (UJ) ────────────────────────────────────────
 

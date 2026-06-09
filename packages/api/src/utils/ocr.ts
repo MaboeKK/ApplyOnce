@@ -250,7 +250,6 @@ export async function parseIdDocument(filePath: string): Promise<{ idNumber: str
     }
 
     // Basic validation: check if it looks like a valid SA ID
-    const yy = parseInt(idNumber.substring(0, 2));
     const mm = parseInt(idNumber.substring(2, 4));
     const dd = parseInt(idNumber.substring(4, 6));
 

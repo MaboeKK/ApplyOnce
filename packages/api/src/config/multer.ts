@@ -5,9 +5,10 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { ValidationError } from '../utils/errors';
+import { config } from './index';
 
-// Upload directory
-const UPLOAD_DIR = path.join(process.cwd(), '../../uploads');
+// Upload directory from config
+const UPLOAD_DIR = config.storage.localPath;
 
 // Ensure upload directory exists
 if (!fs.existsSync(UPLOAD_DIR)) {

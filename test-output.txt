@@ -1,0 +1,50 @@
++ cd /home/kmaboe/applyonce
++ export TMPDIR=/home/kmaboe/tmp
++ TMPDIR=/home/kmaboe/tmp
++ mkdir -p /home/kmaboe/tmp
++ set -a
++ source packages/api/.env
+++ DATABASE_URL=postgresql://applyonce:applyonce_dev_password@localhost:3610/applyonce
+++ REDIS_URL=redis://localhost:3611
+++ NODE_ENV=development
+++ PORT=3600
+++ PORTAL_URL=http://localhost:3601
+++ ADMIN_URL=http://localhost:3602
+++ CORS_ORIGINS=http://localhost:3601,http://localhost:3602,http://45.220.228.31:3601,http://45.220.228.31:3602
+++ JWT_ACCESS_SECRET=REPLACE_WITH_SECURE_RANDOM_STRING
+++ JWT_REFRESH_SECRET=REPLACE_WITH_DIFFERENT_SECURE_RANDOM_STRING
+++ JWT_ACCESS_EXPIRES=15m
+++ JWT_REFRESH_EXPIRES=30d
+++ PAYGATE_ID=10011072130
+++ PAYGATE_SECRET=secret
+++ PAYGATE_SANDBOX=true
+++ STORAGE_TYPE=local
+++ STORAGE_LOCAL_PATH=/home/kmaboe/applyonce/uploads
+++ RATE_LIMIT_WINDOW_MS=900000
+++ RATE_LIMIT_MAX_REQUESTS=100
+++ EMAIL_MODE=dev
+++ SMTP_HOST=
+++ SMTP_PORT=587
+++ SMTP_USER=
+++ SMTP_PASS=
+++ SMTP_FROM='ApplyOnce <no-reply@applyonce.co.za>'
++ set +a
++ ./node_modules/.bin/jest --config packages/api/jest.config.js --runInBand --no-coverage
+FAIL packages/api/src/__tests__/admin.test.ts
+  ● Test suite failed to run
+
+    [96mpackages/shared/src/api/payments/mock-paygate.ts[0m:[93m33[0m:[93m84[0m - [91merror[0m[90m TS2551: [0mProperty 'applicationFeeZAR' does not exist on type 'University'. Did you mean 'applicationFee'?
+
+    [7m33[0m     const applicationFee = universityApplicationFees[universityId] ?? (university?.applicationFeeZAR ?? 100);
+    [7m  [0m [91m                                                                                   ~~~~~~~~~~~~~~~~~[0m
+
+      [96mpackages/shared/src/types/university.ts[0m:[93m41[0m:[93m3[0m
+        [7m41[0m   applicationFee: number;             // ZAR. 0 = free
+        [7m  [0m [96m  ~~~~~~~~~~~~~~[0m
+        'applicationFee' is declared here.
+
+Test Suites: 1 failed, 1 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        2.076 s
+Ran all test suites.

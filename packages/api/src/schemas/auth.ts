@@ -3,9 +3,6 @@
 
 import { z } from 'zod';
 
-// SA ID number: 13 digits (YYMMDD + gender + sequence + citizenship + checksum)
-const saIdNumberRegex = /^\d{13}$/;
-
 export const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z
