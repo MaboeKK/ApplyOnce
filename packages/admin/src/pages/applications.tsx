@@ -184,6 +184,9 @@ export default function ApplicationsPage() {
             checkboxSelection={false}
             disableRowSelectionOnClick
             autoHeight
+            onRowClick={(params) => {
+              router.push(`/applications/${params.id}`);
+            }}
             sx={{
               '& .MuiDataGrid-cell:focus': {
                 outline: 'none',
