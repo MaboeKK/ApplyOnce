@@ -193,6 +193,7 @@ export async function login(
         email: student.email,
         firstName: student.firstName,
         lastName: student.lastName,
+        emailVerified: student.emailVerified, // Always true at this point (checked above)
       },
     });
     return;

@@ -293,7 +293,8 @@ export async function submitMultipleApplications(
       succeeded.push(applicationId);
     } else {
       failed.push(applicationId);
-      logger.error({ applicationId, error: result.reason }, 'Application submission failed');
+      const err = result.reason;
+      logger.error({ applicationId, errorMessage: err?.message, errorStack: err?.stack }, 'Application submission failed');
     }
   });
 

@@ -13,6 +13,15 @@ import { config } from './config';
 import { logger } from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
 import router from './routes';
+import { registerAllMockAdapters } from '@applyonce/shared';
+
+// Register university adapters (mocks in dev/test, none in production until MOU signed)
+if (process.env.NODE_ENV !== 'production') {
+  registerAllMockAdapters();
+  logger.info('Mock university adapters registered (non-production environment)');
+} else {
+  logger.warn('No real university adapters registered - production submissions will fail until MOU signed');
+}
 
 const app = express();
 

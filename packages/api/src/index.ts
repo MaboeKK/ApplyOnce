@@ -5,15 +5,11 @@ import app from './app';
 import { config } from './config';
 import { logger } from './utils/logger';
 import { connectDatabase, disconnectDatabase } from './utils/prisma';
-import { registerAllMockAdapters } from '@applyonce/shared';
 
 async function start() {
   try {
     // Connect to database
     await connectDatabase();
-
-    // Register university adapters (mock for all 26 universities)
-    registerAllMockAdapters();
 
     // Start server
     const server = app.listen(config.port, '0.0.0.0', () => {
