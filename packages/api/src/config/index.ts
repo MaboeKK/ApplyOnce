@@ -2,6 +2,7 @@
 // Central configuration from environment variables
 
 import 'dotenv/config';
+import path from 'path';
 
 function required(key: string): string {
   const value = process.env[key];
@@ -64,7 +65,7 @@ export const config = {
   // Storage
   storage: {
     type: optional('STORAGE_TYPE', 'local'),
-    localPath: optional('STORAGE_LOCAL_PATH', '/home/kmaboe/applyonce/uploads'),
+    localPath: optional('STORAGE_LOCAL_PATH', path.join(process.cwd(), 'uploads')),
   },
 
   // PayGate
