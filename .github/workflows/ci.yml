@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Cancel superseded runs on the same branch/PR
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Least-privilege default
+permissions:
+  contents: read
+
+jobs:
+  lint-typecheck:
+    name: Lint & Typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # api's tsc needs the generated Prisma client types
+      - run: npx prisma generate --schema=packages/api/prisma/schema.prisma
+      - run: npm run typecheck --workspaces --if-present
+      - run: npm run lint --workspaces --if-present
+
+  test-shared:
+    name: Test @applyonce/shared
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test --workspace=@applyonce/shared
+
+  test-api:
+    name: Test @applyonce/api
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: applyonce
+          POSTGRES_PASSWORD: applyonce
+          POSTGRES_DB: applyonce
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://applyonce:applyonce@localhost:5432/applyonce
+      REDIS_URL: redis://localhost:6379
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate --schema=packages/api/prisma/schema.prisma
+      - run: npx prisma migrate deploy --schema=packages/api/prisma/schema.prisma
+      - run: npm run db:seed --workspace=@applyonce/api
+      - run: npm run test --workspace=@applyonce/api -- --forceExit  # TEMP: remove once afterAll teardown is in
+
+  build:
+    name: Build (api, portal, admin)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # api build is `tsc`, which needs the generated Prisma client
+      - run: npx prisma generate --schema=packages/api/prisma/schema.prisma
+      # api (tsc), portal + admin (next build); shared has no build script and is skipped
+      - run: npm run build --workspaces --if-present
