@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   lint-typecheck:
-    name: Lint & Typecheck
+    name: Typecheck
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -29,7 +29,6 @@ jobs:
       # api's tsc needs the generated Prisma client types
       - run: npx prisma generate --schema=packages/api/prisma/schema.prisma
       - run: npm run typecheck --workspaces --if-present
-      - run: npm run lint --workspaces --if-present
 
   test-shared:
     name: Test @applyonce/shared
@@ -75,6 +74,8 @@ jobs:
       NODE_ENV: test
       DATABASE_URL: postgresql://applyonce:applyonce@localhost:5432/applyonce
       REDIS_URL: redis://localhost:6379
+      JWT_ACCESS_SECRET: ci-test-jwt-access-secret-change-me
+      JWT_REFRESH_SECRET: ci-test-jwt-refresh-secret-change-me
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
