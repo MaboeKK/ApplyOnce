@@ -86,7 +86,7 @@ jobs:
       - run: npx prisma generate --schema=packages/api/prisma/schema.prisma
       - run: npx prisma migrate deploy --schema=packages/api/prisma/schema.prisma
       - run: npm run db:seed --workspace=@applyonce/api
-      - run: npm run test --workspace=@applyonce/api -- --forceExit  # TEMP: remove once afterAll teardown is in
+      - run: npm run test --workspace=@applyonce/api
 
   build:
     name: Build (api, portal, admin)
