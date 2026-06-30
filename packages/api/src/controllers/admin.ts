@@ -20,6 +20,7 @@ export const getApplications = asyncHandler(async (req: AuthRequest, res: Respon
   const statusFilter = req.query.status as string | undefined;
 
   // Build where clause with mandatory university filter
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: any = {
     universityId,
   };

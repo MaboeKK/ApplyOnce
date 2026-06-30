@@ -185,7 +185,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData }: Props
           Upload Matric Results
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          Upload your National Senior Certificate (matric certificate). We'll scan it and automatically calculate your APS.
+          Upload your National Senior Certificate (matric certificate). We&apos;ll scan it and automatically calculate your APS.
         </Typography>
 
         {error && (

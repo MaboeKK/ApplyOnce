@@ -71,6 +71,7 @@ export const getAPSMatches = asyncHandler(async (req: AuthRequest, res: Response
   const results: SubjectResult[] = subjectResults.map((r) => ({
     id: r.id,
     studentId: r.studentId,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     subject: r.subject as any,
     mark: r.mark,
     level: r.level,

@@ -142,7 +142,7 @@ export default function RegisterPage() {
 
           <Box sx={{ mt: 2, textAlign: 'center' }}>
             <Typography variant="body2" color="text.secondary">
-              Didn't receive the code?{' '}
+              Didn&apos;t receive the code?{' '}
               <MuiLink href="#" underline="hover">
                 Resend
               </MuiLink>

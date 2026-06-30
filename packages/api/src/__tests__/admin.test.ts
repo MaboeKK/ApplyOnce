@@ -179,6 +179,7 @@ describe('University Admin API', () => {
 
       // Should only have UJ application
       expect(response.body.applications.length).toBeGreaterThanOrEqual(1);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       response.body.applications.forEach((app: any) => {
         expect(app.universityId).toBe('uj');
       });
@@ -194,6 +195,7 @@ describe('University Admin API', () => {
 
       // Should only have Wits application
       expect(response.body.applications.length).toBeGreaterThanOrEqual(1);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       response.body.applications.forEach((app: any) => {
         expect(app.universityId).toBe('wits');
       });

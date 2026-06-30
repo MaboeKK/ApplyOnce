@@ -4,6 +4,7 @@
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { Request } from 'express';
 import { ValidationError } from '../utils/errors';
 import { config } from './index';
 
@@ -29,7 +30,7 @@ const storage = multer.diskStorage({
 });
 
 // File filter
-const fileFilter = (_req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+const fileFilter = (_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   const allowedMimes = [
     'image/jpeg',
     'image/jpg',
