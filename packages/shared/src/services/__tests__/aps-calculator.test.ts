@@ -3,7 +3,7 @@
 
 import { calculateAPS, matchStudentToProgramme } from '../aps-calculator';
 import { University, Programme } from '../../types/university';
-import { SubjectResult, NSCSubject } from '../../types/student';
+import { SubjectResult } from '../../types/student';
 
 // ─── Mock Student Results ───────────────────────────────────────────────────
 

@@ -5,6 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ZodType, ZodError } from 'zod';
 import { ValidationError } from '../utils/errors';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function validateBody<T extends ZodType<any, any, any>>(schema: T) {
   return (req: Request, _res: Response, next: NextFunction) => {
     try {
@@ -24,9 +25,11 @@ export function validateBody<T extends ZodType<any, any, any>>(schema: T) {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function validateQuery<T extends ZodType<any, any, any>>(schema: T) {
   return (req: Request, _res: Response, next: NextFunction) => {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       req.query = schema.parse(req.query) as any;
       next();
     } catch (error) {
@@ -43,9 +46,11 @@ export function validateQuery<T extends ZodType<any, any, any>>(schema: T) {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function validateParams<T extends ZodType<any, any, any>>(schema: T) {
   return (req: Request, _res: Response, next: NextFunction) => {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       req.params = schema.parse(req.params) as any;
       next();
     } catch (error) {

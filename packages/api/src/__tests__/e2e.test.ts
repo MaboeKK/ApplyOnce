@@ -287,6 +287,7 @@ describe('End-to-End Flow with Isolation', () => {
     // ============================================================
     console.log('▶ STEP 8: Application automatically submitted');
     // Poll until submitted (submission runs async after payment notify)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let submittedAppResponse: any;
     for (let i = 0; i < 15; i++) {
       submittedAppResponse = await request(app)
@@ -309,6 +310,7 @@ describe('End-to-End Flow with Isolation', () => {
       .set('Cookie', [`accessToken=${ujAdminToken}`]);
 
     expect(ujInboxResponse.status).toBe(200);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const ujApp = ujInboxResponse.body.applications.find((app: any) => app.id === applicationId);
     expect(ujApp).toBeDefined();
     expect(ujApp.universityId).toBe('uj');
@@ -323,6 +325,7 @@ describe('End-to-End Flow with Isolation', () => {
       .set('Cookie', [`accessToken=${witsAdminToken}`]);
 
     expect(witsInboxResponse.status).toBe(200);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const witsApp = witsInboxResponse.body.applications.find((app: any) => app.id === applicationId);
     expect(witsApp).toBeUndefined();
 
@@ -391,6 +394,7 @@ describe('End-to-End Flow with Isolation', () => {
       .set('Cookie', [`accessToken=${studentToken}`]);
 
     expect(appListResponse.status).toBe(200);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const acceptedApp = appListResponse.body.applications.find((app: any) => app.id === applicationId);
     expect(acceptedApp).toBeDefined();
     expect(acceptedApp.status).toBe('accepted');

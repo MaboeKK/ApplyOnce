@@ -304,6 +304,7 @@ function evaluateSubjectRequirements(
   }
 
   // Check alternative groups (at least ONE must be satisfied)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   for (const [_, alts] of altGroups) {
     const satisfied = alts.some(req => {
       const studentSubj = studentResults.find(r => matchesSubjectKey(r.subject, req.subject));

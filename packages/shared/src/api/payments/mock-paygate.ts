@@ -126,6 +126,7 @@ export function getPaymentsByStudent(studentId: string): Payment[] {
 // 3. Append as `signature` parameter
 // 4. POST to https://www.paygate.co.za/eng/process
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function buildPayGateSignature(
   _params: Record<string, string>,
   _passphrase: string

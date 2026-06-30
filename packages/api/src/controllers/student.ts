@@ -39,7 +39,7 @@ export const getMyProfile = asyncHandler(async (req: AuthRequest, res: Response)
   }
 
   // Remove sensitive fields
-  const { passwordHash, emailVerifyToken, emailVerifyExpires, ...studentData } = student;
+  const { passwordHash: _passwordHash, emailVerifyToken: _emailVerifyToken, emailVerifyExpires: _emailVerifyExpires, ...studentData } = student;
 
   res.json({
     student: {
@@ -60,7 +60,7 @@ export const updateMyProfile = asyncHandler(async (req: AuthRequest, res: Respon
   const updates = req.body;
 
   // Cannot update certain fields via this endpoint
-  const { id, email, passwordHash, emailVerified, ...allowedUpdates } = updates;
+  const { id: _id, email: _email, passwordHash: _passwordHash, emailVerified: _emailVerified, ...allowedUpdates } = updates;
 
   try {
     const student = await prisma.student.update({
@@ -71,7 +71,7 @@ export const updateMyProfile = asyncHandler(async (req: AuthRequest, res: Respon
       },
     });
 
-    const { passwordHash: _, emailVerifyToken, emailVerifyExpires, ...studentData } = student;
+    const { passwordHash: _passwordHash, emailVerifyToken: _emailVerifyToken, emailVerifyExpires: _emailVerifyExpires, ...studentData } = student;
 
     res.json({
       message: 'Profile updated successfully',
@@ -109,6 +109,7 @@ export const updateMySubjects = asyncHandler(async (req: AuthRequest, res: Respo
 
   // Create new subject results
   const subjectResults = await prisma.subjectResult.createMany({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: results.map((result: any) => ({
       studentId,
       subject: result.subject,
