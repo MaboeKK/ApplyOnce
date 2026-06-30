@@ -8,7 +8,7 @@ import { prisma } from '../utils/prisma';
 import { BadRequestError, NotFoundError } from '../utils/errors';
 import { InitiatePaymentInput, PaymentNotificationInput } from '../schemas/payment';
 import { SERVICE_FEE_ZAR } from '@applyonce/shared';
-import { submitMultipleApplications } from '../services/submission';
+import { submitMultipleApplications } from '../workflows/submission';
 import { logger } from '../utils/logger';
 
 /**

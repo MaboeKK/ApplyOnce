@@ -1,4 +1,4 @@
-// packages/api/src/services/submission.ts
+// packages/api/src/workflows/submission.ts
 // Application submission engine - runs after payment confirms
 // Calls MockUniversityAdapter for each application
 
