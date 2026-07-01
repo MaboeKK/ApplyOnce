@@ -161,6 +161,7 @@ export const handlePaymentNotification = asyncHandler(
       throw new NotFoundError('Payment not found');
     }
 
+    // Early return if already processed (prevents duplicate webhook processing)
     if (payment.status !== 'pending') {
       logger.warn({ paymentId, currentStatus: payment.status }, 'Payment already processed');
       return res.json({
@@ -178,15 +179,31 @@ export const handlePaymentNotification = asyncHandler(
 
     const newStatus = statusMap[status];
 
-    // Update payment
-    await prisma.payment.update({
-      where: { id: paymentId },
+    // Update payment with optimistic locking (only update if still pending)
+    // This prevents race conditions when PayGate sends duplicate webhooks
+    const updateResult = await prisma.payment.updateMany({
+      where: {
+        id: paymentId,
+        status: 'pending', // Only update if still pending
+      },
       data: {
         status: newStatus,
         gatewayReference,
         paidAt: status === 'COMPLETE' ? new Date() : undefined,
       },
     });
+
+    // If update affected 0 rows, payment was already processed by a concurrent request
+    if (updateResult.count === 0) {
+      logger.warn(
+        { paymentId, attemptedStatus: newStatus },
+        'Payment status update race condition detected - already processed by concurrent webhook'
+      );
+      return res.json({
+        success: true,
+        message: 'Payment already processed',
+      });
+    }
 
     logger.info({ paymentId, status: newStatus }, 'Payment status updated');
 
