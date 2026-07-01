@@ -94,27 +94,32 @@ export const initiatePayment = asyncHandler(
     const serviceFeesZAR = breakdown.reduce((sum, b) => sum + b.serviceFeeZAR, 0);
     const totalAmountZAR = universityFeesZAR + serviceFeesZAR;
 
-    // Create payment record
-    const payment = await prisma.payment.create({
-      data: {
-        studentId,
-        totalAmountZAR,
-        universityFeesZAR,
-        serviceFeesZAR,
-        status: 'pending',
-        gateway: 'mock',
-        breakdown,
-      },
-    });
+    // Create payment record + link applications atomically
+    // Transaction prevents orphaned payment if linking fails
+    const payment = await prisma.$transaction(async (tx) => {
+      const newPayment = await tx.payment.create({
+        data: {
+          studentId,
+          totalAmountZAR,
+          universityFeesZAR,
+          serviceFeesZAR,
+          status: 'pending',
+          gateway: 'mock',
+          breakdown,
+        },
+      });
 
-    // Link applications to payment
-    await prisma.application.updateMany({
-      where: {
-        id: { in: applicationIds },
-      },
-      data: {
-        paymentId: payment.id,
-      },
+      // Link applications to payment
+      await tx.application.updateMany({
+        where: {
+          id: { in: applicationIds },
+        },
+        data: {
+          paymentId: newPayment.id,
+        },
+      });
+
+      return newPayment;
     });
 
     // Build mock PayGate URL
