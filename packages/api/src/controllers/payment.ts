@@ -202,17 +202,31 @@ export const handlePaymentNotification = asyncHandler(
       // Submit applications (runs in background)
       submitMultipleApplications(applicationIds, payment.studentId)
         .then((result) => {
-          logger.info(
-            {
-              paymentId,
-              succeeded: result.succeeded.length,
-              failed: result.failed.length,
-            },
-            'Applications submitted'
-          );
+          if (result.failed.length > 0) {
+            logger.warn(
+              {
+                paymentId,
+                succeeded: result.succeeded.length,
+                failed: result.failed.length,
+                failedApplicationIds: result.failed,
+              },
+              'Payment complete but some applications failed to submit - check application status for details'
+            );
+          } else {
+            logger.info(
+              {
+                paymentId,
+                succeeded: result.succeeded.length,
+              },
+              'All applications submitted successfully'
+            );
+          }
         })
         .catch((error) => {
-          logger.error({ paymentId, error }, 'Submission engine failed');
+          logger.error(
+            { paymentId, error: error.message, stack: error.stack },
+            'Submission engine encountered unexpected error'
+          );
         });
 
       return res.json({

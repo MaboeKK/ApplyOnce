@@ -35,29 +35,30 @@ function requireField<T>(value: T | null | undefined, label: string): T {
 export async function submitApplication(input: SubmissionInput): Promise<void> {
   const { applicationId } = input;
 
-  // Fetch the application with all related data
-  const application = await prisma.application.findUnique({
-    where: { id: applicationId },
-    include: {
-      student: {
-        include: {
-          subjectResults: true,
-          documents: true,
+  try {
+    // Fetch the application with all related data
+    const application = await prisma.application.findUnique({
+      where: { id: applicationId },
+      include: {
+        student: {
+          include: {
+            subjectResults: true,
+            documents: true,
+          },
         },
+        university: true,
       },
-      university: true,
-    },
-  });
+    });
 
-  if (!application) {
-    logger.error({ applicationId }, 'Application not found for submission');
-    throw new Error(`Application ${applicationId} not found`);
-  }
+    if (!application) {
+      logger.error({ applicationId }, 'Application not found for submission');
+      throw new Error(`Application ${applicationId} not found`);
+    }
 
-  if (application.status !== 'draft') {
-    logger.warn({ applicationId, status: application.status }, 'Application already submitted');
-    return;
-  }
+    if (application.status !== 'draft') {
+      logger.warn({ applicationId, status: application.status }, 'Application already submitted');
+      return;
+    }
 
   // Get the university adapter
   const adapter = getAdapter(application.universityId);
@@ -269,6 +270,41 @@ export async function submitApplication(input: SubmissionInput): Promise<void> {
     });
 
     // Application stays in draft state so user can retry
+    }
+  } catch (error) {
+    // Capture any exceptions (missing fields, validation errors, etc.)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error during submission';
+
+    logger.error(
+      { applicationId, errorMessage, errorStack: error instanceof Error ? error.stack : undefined },
+      'Application submission failed with exception'
+    );
+
+    // Update application status to submission_failed with error details
+    await prisma.application.update({
+      where: { id: applicationId },
+      data: {
+        status: 'submission_failed',
+        notes: `Submission failed: ${errorMessage}`,
+      },
+    });
+
+    // Log failure event
+    await prisma.applicationEvent.create({
+      data: {
+        applicationId,
+        eventType: 'submission_failed',
+        fromStatus: 'draft',
+        toStatus: 'submission_failed',
+        data: {
+          error: errorMessage,
+          timestamp: new Date().toISOString(),
+        },
+      },
+    });
+
+    // Re-throw so Promise.allSettled can track this as failed
+    throw error;
   }
 }
 
