@@ -117,7 +117,7 @@ ExcelJS, i18next, Email 2FA, Sentry, Kysely, Vitest, commitlint, Expo
 | Thing | Mock | Replaced when |
 |---|---|---|
 | All 26 university APIs | MockUniversityAdapter | MOU signed per university |
-| University decisions | Human logs into admin portal and clicks Accept/Decline | Always — this IS the product |
+| University decisions | Human logs into admin portal and clicks Accept/Reject | Always — this IS the product |
 | PayGate payments | Mock checkout — confirms immediately | Real PayGate merchant account |
 | DBE/Umalusi results | Manual upload + OCR | Phase 2 |
 
@@ -155,7 +155,7 @@ Register (ID auto-fills DOB + gender)
 University admin logs in at admin.applyonce.co.za
 → Dashboard: inbox of all applications received for their university
 → Click an application → see full student profile, APS, subjects, documents
-→ Click Accept or Decline → must enter a reason
+→ Click Accept or Reject → must enter a reason
 → Decision immediately reflects on the student's dashboard
 
 ---
@@ -201,7 +201,7 @@ University admin logs in at admin.applyonce.co.za
 23. University login page
 24. Applications inbox — table of all received applications, filterable by status
 25. Application detail — full student profile, APS, subjects, uploaded documents
-26. Decision panel — Accept / Decline radio + reason text field + confirm button
+26. Decision panel — Accept / Reject radio + reason text field + confirm button
 27. Decision confirmation — sent back to API, student dashboard updates
 
 ---
@@ -437,9 +437,9 @@ The matric results step is UPLOAD-FIRST, not manual entry. Ease of use is the pr
 ## FINAL PRODUCT DECISIONS — ROUND 2 (locked with founder)
 
 ### University admin decisions
-- Admins can **Accept or Decline only** — NO waitlist option in the UI
+- Admins can **Accept or Reject only** — NO waitlist option in the UI
 - The 'waitlisted' status may remain in the schema but is unused in MVP
-- A reason is required for both Accept and Decline
+- A reason is required for both Accept and Reject
 
 ### One programme per university
 - A student may apply to a given university for **only ONE programme**
@@ -460,7 +460,7 @@ The matric results step is UPLOAD-FIRST, not manual entry. Ease of use is the pr
 - After submission: view-only status tracking
 
 ### Decision notifications — in-app + email
-- When an admin Accepts or Declines, the student is notified BOTH in-app (dashboard status updates) AND by email
+- When an admin Accepts or Rejects, the student is notified BOTH in-app (dashboard status updates) AND by email
 - The email respects EMAIL_MODE: in dev it is logged/shown (no SMTP needed); in production it sends via Nodemailer
 - Email content: which university, which programme, the decision, and the admin's reason
 
