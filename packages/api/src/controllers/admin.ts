@@ -1,7 +1,9 @@
 // packages/api/src/controllers/admin.ts
-// University admin controllers (applications inbox, detail, decision)
+// University admin controllers (applications inbox, detail, decision, document download)
 
 import { Response } from 'express';
+import path from 'path';
+import fs from 'fs';
 import { AuthRequest } from '../types/express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { prisma } from '../utils/prisma';
@@ -9,6 +11,7 @@ import { NotFoundError, ForbiddenError, BadRequestError } from '../utils/errors'
 import { ApplicationDecisionInput } from '../schemas/admin';
 import { logger } from '../utils/logger';
 import { sendDecisionEmail } from '../utils/email';
+import { UPLOAD_DIR } from '../config/multer';
 
 /**
  * GET /v1/admin/applications
@@ -288,4 +291,79 @@ export const updateApplicationDecision = asyncHandler(async (req: AuthRequest, r
       decisionAt: updatedApplication.decisionAt,
     },
   });
+});
+
+/**
+ * GET /v1/admin/documents/:id
+ * Download a student document (ID, matric certificate)
+ * Isolation enforced: Admin can only download documents for students who have
+ * applied to their university
+ */
+export const downloadDocument = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+  const universityId = req.admin!.universityId;
+  const adminId = req.admin!.adminId;
+
+  // Fetch document with student relation
+  const document = await prisma.document.findUnique({
+    where: { id },
+    include: {
+      student: {
+        include: {
+          applications: {
+            select: {
+              universityId: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!document) {
+    throw new NotFoundError('Document not found', 'DOCUMENT_NOT_FOUND');
+  }
+
+  // Isolation check: Admin can only download documents for students who have
+  // applied to their university
+  const hasApplicationToThisUniversity = document.student.applications.some(
+    (app) => app.universityId === universityId
+  );
+
+  if (!hasApplicationToThisUniversity) {
+    logger.warn(
+      {
+        adminId,
+        universityId,
+        documentId: id,
+        studentId: document.studentId,
+      },
+      'Admin attempted to access document for student with no application to their university'
+    );
+    throw new ForbiddenError(
+      'You do not have permission to access this document',
+      'UNIVERSITY_MISMATCH'
+    );
+  }
+
+  // Check file exists on disk
+  const filePath = path.join(UPLOAD_DIR, document.storageKey);
+
+  if (!fs.existsSync(filePath)) {
+    throw new NotFoundError('File not found on server', 'FILE_NOT_FOUND');
+  }
+
+  logger.info(
+    {
+      adminId,
+      universityId,
+      documentId: id,
+      documentType: document.type,
+      studentId: document.studentId,
+    },
+    'Admin downloaded student document'
+  );
+
+  // Serve the file
+  res.download(filePath, document.fileName);
 });
