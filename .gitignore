@@ -39,3 +39,7 @@ test-data/real/
 coverage/
 .turbo/
 .cache/
+
+# Local analysis/temporary files (not for commit)
+CODEBASE_ASSESSMENT.md
+run-test-detect.sh

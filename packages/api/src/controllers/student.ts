@@ -6,7 +6,8 @@ import { AuthRequest } from '../types/express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { prisma } from '../utils/prisma';
 import { NotFoundError, ConflictError } from '../utils/errors';
-import { markToAPS } from '@applyonce/shared';
+import { markToAPS, normalizeSubjectName } from '@applyonce/shared';
+import { parseSAIdNumber } from '../utils/saId';
 import { Prisma } from '@prisma/client';
 
 /**
@@ -60,7 +61,23 @@ export const updateMyProfile = asyncHandler(async (req: AuthRequest, res: Respon
   const updates = req.body;
 
   // Cannot update certain fields via this endpoint
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { id: _id, email: _email, passwordHash: _passwordHash, emailVerified: _emailVerified, ...allowedUpdates } = updates;
+
+  // SECURITY: If idNumber is present, auto-derive DOB and gender from it
+  // and IGNORE any client-submitted DOB/gender values to prevent spoofing
+  if (allowedUpdates.idNumber) {
+    try {
+      const idInfo = parseSAIdNumber(allowedUpdates.idNumber);
+
+      // Replace DOB and gender with server-derived values (ignore client input)
+      allowedUpdates.dateOfBirth = idInfo.dateOfBirth;
+      allowedUpdates.gender = idInfo.gender;
+    } catch (error) {
+      // If ID parsing fails, the validation error will be caught below
+      // (invalid ID format will fail the Zod schema validation)
+    }
+  }
 
   try {
     const student = await prisma.student.update({
@@ -107,12 +124,12 @@ export const updateMySubjects = asyncHandler(async (req: AuthRequest, res: Respo
     where: { studentId },
   });
 
-  // Create new subject results
+  // Create new subject results (normalize subject names for consistency)
   const subjectResults = await prisma.subjectResult.createMany({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: results.map((result: any) => ({
       studentId,
-      subject: result.subject,
+      subject: normalizeSubjectName(result.subject),
       mark: result.mark,
       level: result.level || markToAPS(result.mark),
       year: result.year,
