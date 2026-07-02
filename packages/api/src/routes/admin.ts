@@ -113,4 +113,36 @@ router.patch(
   adminController.updateApplicationDecision
 );
 
+/**
+ * @swagger
+ * /v1/admin/documents/{id}:
+ *   get:
+ *     summary: Download a student document (only for students who applied to admin's university)
+ *     tags: [Admin]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Document ID
+ *     responses:
+ *       200:
+ *         description: Document file download
+ *         content:
+ *           application/octet-stream:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Not authorized to access this document
+ *       404:
+ *         description: Document not found
+ */
+router.get('/documents/:id', adminController.downloadDocument);
+
 export default router;
