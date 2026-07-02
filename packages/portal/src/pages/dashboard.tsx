@@ -42,7 +42,7 @@ function getStatusConfig(status: string) {
     case 'submission_failed':
       return { color: 'error' as const, label: 'Submission Failed', icon: <ErrorIcon fontSize="small" /> };
     default:
-      return { color: 'default' as const, label: status, icon: null };
+      return { color: 'default' as const, label: status };
   }
 }
 
@@ -263,7 +263,7 @@ export default function DashboardPage() {
                         label={statusConfig.label}
                         color={statusConfig.color}
                         size="small"
-                        icon={statusConfig.icon}
+                        {...('icon' in statusConfig && { icon: statusConfig.icon })}
                       />
                     </Box>
 
