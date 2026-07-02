@@ -60,6 +60,7 @@ model RefreshToken {
   expiresAt DateTime
   createdAt DateTime @default(now())
 
+  @@index([studentId])
   @@map("refresh_tokens")
 }
 
@@ -80,6 +81,7 @@ model UniversityAdmin {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([universityId])
   @@map("university_admins")
 }
 
@@ -91,6 +93,7 @@ model UniversityAdminRefreshToken {
   expiresAt DateTime
   createdAt DateTime        @default(now())
 
+  @@index([adminId])
   @@map("university_admin_refresh_tokens")
 }
 
@@ -155,6 +158,9 @@ model Document {
 
   uploadedAt DateTime @default(now())
 
+  @@index([studentId])
+  @@index([type])
+  @@index([studentId, type])
   @@map("documents")
 }
 
@@ -193,6 +199,10 @@ model Application {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([studentId])
+  @@index([universityId])
+  @@index([status])
+  @@index([universityId, status])
   @@map("applications")
 }
 
@@ -219,6 +229,7 @@ model Payment {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
+  @@index([studentId])
   @@map("payments")
 }
 
@@ -236,5 +247,6 @@ model ApplicationEvent {
 
   createdAt DateTime @default(now())
 
+  @@index([applicationId])
   @@map("application_events")
 }
