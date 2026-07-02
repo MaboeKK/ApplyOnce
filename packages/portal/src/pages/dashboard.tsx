@@ -15,17 +15,42 @@ import {
   CardActions,
   Chip,
   Alert,
+  Divider,
+  Stack,
 } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import DescriptionIcon from '@mui/icons-material/Description';
 import SchoolIcon from '@mui/icons-material/School';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
+import ErrorIcon from '@mui/icons-material/Error';
 import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
+
+// Helper to render application status with appropriate color and icon
+function getStatusConfig(status: string) {
+  switch (status) {
+    case 'draft':
+      return { color: 'default' as const, label: 'Draft', icon: <HourglassEmptyIcon fontSize="small" /> };
+    case 'submitted':
+      return { color: 'info' as const, label: 'Submitted', icon: <HourglassEmptyIcon fontSize="small" /> };
+    case 'accepted':
+      return { color: 'success' as const, label: 'Accepted', icon: <CheckCircleIcon fontSize="small" /> };
+    case 'rejected':
+      return { color: 'error' as const, label: 'Rejected', icon: <CancelIcon fontSize="small" /> };
+    case 'submission_failed':
+      return { color: 'error' as const, label: 'Submission Failed', icon: <ErrorIcon fontSize="small" /> };
+    default:
+      return { color: 'default' as const, label: status };
+  }
+}
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
   const [profile, setProfile] = useState<any>(null);
+  const [applications, setApplications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,10 +64,14 @@ export default function DashboardPage() {
 
   const fetchProfile = async () => {
     try {
-      const response = await api.get('/students/me');
-      setProfile(response.data.student);
+      const [profileRes, appsRes] = await Promise.all([
+        api.get('/students/me'),
+        api.get('/applications'),
+      ]);
+      setProfile(profileRes.data.student);
+      setApplications(appsRes.data.applications || []);
     } catch (err) {
-      console.error('Failed to fetch profile', err);
+      console.error('Failed to fetch data', err);
     } finally {
       setLoading(false);
     }
@@ -166,15 +195,21 @@ export default function DashboardPage() {
                 <Typography variant="h6">Applications</Typography>
               </Box>
               <Typography variant="body2" color="text.secondary">
-                Browse universities and programmes to apply
+                {applications.length > 0
+                  ? `You have ${applications.length} application${applications.length > 1 ? 's' : ''}`
+                  : 'Browse universities and programmes to apply'}
               </Typography>
               <Box sx={{ mt: 2 }}>
-                <Chip label="Coming soon" size="small" />
+                <Chip
+                  label={applications.length > 0 ? `${applications.length} Active` : 'None yet'}
+                  color={applications.length > 0 ? 'primary' : 'default'}
+                  size="small"
+                />
               </Box>
             </CardContent>
             <CardActions>
               <Button size="small" disabled>
-                Browse Universities
+                Browse Universities (Coming Soon)
               </Button>
             </CardActions>
           </Card>
@@ -198,6 +233,77 @@ export default function DashboardPage() {
               </Grid>
             ))}
           </Grid>
+        </Paper>
+      )}
+
+      {applications.length > 0 && (
+        <Paper sx={{ p: 3, mt: 4 }}>
+          <Typography variant="h6" gutterBottom color="primary">
+            Your Applications
+          </Typography>
+          <Stack spacing={2} sx={{ mt: 2 }}>
+            {applications.map((app: any) => {
+              const statusConfig = getStatusConfig(app.status);
+              return (
+                <Card key={app.id} variant="outlined">
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="subtitle1" fontWeight={600}>
+                          {app.programmeName}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {app.universityName}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {app.facultyName}
+                        </Typography>
+                      </Box>
+                      <Chip
+                        label={statusConfig.label}
+                        color={statusConfig.color}
+                        size="small"
+                        {...('icon' in statusConfig && { icon: statusConfig.icon })}
+                      />
+                    </Box>
+
+                    {app.universityReference && (
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                        Reference: {app.universityReference}
+                      </Typography>
+                    )}
+
+                    {app.status === 'submission_failed' && app.notes && (
+                      <Alert severity="error" sx={{ mt: 2 }}>
+                        <Typography variant="body2" fontWeight={600}>
+                          Submission Error
+                        </Typography>
+                        <Typography variant="body2">{app.notes}</Typography>
+                      </Alert>
+                    )}
+
+                    {app.status === 'accepted' && app.decisionReason && (
+                      <Alert severity="success" sx={{ mt: 2 }}>
+                        <Typography variant="body2">{app.decisionReason}</Typography>
+                      </Alert>
+                    )}
+
+                    {app.status === 'rejected' && app.decisionReason && (
+                      <Alert severity="error" sx={{ mt: 2 }}>
+                        <Typography variant="body2">{app.decisionReason}</Typography>
+                      </Alert>
+                    )}
+
+                    {app.submittedAt && (
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                        Submitted: {new Date(app.submittedAt).toLocaleDateString()}
+                      </Typography>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </Stack>
         </Paper>
       )}
     </Container>
