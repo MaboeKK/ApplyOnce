@@ -36,6 +36,8 @@ const guardianSchema = z.object({
 });
 
 // Update profile schema
+// NOTE: When idNumber is provided, dateOfBirth and gender are auto-derived
+// server-side and any client-submitted values are ignored (spoofing prevention)
 export const updateStudentProfileSchema = z.object({
   idNumber: z.string().regex(/^\d{13}$/, 'SA ID number must be 13 digits').optional(),
   dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date of birth must be in YYYY-MM-DD format').transform((str) => new Date(str)).optional(),
