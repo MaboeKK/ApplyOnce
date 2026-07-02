@@ -10,6 +10,7 @@ ApplyOnce is a mobile application that allows South African matric students and 
 - [Project Structure](PROJECT_STRUCTURE.md)
 - [Claude CLI Context](CLAUDE.md)
 - [Branch Protection Setup](.github/BRANCH_PROTECTION.md)
+- [Deployment Security Checklist](DEPLOYMENT_SECURITY.md)
 
 ## Status
 
