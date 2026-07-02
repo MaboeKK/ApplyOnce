@@ -6,7 +6,7 @@ import { AuthRequest } from '../types/express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { prisma } from '../utils/prisma';
 import { NotFoundError, ConflictError } from '../utils/errors';
-import { markToAPS } from '@applyonce/shared';
+import { markToAPS, normalizeSubjectName } from '@applyonce/shared';
 import { Prisma } from '@prisma/client';
 
 /**
@@ -107,12 +107,12 @@ export const updateMySubjects = asyncHandler(async (req: AuthRequest, res: Respo
     where: { studentId },
   });
 
-  // Create new subject results
+  // Create new subject results (normalize subject names for consistency)
   const subjectResults = await prisma.subjectResult.createMany({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: results.map((result: any) => ({
       studentId,
-      subject: result.subject,
+      subject: normalizeSubjectName(result.subject),
       mark: result.mark,
       level: result.level || markToAPS(result.mark),
       year: result.year,
