@@ -27,6 +27,7 @@ import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import ErrorIcon from '@mui/icons-material/Error';
 import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
+import PortalNav from '@/components/Layout/PortalNav';
 
 // Helper to render application status with appropriate color and icon
 function getStatusConfig(status: string) {
@@ -48,7 +49,7 @@ function getStatusConfig(status: string) {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const [profile, setProfile] = useState<any>(null);
   const [applications, setApplications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,11 +78,6 @@ export default function DashboardPage() {
     }
   };
 
-  const handleLogout = async () => {
-    await logout();
-    router.push('/login');
-  };
-
   if (!isAuthenticated || loading) {
     return null;
   }
@@ -92,19 +88,16 @@ export default function DashboardPage() {
   const hasAPS = profile?.subjectResults?.length > 0;
 
   return (
+    <>
+    <PortalNav />
     <Container maxWidth="lg" sx={{ py: 6 }}>
-      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Box>
-          <Typography variant="h4" gutterBottom>
-            Welcome, {user?.firstName}!
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Your ApplyOnce dashboard
-          </Typography>
-        </Box>
-        <Button variant="outlined" onClick={handleLogout}>
-          Logout
-        </Button>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" gutterBottom>
+          Welcome, {user?.firstName}!
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Your ApplyOnce dashboard
+        </Typography>
       </Box>
 
       {!hasCompletedProfile && (
@@ -208,9 +201,14 @@ export default function DashboardPage() {
               </Box>
             </CardContent>
             <CardActions>
-              <Button size="small" disabled>
-                Browse Universities (Coming Soon)
+              <Button size="small" onClick={() => router.push('/universities')}>
+                Browse Universities
               </Button>
+              {applications.length > 0 && (
+                <Button size="small" onClick={() => router.push('/cart')}>
+                  View Cart
+                </Button>
+              )}
             </CardActions>
           </Card>
         </Grid>
@@ -245,7 +243,12 @@ export default function DashboardPage() {
             {applications.map((app: any) => {
               const statusConfig = getStatusConfig(app.status);
               return (
-                <Card key={app.id} variant="outlined">
+                <Card
+                  key={app.id}
+                  variant="outlined"
+                  sx={{ cursor: 'pointer' }}
+                  onClick={() => router.push(`/applications/${app.id}`)}
+                >
                   <CardContent>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                       <Box sx={{ flex: 1 }}>
@@ -307,5 +310,6 @@ export default function DashboardPage() {
         </Paper>
       )}
     </Container>
+    </>
   );
 }

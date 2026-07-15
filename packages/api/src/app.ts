@@ -56,20 +56,25 @@ app.use(
   })
 );
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: config.rateLimit.windowMs,
-  max: config.rateLimit.maxRequests,
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (_req, res) => {
-    res.status(429).json({
-      message: 'Too many requests, please try again later',
-      code: 'RATE_LIMIT_EXCEEDED',
-    });
-  },
-});
-app.use(limiter);
+// Rate limiting (production only — dev/test traffic, especially React StrictMode's
+// doubled effect calls, exhausts a per-IP budget meant to deter abuse, not browsing)
+if (config.env === 'production') {
+  const limiter = rateLimit({
+    windowMs: config.rateLimit.windowMs,
+    max: config.rateLimit.maxRequests,
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (_req, res) => {
+      res.status(429).json({
+        message: 'Too many requests, please try again later',
+        code: 'RATE_LIMIT_EXCEEDED',
+      });
+    },
+  });
+  app.use(limiter);
+} else {
+  logger.info('Rate limiting disabled (non-production environment)');
+}
 
 // Swagger documentation
 const swaggerOptions = {

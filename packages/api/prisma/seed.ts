@@ -89,10 +89,11 @@ async function main() {
   console.log('▶ Creating demo student account...');
   await prisma.student.upsert({
     where: { email: 'demo@applyonce.co.za' },
-    update: {},
+    update: { emailVerified: true },
     create: {
       idNumber:     '0001015009087',
       email:        'demo@applyonce.co.za',
+      emailVerified: true,
       phone:        '0821234567',
       passwordHash: studentHash,
       firstName:    'Demo',
