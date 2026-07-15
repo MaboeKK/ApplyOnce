@@ -26,7 +26,7 @@ export default function PaymentFailedPage() {
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
             Your payment was cancelled or did not go through. Your programmes are still saved in
-            your cart — you can try again whenever you're ready.
+            your cart — you can try again whenever you&apos;re ready.
           </Typography>
           <Stack spacing={1.5}>
             <Button variant="contained" size="large" onClick={() => router.push('/cart')}>
