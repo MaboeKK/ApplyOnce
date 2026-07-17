@@ -46,6 +46,14 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Cookie parsing
 app.use(cookieParser());
 
+// Every response here is scoped to the cookie-authenticated caller — never let a
+// shared browser HTTP cache reuse one session's response body for another session
+// hitting the same URL (e.g. /v1/applications after switching accounts).
+app.use((_req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
+
 // HTTP request logging
 app.use(
   pinoHttp({
