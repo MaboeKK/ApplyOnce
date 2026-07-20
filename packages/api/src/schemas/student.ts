@@ -26,13 +26,23 @@ const addressSchema = z.object({
 });
 
 // Guardian schema
+const emergencyContactSchema = z.object({
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  phone: z.string().regex(/^\+27[6-8]\d{8}$/, 'Phone must be in format +27XXXXXXXXX').optional(),
+  relationship: z.string().optional(),
+});
+
 const guardianSchema = z.object({
   firstName: z.string().min(1, 'Guardian first name is required'),
   lastName: z.string().min(1, 'Guardian last name is required'),
   relationship: z.string().min(1, 'Relationship is required'),
+  otherRelationship: z.string().optional(),
   phone: z.string().regex(/^\+27[6-8]\d{8}$/, 'Phone must be in format +27XXXXXXXXX'),
-  email: z.string().email('Invalid email').optional(),
-  annualIncome: z.number().int().positive().optional(),
+  email: z.string().email('Invalid email').optional().or(z.literal('')),
+  annualIncome: z.number().int().min(0, 'Annual income cannot be negative').optional(),
+  emergencyContactSameAsGuardian: z.boolean().optional(),
+  emergencyContact: emergencyContactSchema.optional(),
 });
 
 // Update profile schema

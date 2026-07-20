@@ -14,7 +14,10 @@ import {
   Autocomplete,
   Alert,
 } from '@mui/material';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useState, useEffect } from 'react';
+import PhoneField from './PhoneField';
+import { digitsOnly, formatIdNumber, validateIdNumber, validatePhoneNational, toE164 } from '@/utils/formatters';
 
 // SA official languages
 const SA_LANGUAGES = [
@@ -33,15 +36,22 @@ const SA_LANGUAGES = [
 ];
 
 const personalSchema = z.object({
-  idNumber: z
-    .string()
-    .length(13, 'SA ID number must be exactly 13 digits')
-    .regex(/^\d{13}$/, 'ID number must contain only digits'),
+  idNumber: z.string().superRefine((val, ctx) => {
+    const result = validateIdNumber(val);
+    if (!result.valid) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: result.message });
+    }
+  }),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   dateOfBirth: z.string().optional(), // Auto-extracted, display only
   gender: z.string().optional(), // Auto-extracted, display only
-  phone: z.string().regex(/^[6-8]\d{8}$/, 'Phone number must be 9 digits starting with 6, 7, or 8 (e.g., 821234567)'),
+  phone: z.string().superRefine((val, ctx) => {
+    const result = validatePhoneNational(val);
+    if (!result.valid) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: result.message });
+    }
+  }),
   race: z.enum(['african', 'coloured', 'indian', 'white', 'other', 'prefer_not_to_say']),
   homeLanguage: z.string().min(1, 'Home language is required'),
   disability: z.string().optional(),
@@ -88,6 +98,8 @@ export default function PersonalStep({ data, onNext, user }: Props) {
     formState: { errors },
   } = useForm<PersonalData>({
     resolver: zodResolver(personalSchema),
+    mode: 'onBlur',
+    reValidateMode: 'onChange',
     defaultValues: {
       idNumber: data.idNumber || '',
       firstName: user?.firstName || data.firstName || '',
@@ -99,6 +111,8 @@ export default function PersonalStep({ data, onNext, user }: Props) {
     },
   });
 
+  const values = watch();
+  const canProceed = personalSchema.safeParse(values).success;
   const idNumber = watch('idNumber');
 
   // Auto-extract DOB and gender when ID number changes
@@ -112,11 +126,9 @@ export default function PersonalStep({ data, onNext, user }: Props) {
   }, [idNumber]);
 
   const onSubmit = (formData: PersonalData) => {
-    // Convert phone to +27 format for storage
-    const phoneWithPrefix = `+27${formData.phone}`;
     onNext({
       ...formData,
-      phone: phoneWithPrefix,
+      phone: toE164(formData.phone),
       dateOfBirth: extractedInfo?.dateOfBirth,
       gender: extractedInfo?.gender.toLowerCase(),
     });
@@ -171,9 +183,21 @@ export default function PersonalStep({ data, onNext, user }: Props) {
             render={({ field }) => (
               <TextField
                 {...field}
+                value={formatIdNumber(field.value)}
+                onChange={(e) => field.onChange(digitsOnly(e.target.value).slice(0, 13))}
+                onPaste={(e) => {
+                  const pasted = e.clipboardData.getData('text');
+                  if (pasted) {
+                    e.preventDefault();
+                    field.onChange(digitsOnly(pasted).slice(0, 13));
+                  }
+                }}
                 label="SA ID Number"
+                required
                 fullWidth
-                placeholder="13-digit ID number"
+                placeholder="888888 8888 888"
+                autoComplete="off"
+                inputProps={{ inputMode: 'numeric' }}
                 error={!!errors.idNumber}
                 helperText={errors.idNumber?.message || 'Your date of birth and gender will be extracted automatically'}
               />
@@ -194,16 +218,14 @@ export default function PersonalStep({ data, onNext, user }: Props) {
             name="phone"
             control={control}
             render={({ field }) => (
-              <TextField
-                {...field}
+              <PhoneField
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
                 label="Phone Number"
-                fullWidth
-                placeholder="821234567"
+                required
                 error={!!errors.phone}
-                helperText={errors.phone?.message || 'Enter 9 digits after +27 (e.g., 821234567)'}
-                InputProps={{
-                  startAdornment: <Box component="span" sx={{ mr: 1, color: 'text.secondary', fontWeight: 600 }}>+27</Box>,
-                }}
+                helperText={errors.phone?.message}
               />
             )}
           />
@@ -218,6 +240,7 @@ export default function PersonalStep({ data, onNext, user }: Props) {
                 {...field}
                 label="Race"
                 select
+                required
                 fullWidth
                 error={!!errors.race}
                 helperText={errors.race?.message || 'For statistical reporting only'}
@@ -247,8 +270,10 @@ export default function PersonalStep({ data, onNext, user }: Props) {
                   <TextField
                     {...params}
                     label="Home Language"
+                    required
+                    onBlur={field.onBlur}
                     error={!!errors.homeLanguage}
-                    helperText={errors.homeLanguage?.message}
+                    helperText={errors.homeLanguage?.message || ' '}
                   />
                 )}
                 freeSolo
@@ -269,6 +294,7 @@ export default function PersonalStep({ data, onNext, user }: Props) {
                 multiline
                 rows={2}
                 placeholder="Leave blank if not applicable"
+                helperText="Optional"
               />
             )}
           />
@@ -276,7 +302,7 @@ export default function PersonalStep({ data, onNext, user }: Props) {
       </Grid>
 
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
-        <Button type="submit" variant="contained" size="large">
+        <Button type="submit" variant="contained" size="large" endIcon={<ArrowForwardIcon />} disabled={!canProceed}>
           Next
         </Button>
       </Box>

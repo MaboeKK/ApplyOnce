@@ -22,8 +22,15 @@ import SchoolStep from '@/components/Profile/SchoolStep';
 import ResultsStep from '@/components/Profile/ResultsStep';
 import ReviewStep from '@/components/Profile/ReviewStep';
 import api from '@/config/api';
+import { saveDraft, loadDraft, clearDraft } from '@/utils/draft-storage';
 
 const steps = ['Personal', 'Address', 'Guardian', 'School', 'Results', 'Review'];
+const WIZARD_DRAFT_KEY = 'applyonce_profile_wizard_draft';
+
+interface WizardDraft {
+  activeStep: number;
+  profileData: any;
+}
 
 export default function ProfileSetup() {
   const router = useRouter();
@@ -38,6 +45,8 @@ export default function ProfileSetup() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+  const [resumedFromDraft, setResumedFromDraft] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -90,11 +99,28 @@ export default function ProfileSetup() {
         }
       } catch (err) {
         console.error('Failed to fetch existing profile:', err);
+      } finally {
+        // A local draft always reflects more recent in-browser progress than the server
+        // (intermediate wizard steps aren't persisted server-side until final submit),
+        // so it takes priority — this is what lets a refresh mid-wizard resume correctly.
+        const draft = loadDraft<WizardDraft>(WIZARD_DRAFT_KEY);
+        if (draft) {
+          setProfileData(draft.profileData);
+          setActiveStep(draft.activeStep);
+          setResumedFromDraft(true);
+        }
+        setHydrated(true);
       }
     };
 
     fetchExistingProfile();
   }, [isAuthenticated, router]);
+
+  // Auto-save wizard progress so a refresh or interrupted session resumes where the user left off.
+  useEffect(() => {
+    if (!hydrated) return;
+    saveDraft<WizardDraft>(WIZARD_DRAFT_KEY, { activeStep, profileData });
+  }, [hydrated, activeStep, profileData]);
 
   const handleNext = (stepData: any) => {
     const stepKeys = ['personal', 'address', 'guardian', 'school', 'results', 'review'];
@@ -162,6 +188,8 @@ export default function ProfileSetup() {
         });
       }
 
+      clearDraft(WIZARD_DRAFT_KEY);
+
       // Redirect to dashboard
       router.push('/dashboard');
     } catch (err: any) {
@@ -208,6 +236,8 @@ export default function ProfileSetup() {
             data={profileData.guardian}
             onNext={handleNext}
             onBack={handleBack}
+            applicantPhone={profileData.personal.phone}
+            applicantEmail={user?.email}
           />
         );
       case 3:
@@ -260,6 +290,12 @@ export default function ProfileSetup() {
             </Step>
           ))}
         </Stepper>
+
+        {resumedFromDraft && (
+          <Alert severity="info" sx={{ mb: 3 }} onClose={() => setResumedFromDraft(false)}>
+            We restored your progress from where you left off.
+          </Alert>
+        )}
 
         {error && (
           <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>

@@ -11,6 +11,7 @@ import {
   Alert,
   Chip,
 } from '@mui/material';
+import { subjectLabel } from '@/utils/subject-labels';
 
 interface Props {
   data: any;
@@ -136,7 +137,9 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
               Relationship
             </Typography>
             <Typography variant="body1" sx={{ textTransform: 'capitalize' }}>
-              {data.guardian.relationship?.replace('_', ' ')}
+              {data.guardian.relationship === 'other'
+                ? data.guardian.otherRelationship
+                : data.guardian.relationship?.replace('_', ' ')}
             </Typography>
           </Grid>
           <Grid item xs={6}>
@@ -155,15 +158,7 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
               {data.guardian.email || '-'}
             </Typography>
           </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">
-              Employed
-            </Typography>
-            <Typography variant="body1">
-              {data.guardian.employed ? 'Yes' : 'No'}
-            </Typography>
-          </Grid>
-          {data.guardian.employed && data.guardian.annualIncome && (
+          {typeof data.guardian.annualIncome === 'number' && (
             <Grid item xs={6}>
               <Typography variant="body2" color="text.secondary">
                 Annual Income
@@ -174,6 +169,32 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
             </Grid>
           )}
         </Grid>
+        {data.guardian.emergencyContact?.firstName && (
+          <>
+            <Divider sx={{ my: 2 }} />
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+              Emergency Contact
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="text.secondary">
+                  Name
+                </Typography>
+                <Typography variant="body1">
+                  {data.guardian.emergencyContact.firstName} {data.guardian.emergencyContact.lastName}
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="text.secondary">
+                  Phone
+                </Typography>
+                <Typography variant="body1">
+                  {data.guardian.emergencyContact.phone || '-'}
+                </Typography>
+              </Grid>
+            </Grid>
+          </>
+        )}
       </Paper>
 
       <Paper sx={{ p: 3, mb: 3 }}>
@@ -216,7 +237,7 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
                 <Grid item xs={12} key={index}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Typography variant="body2">{subject.subject}</Typography>
+                      <Typography variant="body2">{subjectLabel(subject.subject)}</Typography>
                       {isLifeOrientation && (
                         <Chip label="Not Considered" size="small" color="default" sx={{ fontSize: '0.7rem', height: 20 }} />
                       )}
