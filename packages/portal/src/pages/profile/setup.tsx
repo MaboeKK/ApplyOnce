@@ -25,7 +25,14 @@ import api from '@/config/api';
 import { saveDraft, loadDraft, clearDraft } from '@/utils/draft-storage';
 
 const steps = ['Personal', 'Address', 'Guardian', 'School', 'Results', 'Review'];
-const WIZARD_DRAFT_KEY = 'applyonce_profile_wizard_draft';
+// Scoped per-user: an unscoped key would leak one student's PII (ID number, address,
+// guardian details) into another student's wizard if they share a browser.
+const WIZARD_DRAFT_KEY_PREFIX = 'applyonce_profile_wizard_draft';
+const LEGACY_UNSCOPED_DRAFT_KEY = 'applyonce_profile_wizard_draft'; // pre-fix key, must be purged
+
+function wizardDraftKey(userId: string): string {
+  return `${WIZARD_DRAFT_KEY_PREFIX}:${userId}`;
+}
 
 interface WizardDraft {
   activeStep: number;
@@ -100,27 +107,34 @@ export default function ProfileSetup() {
       } catch (err) {
         console.error('Failed to fetch existing profile:', err);
       } finally {
+        // A stray pre-fix draft was saved under an unscoped key and could belong to
+        // *any* student who used this browser — purge it so it can never be read again.
+        clearDraft(LEGACY_UNSCOPED_DRAFT_KEY);
+
         // A local draft always reflects more recent in-browser progress than the server
         // (intermediate wizard steps aren't persisted server-side until final submit),
         // so it takes priority — this is what lets a refresh mid-wizard resume correctly.
-        const draft = loadDraft<WizardDraft>(WIZARD_DRAFT_KEY);
-        if (draft) {
-          setProfileData(draft.profileData);
-          setActiveStep(draft.activeStep);
-          setResumedFromDraft(true);
+        // Scoped to this student's id so it can never resume with another student's data.
+        if (user?.id) {
+          const draft = loadDraft<WizardDraft>(wizardDraftKey(user.id));
+          if (draft) {
+            setProfileData(draft.profileData);
+            setActiveStep(draft.activeStep);
+            setResumedFromDraft(true);
+          }
         }
         setHydrated(true);
       }
     };
 
     fetchExistingProfile();
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, user?.id]);
 
   // Auto-save wizard progress so a refresh or interrupted session resumes where the user left off.
   useEffect(() => {
-    if (!hydrated) return;
-    saveDraft<WizardDraft>(WIZARD_DRAFT_KEY, { activeStep, profileData });
-  }, [hydrated, activeStep, profileData]);
+    if (!hydrated || !user?.id) return;
+    saveDraft<WizardDraft>(wizardDraftKey(user.id), { activeStep, profileData });
+  }, [hydrated, user?.id, activeStep, profileData]);
 
   const handleNext = (stepData: any) => {
     const stepKeys = ['personal', 'address', 'guardian', 'school', 'results', 'review'];
@@ -188,7 +202,7 @@ export default function ProfileSetup() {
         });
       }
 
-      clearDraft(WIZARD_DRAFT_KEY);
+      if (user?.id) clearDraft(wizardDraftKey(user.id));
 
       // Redirect to dashboard
       router.push('/dashboard');
@@ -255,6 +269,7 @@ export default function ProfileSetup() {
             onNext={handleNext}
             onBack={handleBack}
             profileData={profileData}
+            userId={user?.id}
           />
         );
       case 5:

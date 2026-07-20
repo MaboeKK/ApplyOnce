@@ -42,7 +42,12 @@ import { subjectLabel } from '@/utils/subject-labels';
 import { confidenceDisplay, ConfidenceTier } from '@/utils/confidence';
 import { saveDraft, loadDraft, clearDraft } from '@/utils/draft-storage';
 
-const DRAFT_KEY = 'applyonce_results_draft';
+// Scoped per-user: an unscoped key would leak one student's extracted matric results
+// into another student's session if they share a browser.
+const LEGACY_UNSCOPED_DRAFT_KEY = 'applyonce_results_draft'; // pre-fix key, must be purged
+function resultsDraftKey(userId: string): string {
+  return `applyonce_results_draft:${userId}`;
+}
 
 interface Subject {
   subject: string;
@@ -61,6 +66,7 @@ interface Props {
   onNext: (data: any) => void;
   onBack: () => void;
   profileData?: any; // To get the ID number typed in PersonalStep
+  userId?: string;
 }
 
 const OCR_BANNER: Record<ConfidenceTier, { severity: 'success' | 'warning' | 'error'; icon: JSX.Element; text: string }> = {
@@ -86,10 +92,19 @@ function calculateAPSFromSubjects(subjects: Subject[]): number {
   return eligible.reduce((sum, s) => sum + s.level, 0);
 }
 
-export default function ResultsStep({ data, onNext, onBack, profileData }: Props) {
+export default function ResultsStep({ data, onNext, onBack, profileData, userId }: Props) {
   const hasSavedResults = data.subjects.length > 0;
 
-  const draft = useMemo(() => (!hasSavedResults ? loadDraft<any>(DRAFT_KEY) : null), [hasSavedResults]);
+  // A stray pre-fix draft was saved under an unscoped key and could belong to *any*
+  // student who used this browser — purge it once so it can never be read again.
+  useEffect(() => {
+    clearDraft(LEGACY_UNSCOPED_DRAFT_KEY);
+  }, []);
+
+  const draft = useMemo(
+    () => (!hasSavedResults && userId ? loadDraft<any>(resultsDraftKey(userId)) : null),
+    [hasSavedResults, userId]
+  );
 
   const [step, setStep] = useState<'upload' | 'confirm' | 'id-doc'>(
     hasSavedResults ? 'id-doc' : draft?.step || 'upload'
@@ -127,9 +142,9 @@ export default function ResultsStep({ data, onNext, onBack, profileData }: Props
 
   // Persist in-progress edits so a refresh doesn't lose them (only while results aren't saved server-side yet).
   useEffect(() => {
-    if (hasSavedResults) return;
+    if (hasSavedResults || !userId) return;
     if (step === 'upload' && editedSubjects.length === 0) return;
-    saveDraft(DRAFT_KEY, {
+    saveDraft(resultsDraftKey(userId), {
       step,
       overallConfidence,
       originalSubjects,
@@ -139,7 +154,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData }: Props
       idDocUploaded,
       lastUpdated,
     });
-  }, [hasSavedResults, step, overallConfidence, originalSubjects, editedSubjects, warnings, matricIdNumber, idDocUploaded, lastUpdated]);
+  }, [hasSavedResults, userId, step, overallConfidence, originalSubjects, editedSubjects, warnings, matricIdNumber, idDocUploaded, lastUpdated]);
 
   const handleMatricUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -291,7 +306,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData }: Props
       return;
     }
 
-    clearDraft(DRAFT_KEY);
+    if (userId) clearDraft(resultsDraftKey(userId));
     onNext({
       subjects: editedSubjects,
       aps,
