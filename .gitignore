@@ -35,6 +35,9 @@ Thumbs.db
 # Test data is allowed in git EXCEPT real personal docs
 test-data/real/
 
+# Sourced prospectus PDFs — large external documents, not project source
+docs/prospectuses/
+
 # Coverage / cache
 coverage/
 .turbo/

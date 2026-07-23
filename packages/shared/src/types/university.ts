@@ -27,8 +27,27 @@ export interface ApsRule {
   method: 'standard_aps' | 'composite_index' | 'custom';
   subjectsCounted: number;            // UJ = 6, Wits = 7
   includesLifeOrientation: boolean;   // UJ = false, Wits = true
-  scale: 'nsc_7point';
+  scale: 'nsc_7point' | 'percentage_600' | 'percentage_average' | 'nsc_8point';
   bonusPoints?: string;
+  note?: string;
+  // Present when a university converts the base APS into a different,
+  // faculty-specific score before applying admission minimums (e.g. UCT's
+  // Faculty Points Score / Weighted Points Score).
+  facultyScoring?: FacultyScoringRule[];
+}
+
+// ── Per-faculty score transform (e.g. UCT APS → FPS → WPS) ──────────
+export interface FacultyScoringRule {
+  faculty: string;
+  scoreName: string;                  // e.g. 'FPS', 'WPS'
+  scoreMax: number;                   // e.g. 600, 800, 900
+  transform: string;                  // human-readable formula/description
+  disadvantageFactor?: {
+    maxPercent: number;               // e.g. 20 for Health Sciences (0-20%)
+    formula: string;                  // e.g. 'WPS = FPS + (factor% x FPS)'
+    note?: string;
+  };
+  usesNBT?: boolean;
   note?: string;
 }
 
@@ -98,6 +117,10 @@ export interface ApsMinimum {
   withMathematics?: number;
   withMathematicalLiteracy?: number;
   withTechnicalMathematics?: number;
+  // Which score this minimum is expressed in, when the university uses a
+  // faculty-specific transform (see ApsRule.facultyScoring). Omit for
+  // universities/programmes that use the plain APS.
+  scoreType?: string;                 // e.g. 'FPS', 'WPS'
 }
 
 export type SubjectStatus =
@@ -109,7 +132,8 @@ export type SubjectStatus =
 export interface SubjectRequirement {
   subject: SubjectKey;
   status: SubjectStatus;
-  minRating?: Rating;
+  minRating?: Rating;                 // 1-7 NSC achievement level (UJ/Wits style)
+  minPercentage?: number;             // raw NSC % (e.g. UCT: 'Mathematics 60%')
   homeLanguageRating?: Rating;
   additionalLanguageRating?: Rating;
   altGroup?: string;
