@@ -451,8 +451,12 @@ The matric results step is UPLOAD-FIRST, not manual entry. Ease of use is the pr
 - Proof of residence is NOT required
 - Block submission with a clear message if either is missing
 
-### Programme catalogue
-- Keep the **minimal** mock catalogue already in @applyonce/shared (a few programmes per university) — do not expand it
+### Programme catalogue — SUPERSEDED 2026-07-22
+- ~~Keep the minimal mock catalogue... do not expand it~~ — overridden by the founder. The catalogue IS now being expanded past MVP: real prospectus-derived rulesets for all 26 universities, following the UJ/Wits reference-implementation pattern already in `packages/shared/src/constants/universities.ts`.
+- Order of work: standard-APS universities first (UCT, UP, SU, UKZN, UFS, NWU, Rhodes, UWC, UFH, UniZulu, UL, UNIVEN, NMU, WSU, TUT, DUT, CPUT, VUT, CUT, MUT, SPU, UMP). SMU deferred (health-sciences-only, likely composite-index/NBT like Wits Health Sciences, not plain APS). UNISA deferred separately — its ODL/rolling-intake model doesn't fit the current `apsRule`/`choicesRanked`/`maxChoices` schema and needs a schema discussion before encoding.
+- Source documents: official "[University] Undergraduate Prospectus [year]" or "Minimum Admission Requirements" PDFs, gathered by the founder (not fetched/guessed by Claude — official admission PDFs move and change yearly, so accuracy requires the founder sourcing the current authoritative copy).
+- Drop sourced PDFs in `docs/prospectuses/<university-id>/` (gitignored — same treatment as `test-data/real/`: real external documents, not project source, shouldn't bloat the repo or backups).
+- Claude's job once a PDF lands: read it, extract `apsMinimum`, `subjectRequirements` (required/alternative/not_accepted + minRating, home/additional language ratings), `waitlistBand`, `additionalRequirements` (NBT/portfolio/etc), `closingDateOverride`, `maxChoices`/`choicesRanked`/`choicesIndependent`/`choicesFinal`, `applicationFee`, and the university's `apsRule` (subjectsCounted, includesLifeOrientation, scale) — then encode as a fully-detailed `University` entry replacing its placeholder, matching the UJ/Wits style already in the file.
 
 ### Applications are final
 - **No withdraw** — once an application is submitted it cannot be withdrawn or deleted by the student
