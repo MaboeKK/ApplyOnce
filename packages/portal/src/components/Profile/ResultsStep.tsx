@@ -41,6 +41,7 @@ import { markToAPS } from '@applyonce/shared';
 import { subjectLabel } from '@/utils/subject-labels';
 import { confidenceDisplay, ConfidenceTier } from '@/utils/confidence';
 import { saveDraft, loadDraft, clearDraft } from '@/utils/draft-storage';
+import { getErrorMessage } from '@/utils/error-message';
 
 // Scoped per-user: an unscoped key would leak one student's extracted matric results
 // into another student's session if they share a browser.
@@ -49,7 +50,7 @@ function resultsDraftKey(userId: string): string {
   return `applyonce_results_draft:${userId}`;
 }
 
-interface Subject {
+export interface Subject {
   subject: string;
   mark: number;
   level: number;
@@ -58,14 +59,34 @@ interface Subject {
   edited?: boolean;
 }
 
+interface ResultsData {
+  subjects: Subject[];
+  aps: number | null;
+}
+
+interface ResultsDraft {
+  step: 'upload' | 'confirm' | 'id-doc';
+  overallConfidence: ConfidenceTier | null;
+  originalSubjects: Subject[];
+  editedSubjects: Subject[];
+  warnings: string[];
+  matricIdNumber: string | null;
+  idDocUploaded: boolean;
+  lastUpdated: string | null;
+}
+
+interface OcrSubject {
+  subject: string;
+  mark?: number;
+  year?: number;
+  confidence?: ConfidenceTier;
+}
+
 interface Props {
-  data: {
-    subjects: Subject[];
-    aps: number | null;
-  };
-  onNext: (data: any) => void;
+  data: ResultsData;
+  onNext: (data: ResultsData) => void;
   onBack: () => void;
-  profileData?: any; // To get the ID number typed in PersonalStep
+  profileData?: { personal?: { idNumber?: string } }; // To get the ID number typed in PersonalStep
   userId?: string;
 }
 
@@ -102,7 +123,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
   }, []);
 
   const draft = useMemo(
-    () => (!hasSavedResults && userId ? loadDraft<any>(resultsDraftKey(userId)) : null),
+    () => (!hasSavedResults && userId ? loadDraft<ResultsDraft>(resultsDraftKey(userId)) : null),
     [hasSavedResults, userId]
   );
 
@@ -173,7 +194,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
 
       const { ocr } = response.data;
 
-      const subjects: Subject[] = ocr.subjects.map((s: any) => ({
+      const subjects: Subject[] = ocr.subjects.map((s: OcrSubject) => ({
         ...s,
         year: s.year || currentYear,
         mark: s.mark ?? 0,
@@ -189,9 +210,8 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
       setCertFile(file);
       setLastUpdated(new Date());
       setStep('confirm');
-    } catch (err: any) {
-      const message = err.response?.data?.error?.message || 'Failed to scan certificate';
-      setError(message);
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to scan certificate'));
     } finally {
       setLoading(false);
     }
@@ -288,9 +308,8 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
       }
 
       setIdDocUploaded(true);
-    } catch (err: any) {
-      const message = err.response?.data?.error?.message || 'Failed to scan ID document';
-      setError(message);
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to scan ID document'));
     } finally {
       setIdDocUploading(false);
     }

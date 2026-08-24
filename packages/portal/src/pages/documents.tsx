@@ -23,14 +23,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
 import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
-
-interface Document {
-  id: string;
-  type: string;
-  fileName: string;
-  uploadedAt: string;
-  sizeBytes: number;
-}
+import PortalNav from '@/components/Layout/PortalNav';
+import { getErrorMessage } from '@/utils/error-message';
+import type { PortalDocument } from '@/types';
 
 const documentTypeLabels: Record<string, string> = {
   matric_certificate: 'Matric Certificate',
@@ -41,7 +36,7 @@ const documentTypeLabels: Record<string, string> = {
 export default function DocumentsPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
-  const [documents, setDocuments] = useState<Document[]>([]);
+  const [documents, setDocuments] = useState<PortalDocument[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -59,9 +54,8 @@ export default function DocumentsPage() {
     try {
       const response = await api.get('/documents');
       setDocuments(response.data.documents || []);
-    } catch (err: any) {
-      const message = err.response?.data?.error?.message || 'Failed to load documents';
-      setError(message);
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to load documents'));
     } finally {
       setLoading(false);
     }
@@ -84,9 +78,8 @@ export default function DocumentsPage() {
       });
 
       await fetchDocuments();
-    } catch (err: any) {
-      const message = err.response?.data?.error?.message || 'Failed to upload document';
-      setError(message);
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to upload document'));
     } finally {
       setUploading(false);
     }
@@ -98,9 +91,8 @@ export default function DocumentsPage() {
     try {
       await api.delete(`/documents/${id}`);
       await fetchDocuments();
-    } catch (err: any) {
-      const message = err.response?.data?.error?.message || 'Failed to delete document';
-      setError(message);
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to delete document'));
     }
   };
 
@@ -114,9 +106,8 @@ export default function DocumentsPage() {
       document.body.appendChild(link);
       link.click();
       link.remove();
-    } catch (err: any) {
-      const message = err.response?.data?.error?.message || 'Failed to download document';
-      setError(message);
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to download document'));
     }
   };
 
@@ -132,13 +123,18 @@ export default function DocumentsPage() {
 
   if (loading) {
     return (
-      <Container maxWidth="lg" sx={{ py: 6, textAlign: 'center' }}>
-        <CircularProgress />
-      </Container>
+      <>
+        <PortalNav />
+        <Container maxWidth="lg" sx={{ py: 6, textAlign: 'center' }}>
+          <CircularProgress />
+        </Container>
+      </>
     );
   }
 
   return (
+    <>
+    <PortalNav />
     <Container maxWidth="lg" sx={{ py: 6 }}>
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" gutterBottom>
@@ -330,5 +326,6 @@ export default function DocumentsPage() {
         </Button>
       </Box>
     </Container>
+    </>
   );
 }

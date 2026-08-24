@@ -23,8 +23,9 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
 import PortalNav from '@/components/Layout/PortalNav';
+import type { PortalApplication, ApplicationStatus, ApplicationEvent } from '@/types';
 
-function getStatusConfig(status: string) {
+function getStatusConfig(status: ApplicationStatus) {
   switch (status) {
     case 'draft':
       return { color: 'default' as const, label: 'Draft', icon: <HourglassEmptyIcon fontSize="small" /> };
@@ -53,7 +54,7 @@ export default function ApplicationDetailPage() {
   const { id } = router.query;
   const { isAuthenticated } = useAuthStore();
 
-  const [application, setApplication] = useState<any>(null);
+  const [application, setApplication] = useState<PortalApplication | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -153,8 +154,8 @@ export default function ApplicationDetailPage() {
           </Typography>
           <Divider sx={{ mb: 2 }} />
           <Stack spacing={2}>
-            {application.events?.length > 0 ? (
-              application.events.map((event: any) => (
+            {(application.events?.length ?? 0) > 0 ? (
+              application.events!.map((event: ApplicationEvent) => (
                 <Stack key={event.id} direction="row" spacing={1.5} alignItems="flex-start">
                   <FiberManualRecordIcon sx={{ fontSize: 12, mt: 0.7 }} color="primary" />
                   <Box>

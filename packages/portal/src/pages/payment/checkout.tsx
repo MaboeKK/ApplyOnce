@@ -17,13 +17,15 @@ import {
 import LockIcon from '@mui/icons-material/Lock';
 import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
+import { getErrorMessage } from '@/utils/error-message';
+import type { PortalPayment } from '@/types';
 
 export default function PaymentCheckoutPage() {
   const router = useRouter();
   const { paymentId } = router.query;
   const { isAuthenticated } = useAuthStore();
 
-  const [payment, setPayment] = useState<any>(null);
+  const [payment, setPayment] = useState<PortalPayment | null>(null);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState('');
@@ -52,8 +54,8 @@ export default function PaymentCheckoutPage() {
         gatewayReference: `MOCK-${Date.now()}`,
       });
       router.push(`/payment/success?paymentId=${paymentId}`);
-    } catch (err: any) {
-      setError(err.response?.data?.error?.message || 'Payment failed');
+    } catch (err) {
+      setError(getErrorMessage(err, 'Payment failed'));
       setProcessing(false);
     }
   };
@@ -106,7 +108,7 @@ export default function PaymentCheckoutPage() {
           </Typography>
 
           <Stack spacing={1} sx={{ my: 3 }}>
-            {payment.breakdown?.map((item: any) => (
+            {payment.breakdown?.map((item) => (
               <Stack key={item.applicationId} direction="row" justifyContent="space-between">
                 <Typography variant="body2">
                   {item.programmeName} ({item.universityName})

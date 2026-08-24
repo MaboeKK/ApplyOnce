@@ -35,10 +35,10 @@ export function requireAuth(
 
     next();
   } catch (error) {
-    if (error instanceof jwt.JsonWebTokenError) {
-      next(new UnauthorizedError('Invalid token', 'INVALID_TOKEN'));
-    } else if (error instanceof jwt.TokenExpiredError) {
+    if (error instanceof jwt.TokenExpiredError) {
       next(new UnauthorizedError('Token expired', 'TOKEN_EXPIRED'));
+    } else if (error instanceof jwt.JsonWebTokenError) {
+      next(new UnauthorizedError('Invalid token', 'INVALID_TOKEN'));
     } else {
       next(error);
     }

@@ -12,13 +12,16 @@ import {
   Chip,
 } from '@mui/material';
 import { subjectLabel } from '@/utils/subject-labels';
+import type { User } from '@/store/auth';
+import type { ProfileWizardData } from '@/pages/profile/setup';
+import type { Subject } from '@/components/Profile/ResultsStep';
 
 interface Props {
-  data: any;
+  data: ProfileWizardData;
   onBack: () => void;
   onSubmit: () => void;
   loading: boolean;
-  user: any;
+  user: User | null;
 }
 
 export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Props) {
@@ -113,7 +116,7 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
           {data.address.street}
           {data.address.suburb && `, ${data.address.suburb}`}
           <br />
-          {data.address.city}, {provinceNames[data.address.province] || data.address.province}
+          {data.address.city}, {(data.address.province && provinceNames[data.address.province]) || data.address.province}
           <br />
           {data.address.postalCode}
         </Typography>
@@ -230,7 +233,7 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
             APS: {data.results.aps}
           </Typography>
           <Grid container spacing={1}>
-            {data.results.subjects.map((subject: any, index: number) => {
+            {data.results.subjects.map((subject: Subject, index: number) => {
               const isLifeOrientation = subject.subject.toLowerCase().includes('life orientation') ||
                                        subject.subject.toLowerCase().includes('life_orientation');
               return (

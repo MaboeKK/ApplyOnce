@@ -2,6 +2,7 @@
 // University admin controllers (applications inbox, detail, decision, document download)
 
 import { Response } from 'express';
+import { Prisma } from '@prisma/client';
 import path from 'path';
 import fs from 'fs';
 import { AuthRequest } from '../types/express';
@@ -23,8 +24,7 @@ export const getApplications = asyncHandler(async (req: AuthRequest, res: Respon
   const statusFilter = req.query.status as string | undefined;
 
   // Build where clause with mandatory university filter
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const where: any = {
+  const where: Prisma.ApplicationWhereInput = {
     universityId,
   };
 

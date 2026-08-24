@@ -27,6 +27,9 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
 import PortalNav from '@/components/Layout/PortalNav';
+import { getErrorMessage } from '@/utils/error-message';
+import type { ProgrammeMatch } from '@/types';
+import type { Programme } from '@applyonce/shared';
 
 interface University {
   id: string;
@@ -37,7 +40,7 @@ interface University {
   type?: string;
   city?: string;
   province?: string;
-  programmes: any[];
+  programmes: Programme[];
 }
 
 const strategyColor: Record<string, 'error' | 'success' | 'primary' | 'warning'> = {
@@ -61,7 +64,7 @@ export default function UniversitiesPage() {
   const [search, setSearch] = useState('');
   const [province, setProvince] = useState('all');
   const [apsToggle, setApsToggle] = useState(false);
-  const [matchesByUni, setMatchesByUni] = useState<Record<string, any[]>>({});
+  const [matchesByUni, setMatchesByUni] = useState<Record<string, ProgrammeMatch[]>>({});
   const [apsByUni, setApsByUni] = useState<Record<string, number>>({});
   const [matchesError, setMatchesError] = useState('');
   const [matchesLoading, setMatchesLoading] = useState(false);
@@ -82,8 +85,8 @@ export default function UniversitiesPage() {
     setMatchesError('');
     try {
       const res = await api.get('/aps/matches');
-      const grouped: Record<string, any[]> = {};
-      for (const m of res.data.matches || []) {
+      const grouped: Record<string, ProgrammeMatch[]> = {};
+      for (const m of (res.data.matches || []) as ProgrammeMatch[]) {
         grouped[m.universityId] = grouped[m.universityId] || [];
         grouped[m.universityId].push(m);
       }
@@ -93,10 +96,9 @@ export default function UniversitiesPage() {
       }
       setMatchesByUni(grouped);
       setApsByUni(apsMap);
-    } catch (err: any) {
+    } catch (err) {
       setMatchesError(
-        err.response?.data?.error?.message ||
-          'Upload your matric results to see which universities you qualify for.'
+        getErrorMessage(err, 'Upload your matric results to see which universities you qualify for.')
       );
       setApsToggle(false);
     } finally {

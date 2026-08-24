@@ -21,8 +21,16 @@ import GuardianStep from '@/components/Profile/GuardianStep';
 import SchoolStep from '@/components/Profile/SchoolStep';
 import ResultsStep from '@/components/Profile/ResultsStep';
 import ReviewStep from '@/components/Profile/ReviewStep';
+import { AxiosError } from 'axios';
+import { markToAPS } from '@applyonce/shared';
 import api from '@/config/api';
 import { saveDraft, loadDraft, clearDraft } from '@/utils/draft-storage';
+import type { StudentProfile } from '@/types';
+import type { PersonalData } from '@/components/Profile/PersonalStep';
+import type { AddressData } from '@/components/Profile/AddressStep';
+import type { GuardianStepData } from '@/components/Profile/GuardianStep';
+import type { SchoolData } from '@/components/Profile/SchoolStep';
+import type { Subject } from '@/components/Profile/ResultsStep';
 
 const steps = ['Personal', 'Address', 'Guardian', 'School', 'Results', 'Review'];
 // Scoped per-user: an unscoped key would leak one student's PII (ID number, address,
@@ -34,16 +42,24 @@ function wizardDraftKey(userId: string): string {
   return `${WIZARD_DRAFT_KEY_PREFIX}:${userId}`;
 }
 
+export interface ProfileWizardData {
+  personal: Partial<PersonalData> & { nationality?: string };
+  address: Partial<AddressData>;
+  guardian: Partial<GuardianStepData>;
+  school: Partial<SchoolData>;
+  results: { subjects: Subject[]; aps: number | null };
+}
+
 interface WizardDraft {
   activeStep: number;
-  profileData: any;
+  profileData: ProfileWizardData;
 }
 
 export default function ProfileSetup() {
   const router = useRouter();
   const { isAuthenticated, user } = useAuthStore();
   const [activeStep, setActiveStep] = useState(0);
-  const [profileData, setProfileData] = useState<any>({
+  const [profileData, setProfileData] = useState<ProfileWizardData>({
     personal: {},
     address: {},
     guardian: {},
@@ -65,7 +81,7 @@ export default function ProfileSetup() {
     const fetchExistingProfile = async () => {
       try {
         const response = await api.get('/students/me');
-        const student = response.data.student;
+        const student: StudentProfile = response.data.student;
 
         // Pre-fill profile data if it exists
         if (student) {
@@ -73,7 +89,7 @@ export default function ProfileSetup() {
             personal: {
               idNumber: student.idNumber || '',
               phone: student.phone || '',
-              race: student.race || 'prefer_not_to_say',
+              race: (student.race as PersonalData['race']) || 'prefer_not_to_say',
               homeLanguage: student.homeLanguage || '',
               disability: student.disability || '',
             },
@@ -84,7 +100,12 @@ export default function ProfileSetup() {
               school: student.school || '',
             },
             results: {
-              subjects: student.subjectResults || [],
+              subjects: (student.subjectResults || []).map((s) => ({
+                subject: s.subject,
+                mark: s.mark,
+                level: s.level ?? markToAPS(s.mark),
+                year: s.year,
+              })),
               aps: student.aps || null,
             },
           });
@@ -136,14 +157,14 @@ export default function ProfileSetup() {
     saveDraft<WizardDraft>(wizardDraftKey(user.id), { activeStep, profileData });
   }, [hydrated, user?.id, activeStep, profileData]);
 
-  const handleNext = (stepData: any) => {
+  const handleNext = (stepData: unknown) => {
     const stepKeys = ['personal', 'address', 'guardian', 'school', 'results', 'review'];
     const currentKey = stepKeys[activeStep];
 
-    setProfileData((prev: any) => ({
+    setProfileData((prev) => ({
       ...prev,
       [currentKey]: stepData,
-    }));
+    } as ProfileWizardData));
 
     setActiveStep((prev) => prev + 1);
     setError('');
@@ -160,10 +181,10 @@ export default function ProfileSetup() {
 
     try {
       // Clean data: convert empty strings to undefined for optional fields
-      const cleanData = (obj: any): any => {
+      const cleanData = (obj: unknown): unknown => {
         if (!obj || typeof obj !== 'object') return obj;
-        const cleaned: any = {};
-        for (const [key, value] of Object.entries(obj)) {
+        const cleaned: Record<string, unknown> = {};
+        for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
           if (value === '') {
             // Omit empty strings (let optional fields be undefined)
             continue;
@@ -206,15 +227,16 @@ export default function ProfileSetup() {
 
       // Redirect to dashboard
       router.push('/dashboard');
-    } catch (err: any) {
+    } catch (err) {
       // Extract validation details if available
-      const errorData = err.response?.data?.error;
+      const axiosErr = err as AxiosError<{ error?: { message?: string; details?: Array<{ path: string; message: string }> } }>;
+      const errorData = axiosErr.response?.data?.error;
       let message = errorData?.message || 'Failed to save profile';
 
       // Append validation details if present
       if (errorData?.details && Array.isArray(errorData.details)) {
         const fieldErrors = errorData.details
-          .map((d: any) => `${d.path}: ${d.message}`)
+          .map((d) => `${d.path}: ${d.message}`)
           .join(', ');
         message = `${message} — ${fieldErrors}`;
       }

@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { AxiosError } from 'axios';
 import {
   Box,
   Typography,
@@ -56,9 +57,10 @@ export default function ApplicationsPage() {
         setError(null);
         const response = await api.get('/admin/applications');
         setApplications(response.data.applications);
-      } catch (err: any) {
+      } catch (err) {
         console.error('Error fetching applications:', err);
-        setError(err.response?.data?.message || 'Failed to load applications');
+        const axiosErr = err as AxiosError<{ message?: string }>;
+        setError(axiosErr.response?.data?.message || 'Failed to load applications');
       } finally {
         setLoading(false);
       }

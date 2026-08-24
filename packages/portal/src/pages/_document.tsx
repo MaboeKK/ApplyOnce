@@ -2,11 +2,18 @@
 // Next.js custom document for MUI SSR
 
 import Document, { Html, Head, Main, NextScript, DocumentContext } from 'next/document';
+import type { AppProps } from 'next/app';
+import type { ComponentType, ReactElement } from 'react';
 import createEmotionServer from '@emotion/server/create-instance';
+import { EmotionCache } from '@emotion/react';
 import createEmotionCache from '@/utils/createEmotionCache';
 import { theme } from '@/theme';
 
-export default class MyDocument extends Document {
+interface MyDocumentProps {
+  emotionStyleTags: ReactElement[];
+}
+
+export default class MyDocument extends Document<MyDocumentProps> {
   render() {
     return (
       <Html lang="en">
@@ -19,7 +26,7 @@ export default class MyDocument extends Document {
             rel="stylesheet"
           />
           {/* Inject MUI emotion styles for SSR */}
-          {(this.props as any).emotionStyleTags}
+          {this.props.emotionStyleTags}
         </Head>
         <body>
           <Main />
@@ -37,8 +44,8 @@ MyDocument.getInitialProps = async (ctx: DocumentContext) => {
 
   ctx.renderPage = () =>
     originalRenderPage({
-      enhanceApp: (App: any) =>
-        function EnhanceApp(props) {
+      enhanceApp: (App: ComponentType<AppProps & { emotionCache?: EmotionCache }>) =>
+        function EnhanceApp(props: AppProps) {
           return <App emotionCache={cache} {...props} />;
         },
     });

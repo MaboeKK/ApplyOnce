@@ -40,16 +40,13 @@ import {
   CheckCircle as CheckCircleIcon,
   Cancel as CancelIcon,
 } from '@mui/icons-material';
+import { AxiosError } from 'axios';
 import DashboardLayout from '@/components/Layout/DashboardLayout';
 import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
+import { calculateAPS as calculateAPSShared, getUniversityById, type SubjectResult as SharedSubjectResult, type Address } from '@applyonce/shared';
 
-interface SubjectResult {
-  id: string;
-  subject: string;
-  mark: number;
-  achievementLevel: number;
-}
+type SubjectResult = SharedSubjectResult;
 
 interface Document {
   id: string;
@@ -71,7 +68,7 @@ interface Student {
   race: string | null;
   nationality: string;
   homeLanguage: string | null;
-  address: any;
+  address: Address | null;
   matricYear: number;
   school: string | null;
   subjectResults: SubjectResult[];
@@ -132,14 +129,15 @@ export default function ApplicationDetailPage() {
         setError(null);
         const response = await api.get(`/admin/applications/${id}`);
         setApplication(response.data.application);
-      } catch (err: any) {
+      } catch (err) {
         console.error('Error fetching application:', err);
-        if (err.response?.status === 403) {
+        const axiosErr = err as AxiosError<{ message?: string }>;
+        if (axiosErr.response?.status === 403) {
           setError('You do not have permission to view this application. It may belong to another university.');
-        } else if (err.response?.status === 404) {
+        } else if (axiosErr.response?.status === 404) {
           setError('Application not found.');
         } else {
-          setError(err.response?.data?.message || 'Failed to load application');
+          setError(axiosErr.response?.data?.message || 'Failed to load application');
         }
       } finally {
         setLoading(false);
@@ -178,14 +176,15 @@ export default function ApplicationDetailPage() {
       setConfirmDialogOpen(false);
       setDecision('');
       setReason('');
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error submitting decision:', err);
-      if (err.response?.status === 400 && err.response?.data?.code === 'ALREADY_DECIDED') {
+      const axiosErr = err as AxiosError<{ message?: string; code?: string }>;
+      if (axiosErr.response?.status === 400 && axiosErr.response?.data?.code === 'ALREADY_DECIDED') {
         setSubmitError('This application has already been decided.');
-      } else if (err.response?.status === 403) {
+      } else if (axiosErr.response?.status === 403) {
         setSubmitError('You do not have permission to decide on this application.');
       } else {
-        setSubmitError(err.response?.data?.message || 'Failed to submit decision');
+        setSubmitError(axiosErr.response?.data?.message || 'Failed to submit decision');
       }
     } finally {
       setSubmitting(false);
@@ -225,14 +224,10 @@ export default function ApplicationDetailPage() {
     }
   };
 
-  const calculateAPS = (subjectResults: SubjectResult[]) => {
-    // Exclude Life Orientation and take best 6
-    const eligibleSubjects = subjectResults.filter(
-      (s) => s.subject !== 'Life Orientation'
-    );
-    const sorted = [...eligibleSubjects].sort((a, b) => b.achievementLevel - a.achievementLevel);
-    const best6 = sorted.slice(0, 6);
-    return best6.reduce((sum, s) => sum + s.achievementLevel, 0);
+  const calculateAPS = (subjectResults: SubjectResult[], universityId: string) => {
+    const university = getUniversityById(universityId);
+    if (!university) return null;
+    return calculateAPSShared(subjectResults, university).totalAPS;
   };
 
   if (!isAuthenticated || !user) {
@@ -274,7 +269,7 @@ export default function ApplicationDetailPage() {
   }
 
   const student = application.student;
-  const aps = calculateAPS(student.subjectResults);
+  const aps = calculateAPS(student.subjectResults, application.universityId);
   const alreadyDecided = !!application.decision;
 
   return (
@@ -420,7 +415,7 @@ export default function ApplicationDetailPage() {
                 Subject Results
               </Typography>
               <Chip
-                label={`APS: ${aps}`}
+                label={`APS: ${aps ?? 'N/A'}`}
                 color="primary"
                 sx={{ fontWeight: 600, fontSize: '1rem' }}
               />
@@ -441,7 +436,7 @@ export default function ApplicationDetailPage() {
                     <TableRow key={subject.id}>
                       <TableCell>{subject.subject}</TableCell>
                       <TableCell align="center">{subject.mark}</TableCell>
-                      <TableCell align="center">{subject.achievementLevel}</TableCell>
+                      <TableCell align="center">{subject.level}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -604,7 +599,7 @@ export default function ApplicationDetailPage() {
                       label={
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <CancelIcon color="error" fontSize="small" />
-                          <Typography>Decline</Typography>
+                          <Typography>Reject</Typography>
                         </Box>
                       }
                     />
@@ -655,6 +650,11 @@ export default function ApplicationDetailPage() {
             <br />
             This decision will be immediately visible to the student and cannot be undone.
           </DialogContentText>
+          {submitError && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              {submitError}
+            </Alert>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmDialogOpen(false)} disabled={submitting}>

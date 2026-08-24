@@ -2,7 +2,10 @@
 // Next.js custom document for admin portal
 
 import Document, { Html, Head, Main, NextScript, DocumentContext } from 'next/document';
+import type { AppProps } from 'next/app';
+import type { ComponentType } from 'react';
 import createEmotionServer from '@emotion/server/create-instance';
+import { EmotionCache } from '@emotion/react';
 import createEmotionCache from '@/utils/createEmotionCache';
 
 export default class MyDocument extends Document {
@@ -33,8 +36,8 @@ MyDocument.getInitialProps = async (ctx: DocumentContext) => {
 
   ctx.renderPage = () =>
     originalRenderPage({
-      enhanceApp: (App: any) =>
-        function EnhanceApp(props) {
+      enhanceApp: (App: ComponentType<AppProps & { emotionCache?: EmotionCache }>) =>
+        function EnhanceApp(props: AppProps) {
           return <App emotionCache={cache} {...props} />;
         },
     });

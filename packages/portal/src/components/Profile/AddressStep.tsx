@@ -50,7 +50,7 @@ const addressSchema = z.object({
   postalCode: z.string().regex(/^\d{4}$/, 'Postal code must contain exactly 4 digits.'),
 });
 
-type AddressData = z.infer<typeof addressSchema>;
+export type AddressData = z.infer<typeof addressSchema>;
 
 interface Props {
   data: Partial<AddressData>;

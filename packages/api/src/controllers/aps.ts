@@ -12,6 +12,7 @@ import {
   classifyChoice,
   UNIVERSITIES,
   SubjectResult,
+  NSCSubject,
   getUniversityById,
 } from '@applyonce/shared';
 
@@ -71,8 +72,7 @@ export const getAPSMatches = asyncHandler(async (req: AuthRequest, res: Response
   const results: SubjectResult[] = subjectResults.map((r) => ({
     id: r.id,
     studentId: r.studentId,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    subject: r.subject as any,
+    subject: r.subject as NSCSubject,
     mark: r.mark,
     level: r.level,
     year: r.year,

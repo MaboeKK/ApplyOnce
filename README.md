@@ -1,8 +1,8 @@
 # ApplyOnce
 
-> Apply to every South African university. Once.
+> Apply to every university. Once.
 
-ApplyOnce is a mobile application that allows South African matric students and post-matric applicants to apply to multiple universities through a single unified platform.
+ApplyOnce is a South African web platform where matric students apply to all 26 public universities through one profile, one document vault, and one payment. University admins review and respond on a separate portal.
 
 ## Quick Links
 
@@ -14,12 +14,21 @@ ApplyOnce is a mobile application that allows South African matric students and 
 
 ## Status
 
-**Stage:** Concept & Planning complete. Build phase starting.
+**Stage:** Active build. Core student and university-admin flows are implemented; real prospectus data is being backfilled per university.
+
+## Monorepo Layout
+
+- `packages/api` — Express 4 + TypeScript backend, serves both portals
+- `packages/portal` — student-facing Next.js app
+- `packages/admin` — university-admin Next.js app
+- `packages/shared` — shared types, APS calculator, university constants, and mock adapters (`@applyonce/shared`)
 
 ## Tech Stack
 
-- **Mobile:** React Native (Android + iOS)
-- **Backend:** Node.js / TypeScript
-- **Database:** PostgreSQL
-- **Payments:** PayFast
+- **Frontend:** Next.js 13 + MUI 6 (student portal and university-admin portal)
+- **Backend:** Express 4 + TypeScript
+- **Database:** PostgreSQL 16 (via Prisma 6)
+- **Cache/sessions:** Redis 7
+- **Auth:** JWT in httpOnly cookies
+- **Payments:** Mock PayGate (swapped for a real merchant account post-MVP)
 - **Language:** TypeScript throughout

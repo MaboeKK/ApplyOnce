@@ -19,7 +19,7 @@ const schoolSchema = z.object({
   school: z.string().min(1, 'School name is required'),
 });
 
-type SchoolData = z.infer<typeof schoolSchema>;
+export type SchoolData = z.infer<typeof schoolSchema>;
 
 interface Props {
   data: Partial<SchoolData>;

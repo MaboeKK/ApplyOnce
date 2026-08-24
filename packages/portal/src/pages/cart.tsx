@@ -21,6 +21,8 @@ import { SERVICE_FEE_ZAR } from '@applyonce/shared';
 import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
 import PortalNav from '@/components/Layout/PortalNav';
+import { getErrorMessage } from '@/utils/error-message';
+import type { PortalApplication, ProgrammeMatch } from '@/types';
 
 const strategyColor: Record<string, 'error' | 'success' | 'primary' | 'warning'> = {
   reach: 'warning',
@@ -38,7 +40,7 @@ export default function CartPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
 
-  const [applications, setApplications] = useState<any[]>([]);
+  const [applications, setApplications] = useState<PortalApplication[]>([]);
   const [feeByUni, setFeeByUni] = useState<Record<string, number>>({});
   const [strategyByCode, setStrategyByCode] = useState<Record<string, string>>({});
   const [hasMatricCert, setHasMatricCert] = useState(false);
@@ -66,7 +68,7 @@ export default function CartPage() {
         api.get('/students/me'),
       ]);
 
-      const drafts = (appsRes.data.applications || []).filter((a: any) => a.status === 'draft');
+      const drafts = (appsRes.data.applications || []).filter((a: PortalApplication) => a.status === 'draft');
       setApplications(drafts);
 
       const fees: Record<string, number> = {};
@@ -76,21 +78,21 @@ export default function CartPage() {
       setFeeByUni(fees);
 
       const student = studentRes.data.student;
-      setHasMatricCert(!!student?.documents?.some((d: any) => d.type === 'matric_certificate'));
-      setHasIdDoc(!!student?.documents?.some((d: any) => d.type === 'id_document'));
+      setHasMatricCert(!!student?.documents?.some((d: { type: string }) => d.type === 'matric_certificate'));
+      setHasIdDoc(!!student?.documents?.some((d: { type: string }) => d.type === 'id_document'));
 
       try {
         const matchesRes = await api.get('/aps/matches');
         const map: Record<string, string> = {};
-        for (const m of matchesRes.data.matches || []) {
+        for (const m of (matchesRes.data.matches || []) as ProgrammeMatch[]) {
           map[`${m.universityId}:${m.programmeCode}`] = m.choiceStrategy;
         }
         setStrategyByCode(map);
       } catch {
         // Student hasn't uploaded results yet — skip strategy tagging
       }
-    } catch (err: any) {
-      setError(err.response?.data?.error?.message || 'Failed to load your cart');
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to load your cart'));
     } finally {
       setLoading(false);
     }
@@ -101,8 +103,8 @@ export default function CartPage() {
     try {
       await api.delete(`/applications/${id}`);
       setApplications((prev) => prev.filter((a) => a.id !== id));
-    } catch (err: any) {
-      setError(err.response?.data?.error?.message || 'Failed to remove application');
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to remove application'));
     } finally {
       setRemovingId(null);
     }
@@ -119,8 +121,8 @@ export default function CartPage() {
         cancelUrl: `${origin}/payment/failed`,
       });
       router.push(`/payment/checkout?paymentId=${res.data.payment.id}`);
-    } catch (err: any) {
-      setError(err.response?.data?.error?.message || 'Failed to start payment');
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to start payment'));
       setSubmitting(false);
     }
   };
