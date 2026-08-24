@@ -2,10 +2,11 @@
 // Application management (draft creation, retrieval, deletion)
 
 import { Response } from 'express';
+import { Prisma } from '@prisma/client';
 import { AuthRequest } from '../types/express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { prisma } from '../utils/prisma';
-import { BadRequestError, NotFoundError, ForbiddenError } from '../utils/errors';
+import { BadRequestError, ConflictError, NotFoundError, ForbiddenError } from '../utils/errors';
 
 /**
  * POST /v1/applications
@@ -36,18 +37,30 @@ export const createApplication = asyncHandler(
       );
     }
 
-    // Create draft application
-    const application = await prisma.application.create({
-      data: {
-        studentId,
-        universityId,
-        universityName,
-        programmeId,
-        programmeName,
-        facultyName,
-        status: 'draft',
-      },
-    });
+    // Create draft application. The findFirst check above handles the
+    // common case; the DB-level unique constraint on [studentId, universityId]
+    // is the source of truth and closes the race between two concurrent requests.
+    let application;
+    try {
+      application = await prisma.application.create({
+        data: {
+          studentId,
+          universityId,
+          universityName,
+          programmeId,
+          programmeName,
+          facultyName,
+          status: 'draft',
+        },
+      });
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        throw new ConflictError(
+          `You already have an application to ${universityName}. Remove it first to choose a different programme.`
+        );
+      }
+      throw err;
+    }
 
     // Log event
     await prisma.applicationEvent.create({

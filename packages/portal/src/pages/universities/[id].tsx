@@ -23,17 +23,22 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
 import PortalNav from '@/components/Layout/PortalNav';
+import { getErrorMessage } from '@/utils/error-message';
+import type { PortalApplication, ProgrammeMatch } from '@/types';
+import type { University, Programme, ChoiceStrategy } from '@applyonce/shared';
 
-const strategyColor: Record<string, 'error' | 'success' | 'primary' | 'warning'> = {
+const strategyColor: Record<ChoiceStrategy, 'error' | 'success' | 'primary' | 'warning'> = {
   reach: 'warning',
   match: 'primary',
   safety: 'success',
+  not_qualified: 'error',
 };
 
-const strategyLabel: Record<string, string> = {
+const strategyLabel: Record<ChoiceStrategy, string> = {
   reach: 'Aim high',
   match: 'Strong fit',
   safety: 'Secure',
+  not_qualified: 'Does not qualify',
 };
 
 export default function UniversityDetailPage() {
@@ -41,10 +46,10 @@ export default function UniversityDetailPage() {
   const { id } = router.query;
   const { isAuthenticated } = useAuthStore();
 
-  const [university, setUniversity] = useState<any>(null);
-  const [matchByCode, setMatchByCode] = useState<Record<string, any>>({});
+  const [university, setUniversity] = useState<University | null>(null);
+  const [matchByCode, setMatchByCode] = useState<Record<string, ProgrammeMatch>>({});
   const [hasAPS, setHasAPS] = useState<boolean | null>(null);
-  const [existingApp, setExistingApp] = useState<any>(null);
+  const [existingApp, setExistingApp] = useState<PortalApplication | null>(null);
   const [loading, setLoading] = useState(true);
   const [addingCode, setAddingCode] = useState<string | null>(null);
   const [error, setError] = useState('');
@@ -62,23 +67,24 @@ export default function UniversityDetailPage() {
 
   const load = async () => {
     setLoading(true);
+    const universityId = Array.isArray(id) ? id[0] : id;
     try {
       const [uniRes, appsRes] = await Promise.all([
-        api.get(`/universities/${id}`),
+        api.get(`/universities/${universityId}`),
         api.get('/applications'),
       ]);
       setUniversity(uniRes.data.university);
 
       const existing = (appsRes.data.applications || []).find(
-        (a: any) => a.universityId === id && ['draft', 'submitted'].includes(a.status)
+        (a: PortalApplication) => a.universityId === universityId && ['draft', 'submitted'].includes(a.status)
       );
       setExistingApp(existing || null);
 
       try {
         const matchesRes = await api.get('/aps/matches');
-        const map: Record<string, any> = {};
-        for (const m of matchesRes.data.matches || []) {
-          if (m.universityId === id) {
+        const map: Record<string, ProgrammeMatch> = {};
+        for (const m of (matchesRes.data.matches || []) as ProgrammeMatch[]) {
+          if (m.universityId === universityId) {
             map[m.programmeCode] = m;
           }
         }
@@ -87,8 +93,8 @@ export default function UniversityDetailPage() {
       } catch {
         setHasAPS(false);
       }
-    } catch (err: any) {
-      setError(err.response?.data?.error?.message || 'Failed to load university');
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to load university'));
     } finally {
       setLoading(false);
     }
@@ -96,7 +102,7 @@ export default function UniversityDetailPage() {
 
   const programmesByFaculty = useMemo(() => {
     if (!university) return {};
-    const groups: Record<string, any[]> = {};
+    const groups: Record<string, Programme[]> = {};
     for (const p of university.programmes || []) {
       groups[p.faculty] = groups[p.faculty] || [];
       groups[p.faculty].push(p);
@@ -104,7 +110,8 @@ export default function UniversityDetailPage() {
     return groups;
   }, [university]);
 
-  const handleAddToCart = async (programme: any) => {
+  const handleAddToCart = async (programme: Programme) => {
+    if (!university) return;
     setAddingCode(programme.qualificationCode);
     setError('');
     try {
@@ -117,8 +124,8 @@ export default function UniversityDetailPage() {
       });
       setToast(`${programme.name} added to your cart.`);
       await load();
-    } catch (err: any) {
-      setError(err.response?.data?.error?.message || 'Could not add this programme to your cart.');
+    } catch (err) {
+      setError(getErrorMessage(err, 'Could not add this programme to your cart.'));
     } finally {
       setAddingCode(null);
     }
@@ -191,7 +198,7 @@ export default function UniversityDetailPage() {
             </Typography>
             <Divider sx={{ mb: 2 }} />
             <Stack spacing={2}>
-              {programmes.map((programme: any) => {
+              {programmes.map((programme: Programme) => {
                 const match = matchByCode[programme.qualificationCode];
                 const qualifies = match && (match.meetsRequirements || match.outcome === 'waitlist');
                 const disqualified = match && !match.meetsRequirements && match.outcome !== 'waitlist';
@@ -245,9 +252,9 @@ export default function UniversityDetailPage() {
                           sx={{ mt: 1 }}
                         />
                       )}
-                      {disqualified && match?.missingRequirements?.length > 0 && (
+                      {disqualified && (match?.missingRequirements?.length ?? 0) > 0 && (
                         <Typography variant="caption" color="error" display="block" sx={{ mt: 0.5 }}>
-                          Missing: {match.missingRequirements.join(', ')}
+                          Missing: {match?.missingRequirements?.join(', ')}
                         </Typography>
                       )}
                     </Box>

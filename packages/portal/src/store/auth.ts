@@ -4,6 +4,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import api from '@/config/api';
+import { getErrorMessage } from '@/utils/error-message';
 
 export interface User {
   id: string;
@@ -48,9 +49,8 @@ export const useAuthStore = create<AuthState>()(
           const response = await api.post('/auth/login', { email, password });
           const user = response.data.user;
           set({ user, isAuthenticated: true, isLoading: false });
-        } catch (error: any) {
-          const message = error.response?.data?.error?.message || 'Login failed';
-          set({ error: message, isLoading: false });
+        } catch (error) {
+          set({ error: getErrorMessage(error, 'Login failed'), isLoading: false });
           throw error;
         }
       },
@@ -66,9 +66,8 @@ export const useAuthStore = create<AuthState>()(
             studentId: response.data.studentId,
             verificationCode: response.data.verificationCode,
           };
-        } catch (error: any) {
-          const message = error.response?.data?.error?.message || 'Registration failed';
-          set({ error: message, isLoading: false });
+        } catch (error) {
+          set({ error: getErrorMessage(error, 'Registration failed'), isLoading: false });
           throw error;
         }
       },
@@ -78,9 +77,8 @@ export const useAuthStore = create<AuthState>()(
         try {
           await api.post('/auth/verify', { email, code });
           set({ isLoading: false });
-        } catch (error: any) {
-          const message = error.response?.data?.error?.message || 'Verification failed';
-          set({ error: message, isLoading: false });
+        } catch (error) {
+          set({ error: getErrorMessage(error, 'Verification failed'), isLoading: false });
           throw error;
         }
       },

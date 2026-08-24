@@ -5,7 +5,7 @@ import { Response } from 'express';
 import { AuthRequest } from '../types/express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { prisma } from '../utils/prisma';
-import { BadRequestError, NotFoundError } from '../utils/errors';
+import { BadRequestError, ForbiddenError, NotFoundError } from '../utils/errors';
 import { InitiatePaymentInput, PaymentNotificationInput } from '../schemas/payment';
 import { SERVICE_FEE_ZAR } from '@applyonce/shared';
 import { submitMultipleApplications } from '../workflows/submission';
@@ -66,7 +66,7 @@ export const initiatePayment = asyncHandler(
     // Validate ownership
     const notOwned = applications.filter((app) => app.studentId !== studentId);
     if (notOwned.length > 0) {
-      throw new BadRequestError('You can only pay for your own applications');
+      throw new ForbiddenError('You can only pay for your own applications');
     }
 
     // Validate all are drafts
@@ -292,7 +292,7 @@ export const getPayment = asyncHandler(async (req: AuthRequest, res: Response) =
   }
 
   if (payment.studentId !== studentId) {
-    throw new BadRequestError('You can only view your own payments');
+    throw new ForbiddenError('You can only view your own payments');
   }
 
   res.json({

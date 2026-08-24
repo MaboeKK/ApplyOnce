@@ -1,7 +1,7 @@
 // packages/api/src/utils/prisma.ts
 // Prisma client instance
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { logger } from './logger';
 
 export const prisma = new PrismaClient({
@@ -14,8 +14,7 @@ export const prisma = new PrismaClient({
 
 // Log queries in development
 if (process.env.NODE_ENV === 'development') {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  prisma.$on('query' as never, (e: any) => {
+  prisma.$on('query' as never, (e: Prisma.QueryEvent) => {
     logger.debug({ query: e.query, duration: e.duration }, 'Prisma query');
   });
 }

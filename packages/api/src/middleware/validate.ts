@@ -5,8 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ZodType, ZodError } from 'zod';
 import { ValidationError } from '../utils/errors';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function validateBody<T extends ZodType<any, any, any>>(schema: T) {
+export function validateBody<T extends ZodType>(schema: T) {
   return (req: Request, _res: Response, next: NextFunction) => {
     try {
       req.body = schema.parse(req.body);
@@ -25,12 +24,10 @@ export function validateBody<T extends ZodType<any, any, any>>(schema: T) {
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function validateQuery<T extends ZodType<any, any, any>>(schema: T) {
+export function validateQuery<T extends ZodType>(schema: T) {
   return (req: Request, _res: Response, next: NextFunction) => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      req.query = schema.parse(req.query) as any;
+      req.query = schema.parse(req.query) as unknown as typeof req.query;
       next();
     } catch (error) {
       if (error instanceof ZodError) {
@@ -46,12 +43,10 @@ export function validateQuery<T extends ZodType<any, any, any>>(schema: T) {
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function validateParams<T extends ZodType<any, any, any>>(schema: T) {
+export function validateParams<T extends ZodType>(schema: T) {
   return (req: Request, _res: Response, next: NextFunction) => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      req.params = schema.parse(req.params) as any;
+      req.params = schema.parse(req.params) as unknown as typeof req.params;
       next();
     } catch (error) {
       if (error instanceof ZodError) {

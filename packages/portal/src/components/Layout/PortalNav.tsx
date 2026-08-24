@@ -7,6 +7,7 @@ import { AppBar, Toolbar, Box, Typography, Button, Badge, Stack } from '@mui/mat
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
+import type { PortalApplication } from '@/types';
 
 const navLinks = [
   { href: '/dashboard', label: 'Dashboard' },
@@ -23,7 +24,7 @@ export default function PortalNav() {
     api
       .get('/applications')
       .then((res) => {
-        const drafts = (res.data.applications || []).filter((a: any) => a.status === 'draft');
+        const drafts = (res.data.applications || []).filter((a: PortalApplication) => a.status === 'draft');
         setCartCount(drafts.length);
       })
       .catch(() => {});

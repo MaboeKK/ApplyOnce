@@ -77,3 +77,5 @@ export const subjectResultSchema = z.object({
 export const updateSubjectsSchema = z.object({
   results: z.array(subjectResultSchema).min(6, 'Minimum 6 subjects required').max(10),
 });
+
+export type UpdateSubjectsInput = z.infer<typeof updateSubjectsSchema>;

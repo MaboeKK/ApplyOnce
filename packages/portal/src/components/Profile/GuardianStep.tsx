@@ -47,9 +47,28 @@ const nameField = (label: string) =>
     .min(1, `${label} is required`)
     .refine(isValidName, `${label} may only contain letters, spaces, apostrophes and hyphens.`);
 
+interface EmergencyContact {
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  relationship?: string;
+}
+
+export interface GuardianStepData {
+  firstName: string;
+  lastName: string;
+  relationship: string;
+  otherRelationship?: string;
+  phone: string;
+  email?: string;
+  annualIncome?: number;
+  emergencyContactSameAsGuardian?: boolean;
+  emergencyContact?: EmergencyContact;
+}
+
 interface Props {
-  data: Partial<any>;
-  onNext: (data: any) => void;
+  data: Partial<GuardianStepData>;
+  onNext: (data: GuardianStepData) => void;
   onBack: () => void;
   applicantPhone?: string; // E.164, from PersonalStep
   applicantEmail?: string;

@@ -3,6 +3,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { AxiosError } from 'axios';
 import api from '@/config/api';
 
 export interface AdminUser {
@@ -46,8 +47,9 @@ export const useAuthStore = create<AuthState>()(
           }
 
           set({ user, isAuthenticated: true, isLoading: false });
-        } catch (error: any) {
-          const message = error.response?.data?.message || error.message || 'Login failed';
+        } catch (error) {
+          const axiosErr = error as AxiosError<{ message?: string }>;
+          const message = axiosErr.response?.data?.message || axiosErr.message || 'Login failed';
           set({ error: message, isLoading: false });
           throw error;
         }

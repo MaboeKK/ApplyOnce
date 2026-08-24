@@ -28,9 +28,10 @@ import ErrorIcon from '@mui/icons-material/Error';
 import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
 import PortalNav from '@/components/Layout/PortalNav';
+import type { StudentProfile, PortalApplication, ApplicationStatus } from '@/types';
 
 // Helper to render application status with appropriate color and icon
-function getStatusConfig(status: string) {
+function getStatusConfig(status: ApplicationStatus) {
   switch (status) {
     case 'draft':
       return { color: 'default' as const, label: 'Draft', icon: <HourglassEmptyIcon fontSize="small" /> };
@@ -50,8 +51,8 @@ function getStatusConfig(status: string) {
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
-  const [profile, setProfile] = useState<any>(null);
-  const [applications, setApplications] = useState<any[]>([]);
+  const [profile, setProfile] = useState<StudentProfile | null>(null);
+  const [applications, setApplications] = useState<PortalApplication[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -83,9 +84,9 @@ export default function DashboardPage() {
   }
 
   const hasCompletedProfile = profile?.school && profile?.matricYear;
-  const hasMatricCert = profile?.documents?.some((d: any) => d.type === 'matric_certificate');
-  const hasIdDoc = profile?.documents?.some((d: any) => d.type === 'id_document');
-  const hasAPS = profile?.subjectResults?.length > 0;
+  const hasMatricCert = profile?.documents?.some((d) => d.type === 'matric_certificate');
+  const hasIdDoc = profile?.documents?.some((d) => d.type === 'id_document');
+  const hasAPS = (profile?.subjectResults?.length ?? 0) > 0;
 
   return (
     <>
@@ -106,7 +107,7 @@ export default function DashboardPage() {
         </Alert>
       )}
 
-      {hasAPS && (
+      {hasAPS && profile && (
         <Paper sx={{ p: 3, mb: 4, bgcolor: 'success.50', border: '2px solid', borderColor: 'success.main' }}>
           <Typography variant="h5" color="success.dark">
             Your APS: <strong>{profile.aps || 'Calculating...'}</strong>
@@ -214,13 +215,13 @@ export default function DashboardPage() {
         </Grid>
       </Grid>
 
-      {hasAPS && profile.subjectResults && (
+      {hasAPS && profile && profile.subjectResults && (
         <Paper sx={{ p: 3, mt: 4 }}>
           <Typography variant="h6" gutterBottom color="primary">
             Your Matric Results
           </Typography>
           <Grid container spacing={2}>
-            {profile.subjectResults.map((result: any) => (
+            {profile.subjectResults.map((result) => (
               <Grid item xs={12} sm={6} md={4} key={result.id}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Typography variant="body2">{result.subject}</Typography>
@@ -240,7 +241,7 @@ export default function DashboardPage() {
             Your Applications
           </Typography>
           <Stack spacing={2} sx={{ mt: 2 }}>
-            {applications.map((app: any) => {
+            {applications.map((app) => {
               const statusConfig = getStatusConfig(app.status);
               return (
                 <Card

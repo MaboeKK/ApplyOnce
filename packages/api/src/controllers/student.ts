@@ -9,6 +9,7 @@ import { NotFoundError, ConflictError } from '../utils/errors';
 import { markToAPS, normalizeSubjectName } from '@applyonce/shared';
 import { parseSAIdNumber } from '../utils/saId';
 import { Prisma } from '@prisma/client';
+import { UpdateSubjectsInput } from '../schemas/student';
 
 /**
  * GET /v1/students/me
@@ -117,24 +118,24 @@ export const updateMyProfile = asyncHandler(async (req: AuthRequest, res: Respon
  */
 export const updateMySubjects = asyncHandler(async (req: AuthRequest, res: Response) => {
   const studentId = req.student!.studentId;
-  const { results } = req.body;
+  const { results } = req.body as UpdateSubjectsInput;
 
-  // Delete existing subject results
-  await prisma.subjectResult.deleteMany({
-    where: { studentId },
-  });
-
-  // Create new subject results (normalize subject names for consistency)
-  const subjectResults = await prisma.subjectResult.createMany({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data: results.map((result: any) => ({
-      studentId,
-      subject: normalizeSubjectName(result.subject),
-      mark: result.mark,
-      level: result.level || markToAPS(result.mark),
-      year: result.year,
-    })),
-  });
+  // Delete + recreate atomically so a failure never leaves the student with
+  // an empty subject list (and therefore a null APS) between the two steps.
+  await prisma.$transaction([
+    prisma.subjectResult.deleteMany({
+      where: { studentId },
+    }),
+    prisma.subjectResult.createMany({
+      data: results.map((result) => ({
+        studentId,
+        subject: normalizeSubjectName(result.subject),
+        mark: result.mark,
+        level: result.level || markToAPS(result.mark),
+        year: result.year,
+      })),
+    }),
+  ]);
 
   // Fetch the created results
   const updated = await prisma.subjectResult.findMany({
@@ -144,7 +145,7 @@ export const updateMySubjects = asyncHandler(async (req: AuthRequest, res: Respo
 
   res.json({
     message: 'Subject results updated successfully',
-    count: subjectResults.count,
+    count: updated.length,
     subjects: updated,
   });
 });

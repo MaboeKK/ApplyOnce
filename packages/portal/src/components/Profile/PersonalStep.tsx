@@ -18,6 +18,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useState, useEffect } from 'react';
 import PhoneField from './PhoneField';
 import { digitsOnly, formatIdNumber, validateIdNumber, validatePhoneNational, toE164 } from '@/utils/formatters';
+import type { User } from '@/store/auth';
 
 // SA official languages
 const SA_LANGUAGES = [
@@ -57,12 +58,12 @@ const personalSchema = z.object({
   disability: z.string().optional(),
 });
 
-type PersonalData = z.infer<typeof personalSchema>;
+export type PersonalData = z.infer<typeof personalSchema>;
 
 interface Props {
   data: Partial<PersonalData>;
   onNext: (data: PersonalData) => void;
-  user: any;
+  user: User | null;
 }
 
 // Parse SA ID number to extract DOB and gender
