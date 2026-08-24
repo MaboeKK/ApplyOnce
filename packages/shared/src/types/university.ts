@@ -75,6 +75,7 @@ export interface University {
   province?: string;
   website?: string;
   applicationPortal?: string;
+  logoUrl?: string;                   // path to a real logo asset, when we have one
 }
 
 // ── Programme ───────────────────────────────────────────────────────
