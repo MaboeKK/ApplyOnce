@@ -11,6 +11,7 @@ const UJ: University = {
   id: 'uj',
   name: 'University of Johannesburg',
   shortName: 'UJ',
+  logoUrl: '/logos/uj.png',
   applicationSystem: 'Custom portal',
   applicationFee: 0,
   feeNote: 'No application fee for online or paper applications. The flat ApplyOnce service fee still applies.',
@@ -149,6 +150,7 @@ const WITS: University = {
   id: 'wits',
   name: 'University of the Witwatersrand',
   shortName: 'Wits',
+  logoUrl: '/logos/wits.png',
   applicationSystem: 'Custom portal',
   applicationFee: 100,
   feeNote: 'R100 flat for all applicants.',
@@ -1941,6 +1943,7 @@ const UCT: University = {
   id: 'uct',
   name: 'University of Cape Town',
   shortName: 'UCT',
+  logoUrl: '/logos/uct.png',
   applicationSystem: 'Custom portal',
   applicationFee: 100,
   feeNote: 'R100 for South African and SADC applicants; R300 for other international applicants. Non-refundable. Currently registered UCT students, UCT graduates, and Semester Study Abroad applicants do not pay.',
@@ -3591,6 +3594,7 @@ const UP: University = {
   id: 'up',
   name: 'University of Pretoria',
   shortName: 'UP',
+  logoUrl: '/logos/up.png',
   applicationSystem: 'Custom portal',
   applicationFee: 0,
   feeNote: 'No application fee is stated in the sourced 2027 Undergraduate Prospectus text. Verify directly via UP\'s application portal before relying on this figure.',
@@ -4915,6 +4919,7 @@ const SU: University = {
   id: 'su',
   name: 'Stellenbosch University',
   shortName: 'SU',
+  logoUrl: '/logos/su.png',
   applicationSystem: 'Custom portal',
   applicationFee: 100,
   feeNote: 'UNCONFIRMED against the sourced 2027 prospectus text (which did not include a general application-fee page) — carried over from prior data. Verify via www.maties.com before relying on this figure.',
@@ -7950,6 +7955,7 @@ const UFS: University = {
   id: 'ufs',
   name: 'University of the Free State',
   shortName: 'UFS',
+  logoUrl: '/logos/ufs.png',
   applicationSystem: 'Custom portal',
   applicationFee: 150,
   feeNote: 'UNCONFIRMED against the sourced 2027 prospectus text (no domestic application-fee figure found) — carried over from prior data. Verify via apply.ufs.ac.za before relying on this figure.',
@@ -10048,6 +10054,7 @@ const UKZN: University = {
   id: 'ukzn',
   name: 'University of KwaZulu-Natal',
   shortName: 'UKZN',
+  logoUrl: '/logos/ukzn.png',
   applicationSystem: 'CAO',
   applicationFee: 210,
   feeNote: 'R210 on-time direct-to-UKZN application (R420 late). First-time SA undergrad applicants alternatively apply via the CAO (Central Applications Office) for R250 before 31 October 2026 (R470 late), which also covers other KZN institutions — CAO admin fee is separate from and not doubled with the direct UKZN fee.',
@@ -10092,26 +10099,33 @@ const PLACEHOLDERS: University[] = [
 ];
 
 // Generate remaining placeholders
-const REMAINING_UNIS = [
-  { id: 'nwu', name: 'North-West University', shortName: 'NWU', fee: 150, type: 'traditional' as const },
-  { id: 'nmu', name: 'Nelson Mandela University', shortName: 'NMU', fee: 200, type: 'comprehensive' as const },
-  { id: 'uwc', name: 'University of the Western Cape', shortName: 'UWC', fee: 100, type: 'traditional' as const },
-  { id: 'rhodes', name: 'Rhodes University', shortName: 'Rhodes', fee: 100, type: 'traditional' as const },
-  { id: 'unisa', name: 'University of South Africa', shortName: 'UNISA', fee: 115, type: 'traditional' as const },
-  { id: 'tut', name: 'Tshwane University of Technology', shortName: 'TUT', fee: 240, type: 'university_of_technology' as const },
-  { id: 'dut', name: 'Durban University of Technology', shortName: 'DUT', fee: 270, type: 'university_of_technology' as const },
-  { id: 'cput', name: 'Cape Peninsula University of Technology', shortName: 'CPUT', fee: 100, type: 'university_of_technology' as const },
-  { id: 'vut', name: 'Vaal University of Technology', shortName: 'VUT', fee: 200, type: 'university_of_technology' as const },
-  { id: 'cut', name: 'Central University of Technology', shortName: 'CUT', fee: 180, type: 'university_of_technology' as const },
-  { id: 'mut', name: 'Mangosuthu University of Technology', shortName: 'MUT', fee: 270, type: 'university_of_technology' as const },
-  { id: 'unizulu', name: 'University of Zululand', shortName: 'UniZulu', fee: 150, type: 'traditional' as const },
-  { id: 'ufh', name: 'University of Fort Hare', shortName: 'UFH', fee: 150, type: 'traditional' as const },
-  { id: 'wsu', name: 'Walter Sisulu University', shortName: 'WSU', fee: 150, type: 'comprehensive' as const },
-  { id: 'smu', name: 'Sefako Makgatho Health Sciences University', shortName: 'SMU', fee: 200, type: 'traditional' as const },
-  { id: 'spu', name: 'Sol Plaatje University', shortName: 'SPU', fee: 100, type: 'traditional' as const },
-  { id: 'ump', name: 'University of Mpumalanga', shortName: 'UMP', fee: 100, type: 'traditional' as const },
-  { id: 'ul', name: 'University of Limpopo', shortName: 'UL', fee: 200, type: 'traditional' as const },
-  { id: 'univen', name: 'University of Venda', shortName: 'UNIVEN', fee: 150, type: 'traditional' as const },
+const REMAINING_UNIS: Array<{
+  id: string;
+  name: string;
+  shortName: string;
+  fee: number;
+  type: 'traditional' | 'university_of_technology' | 'comprehensive';
+  logo?: string;
+}> = [
+  { id: 'nwu', name: 'North-West University', shortName: 'NWU', fee: 150, type: 'traditional' as const, logo: '/logos/nwu.png' },
+  { id: 'nmu', name: 'Nelson Mandela University', shortName: 'NMU', fee: 200, type: 'comprehensive' as const, logo: '/logos/nmu.png' },
+  { id: 'uwc', name: 'University of the Western Cape', shortName: 'UWC', fee: 100, type: 'traditional' as const, logo: '/logos/uwc.png' },
+  { id: 'rhodes', name: 'Rhodes University', shortName: 'Rhodes', fee: 100, type: 'traditional' as const, logo: '/logos/rhodes.png' },
+  { id: 'unisa', name: 'University of South Africa', shortName: 'UNISA', fee: 115, type: 'traditional' as const, logo: '/logos/unisa.png' },
+  { id: 'tut', name: 'Tshwane University of Technology', shortName: 'TUT', fee: 240, type: 'university_of_technology' as const, logo: '/logos/tut.png' },
+  { id: 'dut', name: 'Durban University of Technology', shortName: 'DUT', fee: 270, type: 'university_of_technology' as const, logo: '/logos/dut.png' },
+  { id: 'cput', name: 'Cape Peninsula University of Technology', shortName: 'CPUT', fee: 100, type: 'university_of_technology' as const, logo: '/logos/cput.png' },
+  { id: 'vut', name: 'Vaal University of Technology', shortName: 'VUT', fee: 200, type: 'university_of_technology' as const, logo: '/logos/vut.png' },
+  { id: 'cut', name: 'Central University of Technology', shortName: 'CUT', fee: 180, type: 'university_of_technology' as const, logo: '/logos/cut.png' },
+  { id: 'mut', name: 'Mangosuthu University of Technology', shortName: 'MUT', fee: 270, type: 'university_of_technology' as const, logo: '/logos/mut.png' },
+  { id: 'unizulu', name: 'University of Zululand', shortName: 'UniZulu', fee: 150, type: 'traditional' as const, logo: '/logos/unizulu.png' },
+  { id: 'ufh', name: 'University of Fort Hare', shortName: 'UFH', fee: 150, type: 'traditional' as const, logo: '/logos/ufh.png' },
+  { id: 'wsu', name: 'Walter Sisulu University', shortName: 'WSU', fee: 150, type: 'comprehensive' as const, logo: '/logos/wsu.png' },
+  { id: 'smu', name: 'Sefako Makgatho Health Sciences University', shortName: 'SMU', fee: 200, type: 'traditional' as const, logo: '/logos/smu.png' },
+  { id: 'spu', name: 'Sol Plaatje University', shortName: 'SPU', fee: 100, type: 'traditional' as const, logo: '/logos/spu.png' },
+  { id: 'ump', name: 'University of Mpumalanga', shortName: 'UMP', fee: 100, type: 'traditional' as const, logo: '/logos/ump.png' },
+  { id: 'ul', name: 'University of Limpopo', shortName: 'UL', fee: 200, type: 'traditional' as const, logo: '/logos/ul.png' },
+  { id: 'univen', name: 'University of Venda', shortName: 'UNIVEN', fee: 150, type: 'traditional' as const, logo: '/logos/univen.png' },
 ];
 
 for (const uni of REMAINING_UNIS) {
@@ -10147,6 +10161,7 @@ for (const uni of REMAINING_UNIS) {
     province: 'gauteng',
     website: `https://www.${uni.id}.ac.za`,
     applicationPortal: `https://www.${uni.id}.ac.za/apply`,
+    logoUrl: uni.logo,
   });
 }
 
