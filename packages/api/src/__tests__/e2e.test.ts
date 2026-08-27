@@ -265,8 +265,8 @@ describe('End-to-End Flow with Isolation', () => {
       .set('Cookie', [`accessToken=${studentToken}`])
       .send({
         applicationIds: [applicationId],
-        returnUrl: 'http://localhost:3000/payment/success',
-        cancelUrl: 'http://localhost:3000/payment/cancel',
+        returnUrl: 'http://localhost:3601/payment/success',
+        cancelUrl: 'http://localhost:3601/payment/cancel',
       });
 
     expect(paymentResponse.status).toBe(200);

@@ -7,6 +7,24 @@ import { config } from '../config';
 function getLoggerOptions(): pino.LoggerOptions {
   const baseOptions: pino.LoggerOptions = {
     level: config.env === 'development' ? 'debug' : 'info',
+    // pino-http's default req/res serializers include headers, which
+    // otherwise puts the JWT access/refresh token cookie straight into
+    // every request log line. Also guards a few fields against being
+    // logged directly (e.g. `logger.info({ student }, ...)`).
+    redact: {
+      paths: [
+        'req.headers.cookie',
+        'req.headers.authorization',
+        'res.headers["set-cookie"]',
+        'password',
+        'passwordHash',
+        'idNumber',
+        '*.password',
+        '*.passwordHash',
+        '*.idNumber',
+      ],
+      censor: '[REDACTED]',
+    },
   };
 
   // Use pino-pretty transport in development only if available

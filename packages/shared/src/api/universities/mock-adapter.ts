@@ -12,7 +12,7 @@ import {
 } from './index';
 
 // Simulated network delay (ms) — makes mock feel realistic
-const MOCK_DELAY = (min = 300, max = 900) =>
+const mockDelay = (min = 300, max = 900) =>
   new Promise((r) => setTimeout(r, Math.floor(Math.random() * (max - min)) + min));
 
 // Reference number generator — mimics a university's format
@@ -69,7 +69,7 @@ export class MockUniversityAdapter implements UniversityAdapter {
   }
 
   async submitApplication(payload: ApplicationPayload): Promise<SubmissionResult> {
-    await MOCK_DELAY();
+    await mockDelay();
 
     // Validate first
     const validation = this.validateApplication(payload);
@@ -116,7 +116,7 @@ export class MockUniversityAdapter implements UniversityAdapter {
   }
 
   async checkStatus(universityReference: string): Promise<UniversityApplicationStatus> {
-    await MOCK_DELAY(100, 400);
+    await mockDelay(100, 400);
 
     const submission = mockSubmissions.get(universityReference);
 
