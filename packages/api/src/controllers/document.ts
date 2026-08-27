@@ -10,6 +10,7 @@ import { ValidationError, NotFoundError } from '../utils/errors';
 import { logger } from '../utils/logger';
 import { UPLOAD_DIR } from '../config/multer';
 import { pathExists, safeUnlink } from '../utils/fs';
+import { verifyFileSignature } from '../utils/fileSignature';
 import {
   replaceExistingDocument,
   scanAndSaveMatricCertificate,
@@ -29,6 +30,13 @@ export const uploadDocument = asyncHandler(async (req: AuthRequest, res: Respons
   }
 
   const file = req.file;
+
+  try {
+    await verifyFileSignature(file.path, file.mimetype);
+  } catch (error) {
+    await safeUnlink(file.path);
+    throw error;
+  }
 
   // Delete old file if replacing
   await replaceExistingDocument(studentId, type);

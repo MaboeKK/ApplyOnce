@@ -4,6 +4,7 @@
 import Tesseract from 'tesseract.js';
 import { markToAPS, normalizeSubjectName } from '@applyonce/shared';
 import { logger } from './logger';
+import { InternalError } from './errors';
 
 export interface ExtractedSubject {
   subject: string;
@@ -83,7 +84,7 @@ export async function parseMatricCertificate(filePath: string): Promise<OCRResul
     };
   } catch (error) {
     logger.error({ error, filePath }, 'OCR failed');
-    throw new Error('OCR processing failed');
+    throw new InternalError('OCR processing failed');
   }
 }
 
@@ -256,6 +257,6 @@ export async function parseIdDocument(
     return { idNumber, confidence, warnings };
   } catch (error) {
     logger.error({ error, filePath }, 'ID document OCR failed');
-    throw new Error('ID document OCR processing failed');
+    throw new InternalError('ID document OCR processing failed');
   }
 }

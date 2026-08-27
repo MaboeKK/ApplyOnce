@@ -19,6 +19,11 @@ function getTransporter() {
         user: config.email.smtp.user,
         pass: config.email.smtp.pass,
       },
+      // Without these, a slow/unreachable SMTP host hangs the request that
+      // triggered the email indefinitely (register, admin decision).
+      connectionTimeout: 10_000,
+      greetingTimeout: 10_000,
+      socketTimeout: 20_000,
     });
     logger.info('Email transporter initialized (production mode)');
   } else {
@@ -56,8 +61,9 @@ export async function sendVerificationEmail(email: string, code: string): Promis
 
     logger.info({ email }, 'Verification email sent');
   } catch (error) {
+    // Registration must not fail just because SMTP is slow/unreachable —
+    // the account is already created; log and let the caller continue.
     logger.error({ error, email }, 'Failed to send verification email');
-    throw error;
   }
 }
 
@@ -108,7 +114,8 @@ export async function sendDecisionEmail(params: {
 
     logger.info({ email: studentEmail, universityName, decision }, 'Decision notification sent');
   } catch (error) {
+    // The decision is already recorded — an SMTP failure must not make the
+    // admin's decision request fail. Log and let the caller continue.
     logger.error({ error: error, email: studentEmail }, 'Failed to send decision notification');
-    throw error;
   }
 }

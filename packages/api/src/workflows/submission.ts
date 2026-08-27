@@ -11,6 +11,7 @@ import {
 } from '@applyonce/shared';
 import { prisma } from '../utils/prisma';
 import { logger } from '../utils/logger';
+import { ValidationError, NotFoundError } from '../utils/errors';
 
 interface SubmissionInput {
   applicationId: string;
@@ -23,7 +24,7 @@ interface SubmissionInput {
  */
 function requireField<T>(value: T | null | undefined, label: string): T {
   if (value === null || value === undefined || value === '') {
-    throw new Error(`Cannot submit application — missing ${label}`);
+    throw new ValidationError(`Cannot submit application — missing ${label}`);
   }
   return value;
 }
@@ -52,7 +53,7 @@ export async function submitApplication(input: SubmissionInput): Promise<void> {
 
     if (!application) {
       logger.error({ applicationId }, 'Application not found for submission');
-      throw new Error(`Application ${applicationId} not found`);
+      throw new NotFoundError(`Application ${applicationId} not found`);
     }
 
     if (application.status !== 'draft') {
@@ -64,7 +65,7 @@ export async function submitApplication(input: SubmissionInput): Promise<void> {
     const adapter = getAdapter(application.universityId);
     if (!adapter) {
       logger.error({ universityId: application.universityId }, 'No adapter found for university');
-      throw new Error(`No adapter found for university ${application.universityId}`);
+      throw new NotFoundError(`No adapter found for university ${application.universityId}`);
     }
 
     // Validate required fields before building payload
@@ -85,7 +86,7 @@ export async function submitApplication(input: SubmissionInput): Promise<void> {
     if (missingFields.length > 0) {
       const error = `Cannot submit application - student profile incomplete. Missing: ${missingFields.join(', ')}`;
       logger.error({ applicationId, studentId: student.id, missingFields }, error);
-      throw new Error(error);
+      throw new ValidationError(error);
     }
 
     // Parse address from JSON
@@ -102,7 +103,7 @@ export async function submitApplication(input: SubmissionInput): Promise<void> {
       const error =
         'Cannot submit application - address is incomplete (missing street, city, province, or postal code)';
       logger.error({ applicationId, studentId: student.id, address }, error);
-      throw new Error(error);
+      throw new ValidationError(error);
     }
 
     // Parse guardian from JSON if present (guardian is optional)
@@ -126,7 +127,7 @@ export async function submitApplication(input: SubmissionInput): Promise<void> {
       ) {
         const error = 'Cannot submit application - guardian information is incomplete';
         logger.error({ applicationId, studentId: student.id, guardianData }, error);
-        throw new Error(error);
+        throw new ValidationError(error);
       }
 
       guardian = {
@@ -144,7 +145,7 @@ export async function submitApplication(input: SubmissionInput): Promise<void> {
     if (!university) {
       const error = `University ${application.universityId} not found in constants`;
       logger.error({ applicationId, universityId: application.universityId }, error);
-      throw new Error(error);
+      throw new NotFoundError(error);
     }
 
     // Map Prisma subject results to SubjectResult type
@@ -165,7 +166,7 @@ export async function submitApplication(input: SubmissionInput): Promise<void> {
         { applicationId, studentId: student.id, apsErrors: apsResult.validationErrors },
         error
       );
-      throw new Error(error);
+      throw new ValidationError(error);
     }
 
     // Build the payload - requireField ensures type narrowing at point of use

@@ -64,6 +64,13 @@ export default function PaymentCheckoutPage() {
     setProcessing(true);
     try {
       await api.post('/payments/notify', { paymentId, status: 'CANCELLED' });
+    } catch (err) {
+      // Not surfaced to the user — they're being redirected to the failed
+      // page regardless, but this must not become an unhandled rejection.
+      console.error(
+        'Failed to notify payment cancellation:',
+        getErrorMessage(err, 'Unknown error')
+      );
     } finally {
       router.push('/payment/failed');
     }

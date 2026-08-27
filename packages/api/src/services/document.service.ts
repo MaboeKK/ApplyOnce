@@ -10,6 +10,7 @@ import { NotFoundError } from '../utils/errors';
 import { parseMatricCertificate, parseIdDocument, OCRResult } from '../utils/ocr';
 import { UPLOAD_DIR } from '../config/multer';
 import { safeUnlink } from '../utils/fs';
+import { verifyFileSignature } from '../utils/fileSignature';
 
 type UploadedFile = Pick<
   Express.Multer.File,
@@ -58,6 +59,8 @@ export async function scanAndSaveMatricCertificate(
   file: UploadedFile
 ): Promise<{ document: Document; ocr: OCRResult }> {
   try {
+    await verifyFileSignature(file.path, file.mimetype);
+
     const ocrResult = await parseMatricCertificate(file.path);
     const registeredIdNumber = await getStudentIdNumber(studentId);
 
@@ -87,6 +90,8 @@ export async function scanAndSaveIdDocument(
   warnings: string[];
 }> {
   try {
+    await verifyFileSignature(file.path, file.mimetype);
+
     const ocrResult = await parseIdDocument(file.path);
     const registeredIdNumber = await getStudentIdNumber(studentId);
 
