@@ -2,6 +2,7 @@
 // Payment initiation and webhook handling
 
 import { Response } from 'express';
+import { Prisma } from '@prisma/client';
 import { AuthRequest } from '../types/express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { prisma } from '../utils/prisma';
@@ -89,9 +90,20 @@ export const initiatePayment = asyncHandler(async (req: AuthRequest, res: Respon
     totalZAR: app.university.applicationFeeZAR + SERVICE_FEE_ZAR,
   }));
 
-  const universityFeesZAR = breakdown.reduce((sum, b) => sum + b.applicationFeeZAR, 0);
-  const serviceFeesZAR = breakdown.reduce((sum, b) => sum + b.serviceFeeZAR, 0);
-  const totalAmountZAR = universityFeesZAR + serviceFeesZAR;
+  // totalAmountZAR/universityFeesZAR/serviceFeesZAR are Decimal(10,2) columns -
+  // sum with Prisma.Decimal rather than plain `+` so this stays exact if a
+  // fee is ever fractional (today every fee is a whole Rand integer, so
+  // this doesn't change any current output, only removes a float-rounding
+  // risk before real PayGate integration).
+  const universityFeesZAR = breakdown.reduce(
+    (sum, b) => sum.add(b.applicationFeeZAR),
+    new Prisma.Decimal(0)
+  );
+  const serviceFeesZAR = breakdown.reduce(
+    (sum, b) => sum.add(b.serviceFeeZAR),
+    new Prisma.Decimal(0)
+  );
+  const totalAmountZAR = universityFeesZAR.add(serviceFeesZAR);
 
   // Create payment record + link applications atomically
   // Transaction prevents orphaned payment if linking fails

@@ -8,5 +8,4 @@ export * from './services/aps-calculator';
 export * from './constants/universities';
 export * from './api/universities';
 export * from './api/universities/mock-adapter';
-export * from './api/payments/mock-paygate';
 export * from './utils/subject-mapping';

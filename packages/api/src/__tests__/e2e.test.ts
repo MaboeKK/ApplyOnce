@@ -271,6 +271,12 @@ describe('End-to-End Flow with Isolation', () => {
 
     expect(paymentResponse.status).toBe(200);
     expect(paymentResponse.body.payment.id).toBeDefined();
+    // UJ's seeded applicationFeeZAR is 200 (see prisma/seed.ts), service fee
+    // is 5. Guards the Decimal-based fee summation in controllers/payment.ts
+    // - asserting exact values here, not just "the request didn't fail".
+    expect(paymentResponse.body.payment.universityFeesZAR).toBe(200);
+    expect(paymentResponse.body.payment.serviceFeesZAR).toBe(5);
+    expect(paymentResponse.body.payment.totalAmountZAR).toBe(205);
 
     const paymentId = paymentResponse.body.payment.id;
 
