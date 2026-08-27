@@ -1,11 +1,19 @@
 {
   "root": true,
   "extends": "next/core-web-vitals",
-  "ignorePatterns": [
-    "node_modules",
-    ".next",
-    "out",
-    "build",
-    "coverage"
+  "plugins": ["@typescript-eslint"],
+  "ignorePatterns": ["node_modules", ".next", "out", "build", "coverage"],
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "error",
+    "max-lines": ["warn", { "max": 1000, "skipBlankLines": true, "skipComments": true }],
+    "complexity": ["warn", { "max": 15 }]
+  },
+  "overrides": [
+    {
+      "files": ["src/pages/applications/\\[id\\].tsx"],
+      "rules": {
+        "complexity": "off"
+      }
+    }
   ]
 }

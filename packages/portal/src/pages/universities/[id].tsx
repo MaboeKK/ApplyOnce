@@ -76,7 +76,8 @@ export default function UniversityDetailPage() {
       setUniversity(uniRes.data.university);
 
       const existing = (appsRes.data.applications || []).find(
-        (a: PortalApplication) => a.universityId === universityId && ['draft', 'submitted'].includes(a.status)
+        (a: PortalApplication) =>
+          a.universityId === universityId && ['draft', 'submitted'].includes(a.status)
       );
       setExistingApp(existing || null);
 
@@ -177,9 +178,12 @@ export default function UniversityDetailPage() {
         )}
 
         {existingApp && (
-          <Alert severity={existingApp.status === 'submitted' ? 'success' : 'warning'} sx={{ mb: 3 }}>
-            You already have {existingApp.status === 'submitted' ? 'a submitted' : 'a draft'} application
-            to {university.name} for <strong>{existingApp.programmeName}</strong>.
+          <Alert
+            severity={existingApp.status === 'submitted' ? 'success' : 'warning'}
+            sx={{ mb: 3 }}
+          >
+            You already have {existingApp.status === 'submitted' ? 'a submitted' : 'a draft'}{' '}
+            application to {university.name} for <strong>{existingApp.programmeName}</strong>.
             {existingApp.status === 'draft' &&
               ' Remove it from your cart first if you want to choose a different programme here.'}
           </Alert>
@@ -200,8 +204,10 @@ export default function UniversityDetailPage() {
             <Stack spacing={2}>
               {programmes.map((programme: Programme) => {
                 const match = matchByCode[programme.qualificationCode];
-                const qualifies = match && (match.meetsRequirements || match.outcome === 'waitlist');
-                const disqualified = match && !match.meetsRequirements && match.outcome !== 'waitlist';
+                const qualifies =
+                  match && (match.meetsRequirements || match.outcome === 'waitlist');
+                const disqualified =
+                  match && !match.meetsRequirements && match.outcome !== 'waitlist';
                 const canAdd = !existingApp && (!match || qualifies || hasAPS === false);
 
                 return (
@@ -221,15 +227,14 @@ export default function UniversityDetailPage() {
                   >
                     <Box sx={{ flex: 1 }}>
                       <Stack direction="row" spacing={1} alignItems="center">
-                        {hasAPS && (
-                          qualifies ? (
+                        {hasAPS &&
+                          (qualifies ? (
                             <CheckCircleIcon color="success" fontSize="small" />
                           ) : disqualified ? (
                             <CancelIcon color="error" fontSize="small" />
                           ) : (
                             <HelpOutlineIcon color="disabled" fontSize="small" />
-                          )
-                        )}
+                          ))}
                         <Typography variant="subtitle1" fontWeight={600}>
                           {programme.name}
                         </Typography>
@@ -237,7 +242,8 @@ export default function UniversityDetailPage() {
                       <Typography variant="caption" color="text.secondary" display="block">
                         {programme.qualificationType} · {programme.durationYears} year
                         {programme.durationYears > 1 ? 's' : ''}
-                        {match && ` · Requires APS ${match.requiredAPS}, you have ${match.studentAPS}`}
+                        {match &&
+                          ` · Requires APS ${match.requiredAPS}, you have ${match.studentAPS}`}
                       </Typography>
                       {programme.note && (
                         <Typography variant="caption" color="text.secondary" display="block">
@@ -253,7 +259,12 @@ export default function UniversityDetailPage() {
                         />
                       )}
                       {disqualified && (match?.missingRequirements?.length ?? 0) > 0 && (
-                        <Typography variant="caption" color="error" display="block" sx={{ mt: 0.5 }}>
+                        <Typography
+                          variant="caption"
+                          color="error"
+                          display="block"
+                          sx={{ mt: 0.5 }}
+                        >
                           Missing: {match?.missingRequirements?.join(', ')}
                         </Typography>
                       )}

@@ -1,7 +1,7 @@
 // src/services/__tests__/aps-calculator.test.ts
 // Tests for per-university APS calculation and admission matching
 
-import { calculateAPS, matchStudentToProgramme } from '../aps-calculator';
+import { calculateAPS, matchStudentToProgramme, classifyChoice } from '../aps-calculator';
 import { University, Programme } from '../../types/university';
 import { SubjectResult } from '../../types/student';
 
@@ -91,7 +91,7 @@ describe('APS Calculator - Per-University', () => {
       expect(result.universityId).toBe('uj');
       // Best 6: Accounting(7) + English(6) + Maths(6) + Life Sci(6) + Phys Sci(6) + Business(5) = 36
       expect(result.totalAPS).toBe(36);
-      expect(result.subjects.find(s => s.subject === 'life_orientation')?.included).toBe(false);
+      expect(result.subjects.find((s) => s.subject === 'life_orientation')?.included).toBe(false);
     });
   });
 
@@ -102,7 +102,7 @@ describe('APS Calculator - Per-University', () => {
       expect(result.universityId).toBe('wits');
       // Best 6 + LO(6): 36 + 6 = 42
       expect(result.totalAPS).toBe(42);
-      expect(result.subjects.find(s => s.subject === 'life_orientation')?.included).toBe(true);
+      expect(result.subjects.find((s) => s.subject === 'life_orientation')?.included).toBe(true);
     });
   });
 });
@@ -139,7 +139,7 @@ describe('Programme Matching', () => {
 
       expect(match.outcome).toBe('below_minimum');
       expect(match.meetsRequirements).toBe(false);
-      expect(match.missingRequirements.some(m => m.includes('specific maths type'))).toBe(true);
+      expect(match.missingRequirements.some((m) => m.includes('specific maths type'))).toBe(true);
     });
   });
 
@@ -157,7 +157,12 @@ describe('Programme Matching', () => {
         subjectRequirements: [
           { subject: 'english', status: 'required', minRating: 5 },
           { subject: 'mathematics', status: 'alternative', minRating: 4, altGroup: 'maths' },
-          { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 5, altGroup: 'maths' },
+          {
+            subject: 'mathematicalLiteracy',
+            status: 'alternative',
+            minRating: 5,
+            altGroup: 'maths',
+          },
         ],
       },
     };
@@ -285,7 +290,12 @@ describe('Programme Matching', () => {
         subjectRequirements: [
           { subject: 'english', status: 'required', minRating: 5 },
           { subject: 'mathematics', status: 'alternative', minRating: 4, altGroup: 'maths' },
-          { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 5, altGroup: 'maths' },
+          {
+            subject: 'mathematicalLiteracy',
+            status: 'alternative',
+            minRating: 5,
+            altGroup: 'maths',
+          },
         ],
       },
     };
@@ -306,9 +316,48 @@ describe('Programme Matching', () => {
 });
 
 describe('Choice Strategy Classification', () => {
+  const standardProgramme: Programme = {
+    qualificationCode: 'TEST-STD',
+    universityId: 'uj',
+    name: 'Standard Programme',
+    qualificationType: 'degree',
+    durationYears: 3,
+    faculty: 'Test Faculty',
+    campus: ['Main'],
+    admission: {
+      apsMinimum: { withMathematics: 30 },
+      subjectRequirements: [],
+    },
+  };
+
   test('classifies as reach when 0-2 points above minimum', () => {
-    // Student APS 36, required 35 = gap of 1 = reach
-    expect(true).toBe(true); // Placeholder - classification tested in matching
+    expect(classifyChoice(35, 35, standardProgramme)).toBe('reach'); // gap 0
+    expect(classifyChoice(36, 35, standardProgramme)).toBe('reach'); // gap 1
+    expect(classifyChoice(37, 35, standardProgramme)).toBe('reach'); // gap 2
+  });
+
+  test('classifies as match when 3-5 points above minimum', () => {
+    expect(classifyChoice(38, 35, standardProgramme)).toBe('match'); // gap 3
+    expect(classifyChoice(40, 35, standardProgramme)).toBe('match'); // gap 5
+  });
+
+  test('classifies as safety when 6+ points above minimum', () => {
+    expect(classifyChoice(41, 35, standardProgramme)).toBe('safety'); // gap 6
+    expect(classifyChoice(50, 35, standardProgramme)).toBe('safety'); // gap 15
+  });
+
+  test('classifies as not_qualified when below minimum on a standard programme', () => {
+    expect(classifyChoice(34, 35, standardProgramme)).toBe('not_qualified'); // gap -1
+  });
+
+  test('classifies an ECP below its own minimum as reach, not not_qualified', () => {
+    const ecpBelowMinimum: Programme = {
+      ...standardProgramme,
+      qualificationCode: 'TEST-ECP-GAP',
+      qualificationType: 'extended_diploma',
+    };
+
+    expect(classifyChoice(28, 30, ecpBelowMinimum)).toBe('reach'); // gap -2, but it's an ECP
   });
 
   test('classifies extended programmes as safety', () => {

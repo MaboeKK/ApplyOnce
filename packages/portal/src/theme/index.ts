@@ -6,12 +6,12 @@ import { createTheme } from '@mui/material/styles';
 
 // Design tokens from CLAUDE.md
 const colors = {
-  primary: '#4F46E5',      // Indigo
-  secondary: '#7C3AED',    // Violet
-  accent: '#06B6D4',       // Cyan
-  success: '#10B981',      // Emerald (qualifies)
-  error: '#F43F5E',        // Rose (doesn't qualify)
-  warning: '#F59E0B',      // Amber
+  primary: '#4F46E5', // Indigo
+  secondary: '#7C3AED', // Violet
+  accent: '#06B6D4', // Cyan
+  success: '#10B981', // Emerald (qualifies)
+  error: '#F43F5E', // Rose (doesn't qualify)
+  warning: '#F59E0B', // Amber
   neutral: {
     50: '#F8FAFC',
     100: '#F1F5F9',

@@ -13,7 +13,7 @@ import {
 
 // Simulated network delay (ms) — makes mock feel realistic
 const MOCK_DELAY = (min = 300, max = 900) =>
-  new Promise(r => setTimeout(r, Math.floor(Math.random() * (max - min)) + min));
+  new Promise((r) => setTimeout(r, Math.floor(Math.random() * (max - min)) + min));
 
 // Reference number generator — mimics a university's format
 function generateReference(universityId: string): string {
@@ -23,11 +23,14 @@ function generateReference(universityId: string): string {
 }
 
 // Mock status store — tracks submissions in memory for the session
-const mockSubmissions = new Map<string, {
-  reference: string;
-  status: UniversityApplicationStatus['status'];
-  submittedAt: string;
-}>();
+const mockSubmissions = new Map<
+  string,
+  {
+    reference: string;
+    status: UniversityApplicationStatus['status'];
+    submittedAt: string;
+  }
+>();
 
 export class MockUniversityAdapter implements UniversityAdapter {
   universityId: string;
@@ -144,9 +147,7 @@ import { registerAdapter } from './index';
 
 export function registerAllMockAdapters(): void {
   for (const university of UNIVERSITIES) {
-    registerAdapter(
-      new MockUniversityAdapter(university.id, university.name)
-    );
+    registerAdapter(new MockUniversityAdapter(university.id, university.name));
   }
   console.log(`[University Registry] Registered ${UNIVERSITIES.length} mock adapters`);
 }

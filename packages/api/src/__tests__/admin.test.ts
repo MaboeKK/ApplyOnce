@@ -18,7 +18,8 @@ describe('University Admin API', () => {
   let witsApplicationId: string;
 
   beforeAll(async () => {
-    // Clean up test data
+    // Full-table wipe — safe only because src/__tests__/jest.setup.ts has
+    // already aborted the whole run if DATABASE_URL isn't a dedicated test DB.
     await prisma.applicationEvent.deleteMany({});
     await prisma.application.deleteMany({});
     await prisma.subjectResult.deleteMany({});
@@ -147,7 +148,8 @@ describe('University Admin API', () => {
   });
 
   afterAll(async () => {
-    // Clean up test data
+    // Full-table wipe — safe only because src/__tests__/jest.setup.ts has
+    // already aborted the whole run if DATABASE_URL isn't a dedicated test DB.
     await prisma.applicationEvent.deleteMany({});
     await prisma.application.deleteMany({});
     await prisma.subjectResult.deleteMany({});
@@ -159,7 +161,7 @@ describe('University Admin API', () => {
     await prisma.$disconnect();
 
     // Give a small delay for any pending operations to complete
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
   });
 
   describe('GET /v1/admin/applications', () => {

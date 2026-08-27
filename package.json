@@ -12,12 +12,15 @@
     "dev": "concurrently \"npm run dev:api\" \"npm run dev:portal\" \"npm run dev:admin\"",
     "build": "npm run build --workspaces",
     "lint": "npm run lint --workspaces",
+    "format:check": "prettier --check .",
+    "format": "prettier --write .",
     "typecheck": "npm run typecheck --workspaces",
     "test": "npm run test --workspaces",
     "db:up": "docker compose up postgres redis -d",
     "infra:up": "docker compose up -d",
     "infra:down": "docker compose down",
-    "setup": "bash scripts/setup.sh"
+    "setup": "bash scripts/setup.sh",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "concurrently": "^8.2.0",
@@ -30,7 +33,10 @@
     "lint-staged": "^15.0.0"
   },
   "lint-staged": {
-    "*.{ts,tsx}": ["eslint --fix", "prettier --write"]
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "engines": {
     "node": ">=22.0.0"

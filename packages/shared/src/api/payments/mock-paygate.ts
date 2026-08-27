@@ -3,7 +3,13 @@
 // In production, replace with real PayGate SDK calls.
 // PayGate docs: https://developers.paygate.co.za
 
-import { Payment, PaymentStatus, PaymentInitiateRequest, PaymentInitiateResponse, PaymentBreakdown } from '../../types/application';
+import {
+  Payment,
+  PaymentStatus,
+  PaymentInitiateRequest,
+  PaymentInitiateResponse,
+  PaymentBreakdown,
+} from '../../types/application';
 import { getUniversityById, SERVICE_FEE_ZAR } from '../../constants/universities';
 
 // Mock store — in production this lives in the database
@@ -30,7 +36,8 @@ export async function initiatePayment(
     // For mock, we derive it from the passed fee map
     const universityId = appId.split('_')[1]; // e.g. 'app_uct_123' → 'uct'
     const university = getUniversityById(universityId);
-    const applicationFee = universityApplicationFees[universityId] ?? (university?.applicationFee ?? 100);
+    const applicationFee =
+      universityApplicationFees[universityId] ?? university?.applicationFee ?? 100;
 
     breakdown.push({
       universityId: universityId,
@@ -115,7 +122,7 @@ export function getPayment(paymentId: string): Payment | undefined {
 }
 
 export function getPaymentsByStudent(studentId: string): Payment[] {
-  return Array.from(payments.values()).filter(p => p.studentId === studentId);
+  return Array.from(payments.values()).filter((p) => p.studentId === studentId);
 }
 
 // ─── REAL PAYGATE SIGNATURE (for when you go live) ──────────────────────────

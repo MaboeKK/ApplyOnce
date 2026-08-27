@@ -134,46 +134,148 @@ export default function DocumentsPage() {
 
   return (
     <>
-    <PortalNav />
-    <Container maxWidth="lg" sx={{ py: 6 }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Document Vault
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Your uploaded documents. You need your matric certificate and ID to apply.
-        </Typography>
-      </Box>
+      <PortalNav />
+      <Container maxWidth="lg" sx={{ py: 6 }}>
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h4" gutterBottom>
+            Document Vault
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Your uploaded documents. You need your matric certificate and ID to apply.
+          </Typography>
+        </Box>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>
-          {error}
-        </Alert>
-      )}
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>
+            {error}
+          </Alert>
+        )}
 
-      <Grid container spacing={3}>
-        {requiredTypes.map((type) => {
-          const doc = getDocumentByType(type);
+        <Grid container spacing={3}>
+          {requiredTypes.map((type) => {
+            const doc = getDocumentByType(type);
 
-          return (
-            <Grid item xs={12} md={6} key={type}>
-              <Card>
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <DescriptionIcon color="primary" />
-                      <Typography variant="h6">
-                        {documentTypeLabels[type]}
-                      </Typography>
+            return (
+              <Grid item xs={12} md={6} key={type}>
+                <Card>
+                  <CardContent>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        mb: 2,
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <DescriptionIcon color="primary" />
+                        <Typography variant="h6">{documentTypeLabels[type]}</Typography>
+                      </Box>
+                      <Chip
+                        label={doc ? 'Uploaded' : 'Required'}
+                        color={doc ? 'success' : 'warning'}
+                        size="small"
+                      />
                     </Box>
-                    <Chip
-                      label={doc ? 'Uploaded' : 'Required'}
-                      color={doc ? 'success' : 'warning'}
-                      size="small"
-                    />
-                  </Box>
 
-                  {doc ? (
+                    {doc ? (
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                          {doc.fileName}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          Uploaded {new Date(doc.uploadedAt).toLocaleDateString()}
+                        </Typography>
+
+                        <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                          <Button
+                            size="small"
+                            startIcon={<DownloadIcon />}
+                            onClick={() => handleDownload(doc.id, doc.fileName)}
+                          >
+                            Download
+                          </Button>
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => handleDelete(doc.id)}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Box>
+
+                        <Box sx={{ mt: 2 }}>
+                          <input
+                            type="file"
+                            accept="image/*,.pdf"
+                            onChange={(e) => handleUpload(type, e)}
+                            style={{ display: 'none' }}
+                            id={`replace-${type}`}
+                            disabled={uploading}
+                          />
+                          <label htmlFor={`replace-${type}`}>
+                            <Button
+                              component="span"
+                              size="small"
+                              variant="outlined"
+                              disabled={uploading}
+                            >
+                              Replace
+                            </Button>
+                          </label>
+                        </Box>
+                      </Box>
+                    ) : (
+                      <Box>
+                        <input
+                          type="file"
+                          accept="image/*,.pdf"
+                          onChange={(e) => handleUpload(type, e)}
+                          style={{ display: 'none' }}
+                          id={`upload-${type}`}
+                          disabled={uploading}
+                        />
+                        <label htmlFor={`upload-${type}`}>
+                          <Button
+                            component="span"
+                            variant="contained"
+                            startIcon={<CloudUploadIcon />}
+                            disabled={uploading}
+                            fullWidth
+                          >
+                            {uploading ? 'Uploading...' : 'Upload'}
+                          </Button>
+                        </label>
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+            );
+          })}
+
+          {/* Proof of residence - optional */}
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    mb: 2,
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <DescriptionIcon color="primary" />
+                    <Typography variant="h6">Proof of Residence</Typography>
+                  </Box>
+                  <Chip label="Optional" size="small" />
+                </Box>
+
+                {(() => {
+                  const doc = getDocumentByType('proof_of_residence');
+                  return doc ? (
                     <Box>
                       <Typography variant="body2" color="text.secondary" gutterBottom>
                         {doc.fileName}
@@ -190,34 +292,9 @@ export default function DocumentsPage() {
                         >
                           Download
                         </Button>
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={() => handleDelete(doc.id)}
-                        >
+                        <IconButton size="small" color="error" onClick={() => handleDelete(doc.id)}>
                           <DeleteIcon />
                         </IconButton>
-                      </Box>
-
-                      <Box sx={{ mt: 2 }}>
-                        <input
-                          type="file"
-                          accept="image/*,.pdf"
-                          onChange={(e) => handleUpload(type, e)}
-                          style={{ display: 'none' }}
-                          id={`replace-${type}`}
-                          disabled={uploading}
-                        />
-                        <label htmlFor={`replace-${type}`}>
-                          <Button
-                            component="span"
-                            size="small"
-                            variant="outlined"
-                            disabled={uploading}
-                          >
-                            Replace
-                          </Button>
-                        </label>
                       </Box>
                     </Box>
                   ) : (
@@ -225,15 +302,15 @@ export default function DocumentsPage() {
                       <input
                         type="file"
                         accept="image/*,.pdf"
-                        onChange={(e) => handleUpload(type, e)}
+                        onChange={(e) => handleUpload('proof_of_residence', e)}
                         style={{ display: 'none' }}
-                        id={`upload-${type}`}
+                        id="upload-proof_of_residence"
                         disabled={uploading}
                       />
-                      <label htmlFor={`upload-${type}`}>
+                      <label htmlFor="upload-proof_of_residence">
                         <Button
                           component="span"
-                          variant="contained"
+                          variant="outlined"
                           startIcon={<CloudUploadIcon />}
                           disabled={uploading}
                           fullWidth
@@ -242,90 +319,19 @@ export default function DocumentsPage() {
                         </Button>
                       </label>
                     </Box>
-                  )}
-                </CardContent>
-              </Card>
-            </Grid>
-          );
-        })}
-
-        {/* Proof of residence - optional */}
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <DescriptionIcon color="primary" />
-                  <Typography variant="h6">
-                    Proof of Residence
-                  </Typography>
-                </Box>
-                <Chip label="Optional" size="small" />
-              </Box>
-
-              {(() => {
-                const doc = getDocumentByType('proof_of_residence');
-                return doc ? (
-                  <Box>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      {doc.fileName}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Uploaded {new Date(doc.uploadedAt).toLocaleDateString()}
-                    </Typography>
-
-                    <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                      <Button
-                        size="small"
-                        startIcon={<DownloadIcon />}
-                        onClick={() => handleDownload(doc.id, doc.fileName)}
-                      >
-                        Download
-                      </Button>
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={() => handleDelete(doc.id)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                  </Box>
-                ) : (
-                  <Box>
-                    <input
-                      type="file"
-                      accept="image/*,.pdf"
-                      onChange={(e) => handleUpload('proof_of_residence', e)}
-                      style={{ display: 'none' }}
-                      id="upload-proof_of_residence"
-                      disabled={uploading}
-                    />
-                    <label htmlFor="upload-proof_of_residence">
-                      <Button
-                        component="span"
-                        variant="outlined"
-                        startIcon={<CloudUploadIcon />}
-                        disabled={uploading}
-                        fullWidth
-                      >
-                        {uploading ? 'Uploading...' : 'Upload'}
-                      </Button>
-                    </label>
-                  </Box>
-                );
-              })()}
-            </CardContent>
-          </Card>
+                  );
+                })()}
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
-      </Grid>
 
-      <Box sx={{ mt: 4 }}>
-        <Button variant="outlined" onClick={() => router.push('/dashboard')}>
-          Back to Dashboard
-        </Button>
-      </Box>
-    </Container>
+        <Box sx={{ mt: 4 }}>
+          <Button variant="outlined" onClick={() => router.push('/dashboard')}>
+            Back to Dashboard
+          </Button>
+        </Box>
+      </Container>
     </>
   );
 }

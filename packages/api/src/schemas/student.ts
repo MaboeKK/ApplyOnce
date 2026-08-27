@@ -29,7 +29,10 @@ const addressSchema = z.object({
 const emergencyContactSchema = z.object({
   firstName: z.string().optional(),
   lastName: z.string().optional(),
-  phone: z.string().regex(/^\+27[6-8]\d{8}$/, 'Phone must be in format +27XXXXXXXXX').optional(),
+  phone: z
+    .string()
+    .regex(/^\+27[6-8]\d{8}$/, 'Phone must be in format +27XXXXXXXXX')
+    .optional(),
   relationship: z.string().optional(),
 });
 
@@ -49,12 +52,22 @@ const guardianSchema = z.object({
 // NOTE: When idNumber is provided, dateOfBirth and gender are auto-derived
 // server-side and any client-submitted values are ignored (spoofing prevention)
 export const updateStudentProfileSchema = z.object({
-  idNumber: z.string().regex(/^\d{13}$/, 'SA ID number must be 13 digits').optional(),
-  dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date of birth must be in YYYY-MM-DD format').transform((str) => new Date(str)).optional(),
+  idNumber: z
+    .string()
+    .regex(/^\d{13}$/, 'SA ID number must be 13 digits')
+    .optional(),
+  dateOfBirth: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date of birth must be in YYYY-MM-DD format')
+    .transform((str) => new Date(str))
+    .optional(),
   gender: z.enum(['male', 'female', 'prefer_not_to_say']).optional(),
   firstName: z.string().min(1).optional(),
   lastName: z.string().min(1).optional(),
-  phone: z.string().regex(/^\+27[6-8]\d{8}$/, 'Phone must be in format +27XXXXXXXXX').optional(),
+  phone: z
+    .string()
+    .regex(/^\+27[6-8]\d{8}$/, 'Phone must be in format +27XXXXXXXXX')
+    .optional(),
   race: z.enum(['african', 'coloured', 'indian', 'white', 'other', 'prefer_not_to_say']).optional(),
   nationality: z.string().min(1).optional(),
   homeLanguage: z.string().min(1).optional(),

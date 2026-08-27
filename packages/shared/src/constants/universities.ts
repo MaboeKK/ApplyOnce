@@ -14,7 +14,8 @@ const UJ: University = {
   logoUrl: '/logos/uj.png',
   applicationSystem: 'Custom portal',
   applicationFee: 0,
-  feeNote: 'No application fee for online or paper applications. The flat ApplyOnce service fee still applies.',
+  feeNote:
+    'No application fee for online or paper applications. The flat ApplyOnce service fee still applies.',
   maxChoices: 2,
   choicesRanked: false,
   choicesIndependent: true,
@@ -68,7 +69,12 @@ const UJ: University = {
         subjectRequirements: [
           { subject: 'english', status: 'required', minRating: 5 },
           { subject: 'mathematics', status: 'alternative', minRating: 3, altGroup: 'maths' },
-          { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 4, altGroup: 'maths' },
+          {
+            subject: 'mathematicalLiteracy',
+            status: 'alternative',
+            minRating: 4,
+            altGroup: 'maths',
+          },
           { subject: 'technicalMathematics', status: 'not_accepted' },
         ],
       },
@@ -130,7 +136,12 @@ const UJ: University = {
         subjectRequirements: [
           { subject: 'english', status: 'required', minRating: 4 },
           { subject: 'mathematics', status: 'alternative', minRating: 3, altGroup: 'maths' },
-          { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 4, altGroup: 'maths' },
+          {
+            subject: 'mathematicalLiteracy',
+            status: 'alternative',
+            minRating: 4,
+            altGroup: 'maths',
+          },
         ],
       },
       careers: ['People Management Practitioner', 'HR Officer'],
@@ -186,7 +197,12 @@ const WITS: University = {
       admission: {
         apsMinimum: { default: 38 },
         subjectRequirements: [
-          { subject: 'english', status: 'required', homeLanguageRating: 5, additionalLanguageRating: 5 },
+          {
+            subject: 'english',
+            status: 'required',
+            homeLanguageRating: 5,
+            additionalLanguageRating: 5,
+          },
           { subject: 'mathematics', status: 'required', minRating: 5 },
         ],
         waitlistBand: {
@@ -209,9 +225,19 @@ const WITS: University = {
       admission: {
         apsMinimum: { default: 46 },
         subjectRequirements: [
-          { subject: 'english', status: 'required', homeLanguageRating: 6, additionalLanguageRating: 6 },
+          {
+            subject: 'english',
+            status: 'required',
+            homeLanguageRating: 6,
+            additionalLanguageRating: 6,
+          },
           { subject: 'mathematics', status: 'alternative', minRating: 5, altGroup: 'maths' },
-          { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 6, altGroup: 'maths' },
+          {
+            subject: 'mathematicalLiteracy',
+            status: 'alternative',
+            minRating: 6,
+            altGroup: 'maths',
+          },
         ],
         waitlistBand: {
           apsRange: [40, 45],
@@ -244,7 +270,6 @@ const WITS: University = {
   website: 'https://www.wits.ac.za',
   applicationPortal: 'https://www.wits.ac.za/apply-online',
 };
-
 
 // ═══════════════════════════════════════════════════════════════════════════
 // UNIVERSITY OF CAPE TOWN (UCT) — full reference implementation
@@ -464,7 +489,11 @@ export const UCT_COMMERCE_PROGRAMMES: Programme[] = [
       note: 'FPS 435 = Band A. Band B (WPS 470) and Band C (FPS 430-434, EDU only, redress only) not modelled.',
     },
     additionalRequirements: ['NBT'],
-    careers: ['Attorney (via postgraduate LLB)', 'Advocate (via postgraduate LLB)', 'Commercial Economist'],
+    careers: [
+      'Attorney (via postgraduate LLB)',
+      'Advocate (via postgraduate LLB)',
+      'Commercial Economist',
+    ],
     note: 'Graduates who want to qualify as attorney/advocate proceed to a 2-year postgraduate LLB.',
   },
   {
@@ -572,7 +601,11 @@ export const UCT_COMMERCE_PROGRAMMES: Programme[] = [
     },
     additionalRequirements: ['NBT'],
     firstTimeEntrantsOnly: false,
-    careers: ['HR Manager', 'Organisational Development Consultant', 'Talent Management Specialist'],
+    careers: [
+      'HR Manager',
+      'Organisational Development Consultant',
+      'Talent Management Specialist',
+    ],
     note: 'Text states this Commerce option is only available to students who did pure Mathematics in matric (consistent with the Group 1 Mathematics-required gate already encoded above).',
   },
 
@@ -1090,7 +1123,6 @@ export const UCT_EBE_PROGRAMMES: Programme[] = [
 // published per programme as a hard floor before FPS/WPS is even considered — recorded in prose
 // only, since there is no dedicated schema field for it.
 
-
 export const UCT_HEALTH_SCIENCES_PROGRAMMES: Programme[] = [
   // ─── MBChB ──────────────────────────────────────────────────────────────
   {
@@ -1133,7 +1165,12 @@ export const UCT_HEALTH_SCIENCES_PROGRAMMES: Programme[] = [
       apsMinimum: { default: 730, scoreType: 'FPS' },
       subjectRequirements: [
         { subject: 'mathematics', status: 'required', minPercentage: 60 },
-        { subject: 'physicalScience', status: 'alternative', minPercentage: 65, altGroup: 'science' },
+        {
+          subject: 'physicalScience',
+          status: 'alternative',
+          minPercentage: 65,
+          altGroup: 'science',
+        },
         { subject: 'lifeScience', status: 'alternative', minPercentage: 65, altGroup: 'science' },
         { subject: 'english', status: 'required', minPercentage: 65 },
       ],
@@ -1143,7 +1180,7 @@ export const UCT_HEALTH_SCIENCES_PROGRAMMES: Programme[] = [
         'Band B (likely, all applicants): WPS >= 797. ' +
         'Band C (possible, SA redress applicants only): FPS >= 580 (redress category 1), 610 (redress 2), 680 (redress 3 and 4). ' +
         'Eligible SADC countries for this programme: Angola, Eswatini (Swaziland), Lesotho. ' +
-        "FPS/WPS bake NBT scores directly into the score (out of 900) — ApplyOnce does not collect NBT scores, so true eligibility cannot currently be fully evaluated from academic marks alone. apsMinimum.default is the published Band A FPS threshold, shown for reference.",
+        'FPS/WPS bake NBT scores directly into the score (out of 900) — ApplyOnce does not collect NBT scores, so true eligibility cannot currently be fully evaluated from academic marks alone. apsMinimum.default is the published Band A FPS threshold, shown for reference.',
     },
     additionalRequirements: ['NBT'],
     careers: ['Physiotherapist'],
@@ -1162,8 +1199,18 @@ export const UCT_HEALTH_SCIENCES_PROGRAMMES: Programme[] = [
       apsMinimum: { default: 730, scoreType: 'FPS' },
       subjectRequirements: [
         { subject: 'mathematics', status: 'alternative', minPercentage: 60, altGroup: 'maths' },
-        { subject: 'mathematicalLiteracy', status: 'alternative', minPercentage: 70, altGroup: 'maths' },
-        { subject: 'physicalScience', status: 'alternative', minPercentage: 65, altGroup: 'science' },
+        {
+          subject: 'mathematicalLiteracy',
+          status: 'alternative',
+          minPercentage: 70,
+          altGroup: 'maths',
+        },
+        {
+          subject: 'physicalScience',
+          status: 'alternative',
+          minPercentage: 65,
+          altGroup: 'science',
+        },
         { subject: 'lifeScience', status: 'alternative', minPercentage: 65, altGroup: 'science' },
         { subject: 'english', status: 'required', minPercentage: 65 },
       ],
@@ -1174,7 +1221,7 @@ export const UCT_HEALTH_SCIENCES_PROGRAMMES: Programme[] = [
         'Band C (possible, SA redress applicants only): FPS >= 565 (redress 1), 580 (redress 2), 670 (redress 3 and 4). ' +
         'For Mathematical Literacy applicants, a Mathematics-NBT equivalence score is calculated as: NBT Quantitative Literacy score minus 20 points. ' +
         'Eligible SADC countries: Angola, Botswana, Comoros, DR Congo, Eswatini (Swaziland), Lesotho, Malawi, Mozambique, Seychelles. ' +
-        "FPS/WPS bake NBT scores directly into the score (out of 900) — ApplyOnce does not collect NBT scores, so true eligibility cannot currently be fully evaluated from academic marks alone. apsMinimum.default is the published Band A FPS threshold, shown for reference.",
+        'FPS/WPS bake NBT scores directly into the score (out of 900) — ApplyOnce does not collect NBT scores, so true eligibility cannot currently be fully evaluated from academic marks alone. apsMinimum.default is the published Band A FPS threshold, shown for reference.',
     },
     additionalRequirements: ['NBT'],
     careers: ['Occupational Therapist'],
@@ -1193,8 +1240,18 @@ export const UCT_HEALTH_SCIENCES_PROGRAMMES: Programme[] = [
       apsMinimum: { default: 720, scoreType: 'FPS' },
       subjectRequirements: [
         { subject: 'mathematics', status: 'alternative', minPercentage: 60, altGroup: 'maths' },
-        { subject: 'mathematicalLiteracy', status: 'alternative', minPercentage: 70, altGroup: 'maths' },
-        { subject: 'physicalScience', status: 'alternative', minPercentage: 65, altGroup: 'science' },
+        {
+          subject: 'mathematicalLiteracy',
+          status: 'alternative',
+          minPercentage: 70,
+          altGroup: 'maths',
+        },
+        {
+          subject: 'physicalScience',
+          status: 'alternative',
+          minPercentage: 65,
+          altGroup: 'science',
+        },
         { subject: 'lifeScience', status: 'alternative', minPercentage: 65, altGroup: 'science' },
         { subject: 'english', status: 'required', minPercentage: 65 },
       ],
@@ -1205,7 +1262,7 @@ export const UCT_HEALTH_SCIENCES_PROGRAMMES: Programme[] = [
         'Band C (possible, SA redress applicants only): FPS >= 550 (redress 1), 565 (redress 2), 610 (redress 3 and 4). ' +
         'Mathematical Literacy applicants get a Mathematics-NBT equivalence score of: NBT Quantitative Literacy score minus 20 points. ' +
         'Eligible SADC countries: Angola, Botswana, DR Congo, Lesotho, Malawi, Mauritius, Mozambique, Namibia, Seychelles, Swaziland, Tanzania, Zambia, Zimbabwe. ' +
-        "FPS/WPS bake NBT scores directly into the score (out of 900) — ApplyOnce does not collect NBT scores, so true eligibility cannot currently be fully evaluated from academic marks alone. apsMinimum.default is the published Band A FPS threshold, shown for reference.",
+        'FPS/WPS bake NBT scores directly into the score (out of 900) — ApplyOnce does not collect NBT scores, so true eligibility cannot currently be fully evaluated from academic marks alone. apsMinimum.default is the published Band A FPS threshold, shown for reference.',
     },
     additionalRequirements: ['NBT'],
     careers: ['Audiologist'],
@@ -1224,21 +1281,31 @@ export const UCT_HEALTH_SCIENCES_PROGRAMMES: Programme[] = [
       apsMinimum: { default: 715, scoreType: 'FPS' },
       subjectRequirements: [
         { subject: 'mathematics', status: 'alternative', minPercentage: 60, altGroup: 'maths' },
-        { subject: 'mathematicalLiteracy', status: 'alternative', minPercentage: 70, altGroup: 'maths' },
-        { subject: 'physicalScience', status: 'alternative', minPercentage: 65, altGroup: 'science' },
+        {
+          subject: 'mathematicalLiteracy',
+          status: 'alternative',
+          minPercentage: 70,
+          altGroup: 'maths',
+        },
+        {
+          subject: 'physicalScience',
+          status: 'alternative',
+          minPercentage: 65,
+          altGroup: 'science',
+        },
         { subject: 'lifeScience', status: 'alternative', minPercentage: 65, altGroup: 'science' },
         { subject: 'english', status: 'required', minPercentage: 65 },
       ],
       note:
-        'JUDGMENT CALL / LOWER CONFIDENCE: this programme\'s minimum-subject-requirements paragraph and band table were cut off mid-sentence at a page break in the source OCR text and the ' +
+        "JUDGMENT CALL / LOWER CONFIDENCE: this programme's minimum-subject-requirements paragraph and band table were cut off mid-sentence at a page break in the source OCR text and the " +
         'following page appears to interleave an unrelated "international qualifications" section header before the actual numbers resume. The figures below are reconstructed from the ' +
         'numeric block that follows the same "Mathematics at 60% or Mathematical Literacy at 70%..." requirement wording used by Occupational Therapy and Audiology, matched to a band table ' +
-        'with numbers distinct from every other programme in this chunk (so it is very likely this programme\'s own table, not a duplicate) — but this should be verified against the official ' +
+        "with numbers distinct from every other programme in this chunk (so it is very likely this programme's own table, not a duplicate) — but this should be verified against the official " +
         'prospectus PDF pagination if precision matters. Also requires 60% for the next three best subjects excluding Life Orientation; raw sub-minimum APS (pre-NBT) of 340. ' +
         'Band A (guaranteed): FPS >= 715, NBT Intermediate or above for AL, QL and Mathematics (Mathematical Literacy takers scoring above 75% exempt from NBT Mathematics). ' +
         'Band B (likely): WPS >= 670. Band C (SA redress only): FPS >= 510 (redress 1), 515 (redress 2), 600 (redress 3 and 4). ' +
         'Eligible SADC countries (shared with Audiology in source text): Angola, Botswana, DR Congo, Lesotho, Malawi, Mauritius, Mozambique, Namibia, Seychelles, Swaziland, Tanzania, Zambia, Zimbabwe. ' +
-        "FPS/WPS bake NBT scores directly into the score (out of 900) — ApplyOnce does not collect NBT scores, so true eligibility cannot currently be fully evaluated from academic marks alone. apsMinimum.default is the published Band A FPS threshold, shown for reference.",
+        'FPS/WPS bake NBT scores directly into the score (out of 900) — ApplyOnce does not collect NBT scores, so true eligibility cannot currently be fully evaluated from academic marks alone. apsMinimum.default is the published Band A FPS threshold, shown for reference.',
     },
     additionalRequirements: ['NBT'],
     careers: ['Speech-Language Therapist'],
@@ -1257,12 +1324,14 @@ export const UCT_HEALTH_SCIENCES_PROGRAMMES: Programme[] = [
       apsMinimum: {},
       subjectRequirements: [],
       note:
-        'Not part of the FPS/band system (prospectus explicitly states this qualification\'s criteria are not expressed in bands) — no numeric APS/FPS threshold is published. ' +
+        "Not part of the FPS/band system (prospectus explicitly states this qualification's criteria are not expressed in bands) — no numeric APS/FPS threshold is published. " +
         'Eligibility requires a National Senior Certificate OR an approved HEQSF-level-4 school-leaving qualification, plus National Benchmark Test results in the Upper Intermediate to ' +
         'Proficient range for the Academic and Quantitative Literacy components only (the NBT Mathematics component is not required for this qualification). ' +
         'Offered only if there is a sufficient number of applicants; 30 places available.',
     },
-    additionalRequirements: ['NBT (Academic & Quantitative Literacy components only, no Mathematics component)'],
+    additionalRequirements: [
+      'NBT (Academic & Quantitative Literacy components only, no Mathematics component)',
+    ],
     careers: ['Community-Based Disability Practitioner', 'Home-Based Carer'],
   },
 
@@ -1285,7 +1354,9 @@ export const UCT_HEALTH_SCIENCES_PROGRAMMES: Programme[] = [
         'Offers are made subject to availability of space; 10 places available. ' +
         'durationYears above is an assumption (not stated in the source text) — flagged for verification.',
     },
-    additionalRequirements: ['Prior tertiary study including Chemistry 2 and/or Biochemistry 3, or relevant work experience'],
+    additionalRequirements: [
+      'Prior tertiary study including Chemistry 2 and/or Biochemistry 3, or relevant work experience',
+    ],
   },
 ];
 
@@ -1296,7 +1367,6 @@ export const UCT_HEALTH_SCIENCES_PROGRAMMES: Programme[] = [
 // as a purely informational flag; no NBT score is collected or evaluated by the platform.
 // Only the "guaranteed admission" (Band A) FPS threshold is modelled as apsMinimum.default.
 // Where a programme has only a single "possible admission" tier (no bands), that FPS is used instead.
-
 
 export const UCT_HUMANITIES_PROGRAMMES: Programme[] = [
   // Bachelor of Arts (BA) and Bachelor of Social Science (BSocSc) are presented jointly in the
@@ -1311,9 +1381,7 @@ export const UCT_HUMANITIES_PROGRAMMES: Programme[] = [
     campus: ['Rondebosch'],
     admission: {
       apsMinimum: { default: 450, scoreType: 'FPS' },
-      subjectRequirements: [
-        { subject: 'english', status: 'required', minPercentage: 50 },
-      ],
+      subjectRequirements: [{ subject: 'english', status: 'required', minPercentage: 50 }],
       note:
         'Band A (guaranteed admission, FPS 450+) modelled here. Minimum eligibility is FPS 380 ' +
         '(Band C, possible admission — SA redress applicants only) and Band B (WPS 450+, likely ' +
@@ -1356,9 +1424,7 @@ export const UCT_HUMANITIES_PROGRAMMES: Programme[] = [
     campus: ['Rondebosch'],
     admission: {
       apsMinimum: { default: 450, scoreType: 'FPS' },
-      subjectRequirements: [
-        { subject: 'english', status: 'required', minPercentage: 50 },
-      ],
+      subjectRequirements: [{ subject: 'english', status: 'required', minPercentage: 50 }],
       note:
         'Band A (guaranteed admission, FPS 450+) modelled here. Minimum eligibility is FPS 380 ' +
         '(Band C, possible admission — SA redress applicants only) and Band B (WPS 450+, likely ' +
@@ -1379,9 +1445,7 @@ export const UCT_HUMANITIES_PROGRAMMES: Programme[] = [
     campus: ['Rondebosch'],
     admission: {
       apsMinimum: { default: 380, scoreType: 'FPS' },
-      subjectRequirements: [
-        { subject: 'english', status: 'required', minPercentage: 50 },
-      ],
+      subjectRequirements: [{ subject: 'english', status: 'required', minPercentage: 50 }],
       note:
         'Single "possible admission" tier (FPS 380+) — no guaranteed/likely bands published; the ' +
         'leading indicator for admission is portfolio performance, and places are awarded on merit. ' +
@@ -1401,9 +1465,7 @@ export const UCT_HUMANITIES_PROGRAMMES: Programme[] = [
     campus: ['Rondebosch'],
     admission: {
       apsMinimum: { default: 380, scoreType: 'FPS' },
-      subjectRequirements: [
-        { subject: 'english', status: 'required', minPercentage: 50 },
-      ],
+      subjectRequirements: [{ subject: 'english', status: 'required', minPercentage: 50 }],
       note:
         'Single "possible admission" tier (FPS 380+) — no guaranteed/likely bands published; the ' +
         'leading indicator for admission is audition performance, and places are awarded on merit. ' +
@@ -1424,9 +1486,7 @@ export const UCT_HUMANITIES_PROGRAMMES: Programme[] = [
     campus: ['Rondebosch'],
     admission: {
       apsMinimum: { default: 380, scoreType: 'FPS' },
-      subjectRequirements: [
-        { subject: 'english', status: 'required', minPercentage: 50 },
-      ],
+      subjectRequirements: [{ subject: 'english', status: 'required', minPercentage: 50 }],
       note:
         'Single "possible admission" tier (FPS 380+) — no guaranteed/likely bands published; the ' +
         'leading indicator for admission is audition performance. English: 50% if Home Language, ' +
@@ -1449,9 +1509,7 @@ export const UCT_HUMANITIES_PROGRAMMES: Programme[] = [
     campus: ['Rondebosch'],
     admission: {
       apsMinimum: {},
-      subjectRequirements: [
-        { subject: 'english', status: 'required', minPercentage: 50 },
-      ],
+      subjectRequirements: [{ subject: 'english', status: 'required', minPercentage: 50 }],
       note:
         'No numeric FPS/APS threshold is published for this diploma — minimum requirement is an NSC ' +
         'endorsed for diploma study (or equivalent) plus NBT Academic Literacy at Intermediate level ' +
@@ -1471,9 +1529,7 @@ export const UCT_HUMANITIES_PROGRAMMES: Programme[] = [
     campus: ['Rondebosch'],
     admission: {
       apsMinimum: {},
-      subjectRequirements: [
-        { subject: 'english', status: 'required', minPercentage: 50 },
-      ],
+      subjectRequirements: [{ subject: 'english', status: 'required', minPercentage: 50 }],
       note:
         'No numeric FPS/APS threshold is published for this diploma — minimum requirement is an NSC ' +
         'endorsed for diploma study (or equivalent) plus NBT Academic Literacy at Intermediate level ' +
@@ -1504,12 +1560,10 @@ export const UCT_LAW_PROGRAMMES: Programme[] = [
       // percentage_600 base score) — see UCT's overall facultyScoring rule.
       apsMinimum: { default: 500, scoreType: 'FPS' },
       subjectRequirements: [],
-      note:
-        'UCT Law uses a 3-tier band system, not a single cutoff: Band A (all SA applicants) 500 FPS = guaranteed admission; Band B (all SA applicants) 500 WPS = likely admission; Band C (SA applicants in targeted redress categories only) 470 FPS = possible admission. All bands also require NBT AL "proficient" and NBT QL "intermediate or above" — not evaluated by this platform (NBTs out of scope). International (non-SA schooling) applicants: 510 FPS = probable admission. Only Band A is modelled here; Band B/C thresholds exist but are not enforced by this platform.',
+      note: 'UCT Law uses a 3-tier band system, not a single cutoff: Band A (all SA applicants) 500 FPS = guaranteed admission; Band B (all SA applicants) 500 WPS = likely admission; Band C (SA applicants in targeted redress categories only) 470 FPS = possible admission. All bands also require NBT AL "proficient" and NBT QL "intermediate or above" — not evaluated by this platform (NBTs out of scope). International (non-SA schooling) applicants: 510 FPS = probable admission. Only Band A is modelled here; Band B/C thresholds exist but are not enforced by this platform.',
     },
     careers: ['Advocate', 'Attorney', 'Legal Advisor'],
-    note:
-      'Applicants with non-South African leaving certificates (A-level/AS-level/NSSC/IB Diploma) are instead scored on a separate international APS-points table (not FPS): international applicants 44+/46+ (minimum/probable admission); SA applicants 40+/44+; SA redress applicants 38+/39+. Two other LLB routes are described in the prospectus but are NOT separately modelled as programmes here because no explicit FPS/APS admission number applies at the point of matric application: (1) the combined Humanities/LLB or Commerce/LLB route (5 years min, a BBusSci/LLB variant needs 6) — a matric applicant is admitted into the BA/BSocSci or BCom degree under that faculty\'s own requirements (not in this chunk), then competes for entry into the law major via either the same NSC+NBT LLB Band criteria or a first-year average of 65% (Humanities) / 63% (Commerce); (2) the graduate LLB (3 years min) — open only to holders of an already-completed undergraduate degree, admitted on a competitive basis requiring roughly 65% average in that prior degree. Neither route is gated by matric APS, so neither fits this platform\'s NSC-applicant model.',
+    note: "Applicants with non-South African leaving certificates (A-level/AS-level/NSSC/IB Diploma) are instead scored on a separate international APS-points table (not FPS): international applicants 44+/46+ (minimum/probable admission); SA applicants 40+/44+; SA redress applicants 38+/39+. Two other LLB routes are described in the prospectus but are NOT separately modelled as programmes here because no explicit FPS/APS admission number applies at the point of matric application: (1) the combined Humanities/LLB or Commerce/LLB route (5 years min, a BBusSci/LLB variant needs 6) — a matric applicant is admitted into the BA/BSocSci or BCom degree under that faculty's own requirements (not in this chunk), then competes for entry into the law major via either the same NSC+NBT LLB Band criteria or a first-year average of 65% (Humanities) / 63% (Commerce); (2) the graduate LLB (3 years min) — open only to holders of an already-completed undergraduate degree, admitted on a competitive basis requiring roughly 65% average in that prior degree. Neither route is gated by matric APS, so neither fits this platform's NSC-applicant model.",
   },
 ];
 
@@ -1570,10 +1624,9 @@ export const UCT_LAW_PROGRAMMES: Programme[] = [
 // NSC/NBT results), not a separately-applied-to qualification, so it is described in `note` only, not modelled
 // as a distinct extended_degree Programme.
 
-
 const SCIENCE_ADMISSION_NOTE =
   'Faculty of Science admission bands (NSC applicants): Band A - Guaranteed Admission at FPS 660+ ' +
-  '(shown as this programme\'s apsMinimum); Band B - Likely Admission at WPS 640+; Band C - Possible ' +
+  "(shown as this programme's apsMinimum); Band B - Likely Admission at WPS 640+; Band C - Possible " +
   'Admission (SA redress applicants only) at FPS 550+. All bands additionally require Mathematics 70%+ ' +
   'and Physical Sciences 60%+. Meeting a band does not guarantee admission (capacity-limited). Bands B ' +
   'and C are not modelled in ApplyOnce. NBTs (AL, QL, Mathematics) must be written but are not used for ' +
@@ -1627,9 +1680,7 @@ export const UCT_SCIENCE_PROGRAMMES: Programme[] = [
     campus: ['Rondebosch'],
     admission: {
       apsMinimum: { default: 660, scoreType: 'FPS' },
-      subjectRequirements: [
-        { subject: 'mathematics', status: 'required', minPercentage: 70 },
-      ],
+      subjectRequirements: [{ subject: 'mathematics', status: 'required', minPercentage: 70 }],
       note:
         SCIENCE_ADMISSION_NOTE +
         ' Per the prospectus, applicants who have not completed Physical Science or Information Technology ' +
@@ -1755,9 +1806,7 @@ export const UCT_SCIENCE_PROGRAMMES: Programme[] = [
     campus: ['Rondebosch'],
     admission: {
       apsMinimum: { default: 660, scoreType: 'FPS' },
-      subjectRequirements: [
-        { subject: 'mathematics', status: 'required', minPercentage: 70 },
-      ],
+      subjectRequirements: [{ subject: 'mathematics', status: 'required', minPercentage: 70 }],
       note:
         SCIENCE_ADMISSION_NOTE +
         ' Per the prospectus, applicants who have not completed Physical Science or Information Technology ' +
@@ -1946,7 +1995,8 @@ const UCT: University = {
   logoUrl: '/logos/uct.png',
   applicationSystem: 'Custom portal',
   applicationFee: 100,
-  feeNote: 'R100 for South African and SADC applicants; R300 for other international applicants. Non-refundable. Currently registered UCT students, UCT graduates, and Semester Study Abroad applicants do not pay.',
+  feeNote:
+    'R100 for South African and SADC applicants; R300 for other international applicants. Non-refundable. Currently registered UCT students, UCT graduates, and Semester Study Abroad applicants do not pay.',
   maxChoices: 1,
   choicesRanked: false,
   choicesIndependent: true,
@@ -1995,7 +2045,8 @@ const UCT: University = {
         faculty: 'Science',
         scoreName: 'FPS',
         scoreMax: 800,
-        transform: 'FPS = APS + (Mathematics% + Physical Sciences%) — these two subjects are effectively doubled. IT or Life Sciences may substitute for Physical Sciences for certain majors.',
+        transform:
+          'FPS = APS + (Mathematics% + Physical Sciences%) — these two subjects are effectively doubled. IT or Life Sciences may substitute for Physical Sciences for certain majors.',
         disadvantageFactor: { maxPercent: 10, formula: 'WPS = FPS + (factor% x FPS)' },
         usesNBT: true,
         note: 'NBT results are written but NOT used for Science admission decisions — only for post-admission Extended Degree Programme (EDP) placement.',
@@ -2004,8 +2055,13 @@ const UCT: University = {
         faculty: 'Health Sciences',
         scoreName: 'FPS',
         scoreMax: 900,
-        transform: 'FPS = APS (out of 600) + sum of the three NBT scores (AL + QL + Mathematics, out of 300).',
-        disadvantageFactor: { maxPercent: 20, formula: 'WPS = FPS + (factor% x FPS)', note: 'Wider 0-20% band than other faculties.' },
+        transform:
+          'FPS = APS (out of 600) + sum of the three NBT scores (AL + QL + Mathematics, out of 300).',
+        disadvantageFactor: {
+          maxPercent: 20,
+          formula: 'WPS = FPS + (factor% x FPS)',
+          note: 'Wider 0-20% band than other faculties.',
+        },
         usesNBT: true,
         note: 'NBT scores are baked directly into the FPS formula here (unlike other faculties, where NBT is a separate gate) — true FPS cannot be computed without NBT data, which this platform does not collect.',
       },
@@ -2016,7 +2072,7 @@ const UCT: University = {
   applyUrl: 'https://www.uct.ac.za/apply',
   notes: [
     'UCT applications are for ONE programme choice only (with a formal "change of programme" request process after applying) — this maps directly onto ApplyOnce\'s own one-programme-per-university rule.',
-    'All undergraduate applicants normally resident/schooled in South Africa must write the National Benchmark Tests (NBTs) — mandatory faculty-wide, though not always used in the admission decision itself (e.g. Science). NBTs are out of scope for ApplyOnce\'s MVP; the platform cannot evaluate NBT-gated bands (Band B/C, or Health Sciences\' FPS itself).',
+    "All undergraduate applicants normally resident/schooled in South Africa must write the National Benchmark Tests (NBTs) — mandatory faculty-wide, though not always used in the admission decision itself (e.g. Science). NBTs are out of scope for ApplyOnce's MVP; the platform cannot evaluate NBT-gated bands (Band B/C, or Health Sciences' FPS itself).",
     'Applications, NBT writing (for a conditional Health Sciences offer), and student housing all close 31 July 2026 — much earlier than UJ/Wits. No late applications accepted.',
     'Mature-age exemption applicants (23+, no NSC) are not considered for Health Sciences or Law.',
   ],
@@ -2034,7 +2090,6 @@ const UCT: University = {
   website: 'https://www.uct.ac.za',
   applicationPortal: 'https://www.uct.ac.za/apply',
 };
-
 
 // ═══════════════════════════════════════════════════════════════════════════
 // UNIVERSITY OF PRETORIA (UP) — full reference implementation
@@ -2071,7 +2126,6 @@ const UCT: University = {
 // restricts every student to ONE programme per university (locked product rule).
 // That is set on the University object (handled separately, not here).
 
-
 // ─── FACULTY OF ECONOMIC AND MANAGEMENT SCIENCES ───────────────────────────
 // Table column order in the prospectus: English (Home/FAL) | Mathematics | APS
 
@@ -2092,7 +2146,13 @@ export const UP_EMS_PROGRAMMES: Programme[] = [
         { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 4, altGroup: 'maths' },
       ],
     },
-    careers: ['Diplomat', 'Political analyst', 'Public sector manager', 'Local government official', 'NGO/international organisation staff'],
+    careers: [
+      'Diplomat',
+      'Political analyst',
+      'Public sector manager',
+      'Local government official',
+      'NGO/international organisation staff',
+    ],
   },
   {
     qualificationCode: 'UP-EMS-BCOM-ACC',
@@ -2109,7 +2169,13 @@ export const UP_EMS_PROGRAMMES: Programme[] = [
         { subject: 'mathematics', status: 'required', minRating: 6 },
       ],
     },
-    careers: ['Chartered accountant (CA) track', 'External auditor', 'Government auditor', 'Tax professional', 'Financial director'],
+    careers: [
+      'Chartered accountant (CA) track',
+      'External auditor',
+      'Government auditor',
+      'Tax professional',
+      'Financial director',
+    ],
   },
   {
     qualificationCode: 'UP-EMS-BCOM-INVMAN',
@@ -2143,7 +2209,12 @@ export const UP_EMS_PROGRAMMES: Programme[] = [
         { subject: 'mathematics', status: 'required', minRating: 5 },
       ],
     },
-    careers: ['Financial reporting specialist', 'Management accountant', 'Tax advisor', 'Internal auditor'],
+    careers: [
+      'Financial reporting specialist',
+      'Management accountant',
+      'Tax advisor',
+      'Internal auditor',
+    ],
   },
   {
     qualificationCode: 'UP-EMS-BCOM-ECONOMETRICS',
@@ -2452,39 +2523,79 @@ export const UP_EDUCATION_PROGRAMMES: Programme[] = [
 // School of Engineering table order: English | Mathematics | Physical Sciences | APS
 
 const engineeringDisciplines: { code: string; name: string; careers: string[] }[] = [
-  { code: 'CHEM', name: 'Chemical Engineering', careers: ['Chemical engineer (petroleum, food processing, minerals, power generation)'] },
-  { code: 'CIVIL', name: 'Civil Engineering', careers: ['Civil engineer (structures, dams, roads, bridges, railways)'] },
-  { code: 'COMPUTER', name: 'Computer Engineering', careers: ['Computer engineer (systems, software, networks, embedded systems)'] },
-  { code: 'ELECTRICAL', name: 'Electrical Engineering', careers: ['Electrical engineer (power generation, transmission, renewable energy)'] },
-  { code: 'ELECTRONIC', name: 'Electronic Engineering', careers: ['Electronic engineer (telecommunications, medical technology, robotics)'] },
-  { code: 'INDUSTRIAL', name: 'Industrial Engineering', careers: ['Industrial engineer (production systems, supply chain, quality management)'] },
-  { code: 'MECHANICAL', name: 'Mechanical Engineering', careers: ['Mechanical/aeronautical engineer (vehicles, aircraft, turbines, biomedical systems)'] },
-  { code: 'METALLURGICAL', name: 'Metallurgical Engineering', careers: ['Metallurgical engineer (minerals processing, materials engineering)'] },
-  { code: 'MINING', name: 'Mining Engineering', careers: ['Mining engineer (mine management, technical operations, mine design)'] },
+  {
+    code: 'CHEM',
+    name: 'Chemical Engineering',
+    careers: ['Chemical engineer (petroleum, food processing, minerals, power generation)'],
+  },
+  {
+    code: 'CIVIL',
+    name: 'Civil Engineering',
+    careers: ['Civil engineer (structures, dams, roads, bridges, railways)'],
+  },
+  {
+    code: 'COMPUTER',
+    name: 'Computer Engineering',
+    careers: ['Computer engineer (systems, software, networks, embedded systems)'],
+  },
+  {
+    code: 'ELECTRICAL',
+    name: 'Electrical Engineering',
+    careers: ['Electrical engineer (power generation, transmission, renewable energy)'],
+  },
+  {
+    code: 'ELECTRONIC',
+    name: 'Electronic Engineering',
+    careers: ['Electronic engineer (telecommunications, medical technology, robotics)'],
+  },
+  {
+    code: 'INDUSTRIAL',
+    name: 'Industrial Engineering',
+    careers: ['Industrial engineer (production systems, supply chain, quality management)'],
+  },
+  {
+    code: 'MECHANICAL',
+    name: 'Mechanical Engineering',
+    careers: [
+      'Mechanical/aeronautical engineer (vehicles, aircraft, turbines, biomedical systems)',
+    ],
+  },
+  {
+    code: 'METALLURGICAL',
+    name: 'Metallurgical Engineering',
+    careers: ['Metallurgical engineer (minerals processing, materials engineering)'],
+  },
+  {
+    code: 'MINING',
+    name: 'Mining Engineering',
+    careers: ['Mining engineer (mine management, technical operations, mine design)'],
+  },
 ];
 
 // NOTE: UP_ENGINEERING_PROGRAMMES below covers ALL THREE schools in this single
 // faculty (School of Engineering, School for the Built Environment, School of
 // Information Technology) — one export per faculty, as requested.
 export const UP_ENGINEERING_PROGRAMMES: Programme[] = [
-  ...engineeringDisciplines.map(({ code, name, careers }): Programme => ({
-    qualificationCode: `UP-EBIT-BENG-${code}`,
-    universityId: 'up',
-    name: `Bachelor of Engineering in ${name}`,
-    qualificationType: 'degree',
-    durationYears: 4,
-    faculty: 'Engineering, Built Environment and Information Technology',
-    campus: ['Hatfield'],
-    admission: {
-      apsMinimum: { default: 35 },
-      subjectRequirements: [
-        { subject: 'english', status: 'required', minRating: 5 },
-        { subject: 'mathematics', status: 'required', minRating: 6 },
-        { subject: 'physicalScience', status: 'required', minRating: 6 },
-      ],
-    },
-    careers,
-  })),
+  ...engineeringDisciplines.map(
+    ({ code, name, careers }): Programme => ({
+      qualificationCode: `UP-EBIT-BENG-${code}`,
+      universityId: 'up',
+      name: `Bachelor of Engineering in ${name}`,
+      qualificationType: 'degree',
+      durationYears: 4,
+      faculty: 'Engineering, Built Environment and Information Technology',
+      campus: ['Hatfield'],
+      admission: {
+        apsMinimum: { default: 35 },
+        subjectRequirements: [
+          { subject: 'english', status: 'required', minRating: 5 },
+          { subject: 'mathematics', status: 'required', minRating: 6 },
+          { subject: 'physicalScience', status: 'required', minRating: 6 },
+        ],
+      },
+      careers,
+    })
+  ),
   {
     qualificationCode: 'UP-EBIT-BENG-5YR',
     universityId: 'up',
@@ -2549,7 +2660,10 @@ export const UP_ENGINEERING_PROGRAMMES: Programme[] = [
         { subject: 'physicalScience', status: 'required', minRating: 4 },
       ],
     },
-    careers: ['Construction site manager', 'Candidate professional construction manager (with honours)'],
+    careers: [
+      'Construction site manager',
+      'Candidate professional construction manager (with honours)',
+    ],
   },
   {
     qualificationCode: 'UP-EBIT-BSC-REALESTATE',
@@ -2568,7 +2682,11 @@ export const UP_ENGINEERING_PROGRAMMES: Programme[] = [
         { subject: 'physicalScience', status: 'required', minRating: 4 },
       ],
     },
-    careers: ['Property investment/finance', 'Facilities management', 'Professional property valuer (with honours)'],
+    careers: [
+      'Property investment/finance',
+      'Facilities management',
+      'Professional property valuer (with honours)',
+    ],
   },
   {
     qualificationCode: 'UP-EBIT-BSC-QS',
@@ -2620,7 +2738,11 @@ export const UP_ENGINEERING_PROGRAMMES: Programme[] = [
       subjectRequirements: [{ subject: 'english', status: 'required', minRating: 4 }],
       note: 'If specialising in Information Systems at first-year level, achievement level 5 in Mathematics is required.',
     },
-    careers: ['Information/knowledge manager', 'E-commerce specialist', 'Information systems developer'],
+    careers: [
+      'Information/knowledge manager',
+      'E-commerce specialist',
+      'Information systems developer',
+    ],
   },
   {
     qualificationCode: 'UP-EBIT-BIS-PUBLISHING',
@@ -2634,7 +2756,11 @@ export const UP_ENGINEERING_PROGRAMMES: Programme[] = [
       apsMinimum: { default: 28 },
       subjectRequirements: [{ subject: 'english', status: 'required', minRating: 5 }],
     },
-    careers: ['Publishing house assistant/commissioning editor', 'Copy editor', 'Marketing/production roles'],
+    careers: [
+      'Publishing house assistant/commissioning editor',
+      'Copy editor',
+      'Marketing/production roles',
+    ],
   },
   {
     qualificationCode: 'UP-EBIT-BIS-MULTIMEDIA',
@@ -2896,7 +3022,12 @@ export const UP_HEALTH_SCIENCES_PROGRAMMES: Programme[] = [
         { subject: 'lifeScience', status: 'alternative', minRating: 4, altGroup: 'science' },
       ],
     },
-    careers: ['Sports scientist', 'Biokineticist (with honours)', 'Personal trainer', 'Strength and conditioning specialist'],
+    careers: [
+      'Sports scientist',
+      'Biokineticist (with honours)',
+      'Personal trainer',
+      'Strength and conditioning specialist',
+    ],
   },
 ];
 
@@ -2968,7 +3099,13 @@ export const UP_HUMANITIES_PROGRAMMES: Programme[] = [
       subjectRequirements: [{ subject: 'english', status: 'required', minRating: 5 }],
       note: 'Conditional admission with Grade 11 APS 30; final admission confirmed at APS 28.',
     },
-    careers: ['Community development', 'Counselling', 'Diplomacy and politics', 'Journalism', 'Language services'],
+    careers: [
+      'Community development',
+      'Counselling',
+      'Diplomacy and politics',
+      'Journalism',
+      'Language services',
+    ],
   },
   {
     qualificationCode: 'UP-HUM-BSOCWORK',
@@ -3140,7 +3277,12 @@ export const UP_HUMANITIES_PROGRAMMES: Programme[] = [
       subjectRequirements: [{ subject: 'english', status: 'required', minRating: 5 }],
       note: 'Conditional admission with Grade 11 APS 30; final admission confirmed at APS 28.',
     },
-    careers: ['International relations', 'Diplomatic service', 'Policy analysis', 'Strategic intelligence'],
+    careers: [
+      'International relations',
+      'Diplomatic service',
+      'Policy analysis',
+      'Strategic intelligence',
+    ],
   },
   {
     qualificationCode: 'UP-HUM-BPOLSCI-POLITICAL',
@@ -3286,7 +3428,7 @@ const nasStandard532 = (
   name: string,
   durationYears: number,
   careers: string[],
-  note?: string,
+  note?: string
 ): Programme => ({
   qualificationCode: `UP-NAS-${code}`,
   universityId: 'up',
@@ -3309,57 +3451,89 @@ const nasStandard532 = (
 
 export const UP_NAS_PROGRAMMES: Programme[] = [
   // Agricultural and Food Sciences (all APS 32, English5/Maths5/PhysSci5)
-  nasStandard532('BSC-AGRIC-ECON', 'Bachelor of Science in Agriculture in Agricultural Economics / Agribusiness Management', 4, [
-    'Agricultural economist', 'Commodity trader', 'Agribusiness advisor',
-  ]),
+  nasStandard532(
+    'BSC-AGRIC-ECON',
+    'Bachelor of Science in Agriculture in Agricultural Economics / Agribusiness Management',
+    4,
+    ['Agricultural economist', 'Commodity trader', 'Agribusiness advisor']
+  ),
   nasStandard532('BSC-AGRIC-ANIMAL', 'Bachelor of Science in Agriculture in Animal Science', 4, [
-    'Livestock production specialist', 'Animal nutrition/breeding consultant',
+    'Livestock production specialist',
+    'Animal nutrition/breeding consultant',
   ]),
-  nasStandard532('BSC-AGRIC-PLANTSOIL', 'Bachelor of Science in Agriculture in Applied Plant and Soil Sciences', 4, [
-    'Agricultural researcher', 'Crop/soil management consultant',
-  ]),
-  nasStandard532('BSC-AGRIC-PLANTPATH', 'Bachelor of Science in Agriculture in Plant Pathology', 4, [
-    'Plant pathologist', 'Agricultural extension specialist',
-  ]),
-  nasStandard532('BSC-FOODMAN-CULINARY', 'Bachelor of Science in Food Management (Option: Culinary Science)', 4, [
-    'Culinary scientist', 'Food product developer', 'Food service manager',
-  ]),
-  nasStandard532('BSC-FOODMAN-NUTRITION', 'Bachelor of Science in Food Management (Option: Nutritional Science)', 4, [
-    'Nutrition-focused food industry roles', 'Public health/NGO roles',
-  ], 'Interfaculty programme with the Faculty of Health Sciences (Human Nutrition).'),
+  nasStandard532(
+    'BSC-AGRIC-PLANTSOIL',
+    'Bachelor of Science in Agriculture in Applied Plant and Soil Sciences',
+    4,
+    ['Agricultural researcher', 'Crop/soil management consultant']
+  ),
+  nasStandard532(
+    'BSC-AGRIC-PLANTPATH',
+    'Bachelor of Science in Agriculture in Plant Pathology',
+    4,
+    ['Plant pathologist', 'Agricultural extension specialist']
+  ),
+  nasStandard532(
+    'BSC-FOODMAN-CULINARY',
+    'Bachelor of Science in Food Management (Option: Culinary Science)',
+    4,
+    ['Culinary scientist', 'Food product developer', 'Food service manager']
+  ),
+  nasStandard532(
+    'BSC-FOODMAN-NUTRITION',
+    'Bachelor of Science in Food Management (Option: Nutritional Science)',
+    4,
+    ['Nutrition-focused food industry roles', 'Public health/NGO roles'],
+    'Interfaculty programme with the Faculty of Health Sciences (Human Nutrition).'
+  ),
   nasStandard532('BSC-FOODSCIENCE', 'Bachelor of Science in Food Science', 3, [
-    'Food safety/quality assurance manager', 'Food chemist/microbiologist',
+    'Food safety/quality assurance manager',
+    'Food chemist/microbiologist',
   ]),
   // Biological Sciences (all APS 32, English5/Maths5/PhysSci5)
   nasStandard532('BSC-BIOCHEMISTRY', 'Bachelor of Science in Biochemistry', 3, [
     'Researcher (pharmaceutical, food, waste-processing industries)',
   ]),
   nasStandard532('BSC-BIOTECHNOLOGY', 'Bachelor of Science in Biotechnology', 3, [
-    'Laboratory researcher', 'Bio-entrepreneur',
+    'Laboratory researcher',
+    'Bio-entrepreneur',
   ]),
   nasStandard532('BSC-ECOLOGY', 'Bachelor of Science in Ecology', 3, [
-    'Conservation scientist', 'Environmental consultant',
+    'Conservation scientist',
+    'Environmental consultant',
   ]),
   nasStandard532('BSC-ENTOMOLOGY', 'Bachelor of Science in Entomology', 3, [
-    'Insect management specialist', 'Agricultural/conservation researcher',
+    'Insect management specialist',
+    'Agricultural/conservation researcher',
   ]),
-  nasStandard532('BSC-GENETICS', 'Bachelor of Science in Genetics / Bachelor of Science in Human Genetics', 3, [
-    'Molecular biologist', 'Genetic counsellor', 'Bioinformaticist',
-  ]),
-  nasStandard532('BSC-HUMANPHYSIO', 'Bachelor of Science in Human Physiology (incl. Genetics and Psychology option)', 3, [
-    'Research roles with medical teams', 'Sports physiology', 'Biostatistics',
-  ]),
+  nasStandard532(
+    'BSC-GENETICS',
+    'Bachelor of Science in Genetics / Bachelor of Science in Human Genetics',
+    3,
+    ['Molecular biologist', 'Genetic counsellor', 'Bioinformaticist']
+  ),
+  nasStandard532(
+    'BSC-HUMANPHYSIO',
+    'Bachelor of Science in Human Physiology (incl. Genetics and Psychology option)',
+    3,
+    ['Research roles with medical teams', 'Sports physiology', 'Biostatistics']
+  ),
   nasStandard532('BSC-MEDSCIENCES', 'Bachelor of Science in Medical Sciences', 3, [
-    'Anatomy/physiology researcher', 'Forensic science', 'Health science industry',
+    'Anatomy/physiology researcher',
+    'Forensic science',
+    'Health science industry',
   ]),
   nasStandard532('BSC-MICROBIOLOGY', 'Bachelor of Science in Microbiology', 3, [
-    'Food/dairy/fermentation industry roles', 'Medical/veterinary microbiology',
+    'Food/dairy/fermentation industry roles',
+    'Medical/veterinary microbiology',
   ]),
   nasStandard532('BSC-PLANTSCIENCE', 'Bachelor of Science in Plant Science', 3, [
-    'Plant researcher', 'Biotechnology/pharmaceutical roles',
+    'Plant researcher',
+    'Biotechnology/pharmaceutical roles',
   ]),
   nasStandard532('BSC-ZOOLOGY', 'Bachelor of Science in Zoology', 3, [
-    'Conservation scientist', 'Environmental consultant',
+    'Conservation scientist',
+    'Environmental consultant',
   ]),
   // Consumer Science (English | Mathematics | APS — no Physical Sciences column)
   {
@@ -3450,31 +3624,61 @@ export const UP_NAS_PROGRAMMES: Programme[] = [
   },
   // Physical Sciences (English | Mathematics | Physical Sciences | APS, all APS 34)
   ...[
-    ['BSC-CHEMISTRY', 'Bachelor of Science in Chemistry', ['Synthetic chemist', 'Materials scientist', 'Analytical chemist']],
-    ['BSC-ENVENGGEOLOGY', 'Bachelor of Science in Environmental and Engineering Geology', ['Environmental/engineering geologist', 'Hydrogeologist']],
-    ['BSC-GEOGRAPHY', 'Bachelor of Science in Geography (Option: Geography and Environmental Science)', ['Environmental manager', 'Urban/regional development consultant']],
-    ['BSC-GEOINFORMATICS', 'Bachelor of Science in Geoinformatics', ['Geospatial/GIS consultant', 'Candidate Geomatics Practitioner']],
-    ['BSC-GEOLOGY', 'Bachelor of Science in Geology', ['Mining geologist', 'Environmental/engineering geologist']],
-    ['BSC-METEOROLOGY', 'Bachelor of Science in Meteorology', ['Weather forecaster', 'Climate researcher']],
-    ['BSC-PHYSICS', 'Bachelor of Science in Physics', ['Researcher', 'Radiation/medical scientist', 'Geophysicist']],
-  ].map(([code, name, careers]): Programme => ({
-    qualificationCode: `UP-NAS-${code}`,
-    universityId: 'up',
-    name: name as string,
-    qualificationType: 'degree',
-    durationYears: 3,
-    faculty: 'Natural and Agricultural Sciences',
-    campus: ['Hatfield'],
-    admission: {
-      apsMinimum: { default: 34 },
-      subjectRequirements: [
-        { subject: 'english', status: 'required', minRating: 5 },
-        { subject: 'mathematics', status: 'required', minRating: 5 },
-        { subject: 'physicalScience', status: 'required', minRating: 5 },
-      ],
-    },
-    careers: careers as string[],
-  })),
+    [
+      'BSC-CHEMISTRY',
+      'Bachelor of Science in Chemistry',
+      ['Synthetic chemist', 'Materials scientist', 'Analytical chemist'],
+    ],
+    [
+      'BSC-ENVENGGEOLOGY',
+      'Bachelor of Science in Environmental and Engineering Geology',
+      ['Environmental/engineering geologist', 'Hydrogeologist'],
+    ],
+    [
+      'BSC-GEOGRAPHY',
+      'Bachelor of Science in Geography (Option: Geography and Environmental Science)',
+      ['Environmental manager', 'Urban/regional development consultant'],
+    ],
+    [
+      'BSC-GEOINFORMATICS',
+      'Bachelor of Science in Geoinformatics',
+      ['Geospatial/GIS consultant', 'Candidate Geomatics Practitioner'],
+    ],
+    [
+      'BSC-GEOLOGY',
+      'Bachelor of Science in Geology',
+      ['Mining geologist', 'Environmental/engineering geologist'],
+    ],
+    [
+      'BSC-METEOROLOGY',
+      'Bachelor of Science in Meteorology',
+      ['Weather forecaster', 'Climate researcher'],
+    ],
+    [
+      'BSC-PHYSICS',
+      'Bachelor of Science in Physics',
+      ['Researcher', 'Radiation/medical scientist', 'Geophysicist'],
+    ],
+  ].map(
+    ([code, name, careers]): Programme => ({
+      qualificationCode: `UP-NAS-${code}`,
+      universityId: 'up',
+      name: name as string,
+      qualificationType: 'degree',
+      durationYears: 3,
+      faculty: 'Natural and Agricultural Sciences',
+      campus: ['Hatfield'],
+      admission: {
+        apsMinimum: { default: 34 },
+        subjectRequirements: [
+          { subject: 'english', status: 'required', minRating: 5 },
+          { subject: 'mathematics', status: 'required', minRating: 5 },
+          { subject: 'physicalScience', status: 'required', minRating: 5 },
+        ],
+      },
+      careers: careers as string[],
+    })
+  ),
   // Extended (lower-entry) 4-/5-year Bachelor of Science programmes — percentage-based requirements
   {
     qualificationCode: 'UP-NAS-BSC-MATHEMATICS-EXT',
@@ -3494,51 +3698,69 @@ export const UP_NAS_PROGRAMMES: Programme[] = [
     },
     careers: ['Same career paths as mainstream Bachelor of Science in Mathematics'],
   },
-  ...['BSC-CHEMISTRY', 'BSC-GEOINFORMATICS', 'BSC-GEOLOGY', 'BSC-METEOROLOGY', 'BSC-PHYSICS'].map((code): Programme => ({
-    qualificationCode: `UP-NAS-${code}-EXT`,
-    universityId: 'up',
-    name: `${
-      { 'BSC-CHEMISTRY': 'Bachelor of Science in Chemistry', 'BSC-GEOINFORMATICS': 'Bachelor of Science in Geoinformatics', 'BSC-GEOLOGY': 'Bachelor of Science in Geology', 'BSC-METEOROLOGY': 'Bachelor of Science in Meteorology', 'BSC-PHYSICS': 'Bachelor of Science in Physics' }[code]
-    } (extended)`,
-    qualificationType: 'extended_degree',
-    durationYears: 4,
-    faculty: 'Natural and Agricultural Sciences',
-    campus: ['Hatfield'],
-    admission: {
-      apsMinimum: { default: 32 },
-      subjectRequirements: [
-        { subject: 'english', status: 'required', minPercentage: 58 },
-        { subject: 'mathematics', status: 'required', minPercentage: 58 },
-        { subject: 'physicalScience', status: 'required', minPercentage: 58 },
-      ],
-      note: 'Extended (augmented) programme with additional academic support. Students transferring into a 4-year Bachelor of Engineering programme after year 1 need 70% in Mathematics/Physical Sciences and 65% in Languages.',
-    },
-    careers: ['Same career paths as the mainstream 3-year equivalent'],
-  })),
+  ...['BSC-CHEMISTRY', 'BSC-GEOINFORMATICS', 'BSC-GEOLOGY', 'BSC-METEOROLOGY', 'BSC-PHYSICS'].map(
+    (code): Programme => ({
+      qualificationCode: `UP-NAS-${code}-EXT`,
+      universityId: 'up',
+      name: `${
+        {
+          'BSC-CHEMISTRY': 'Bachelor of Science in Chemistry',
+          'BSC-GEOINFORMATICS': 'Bachelor of Science in Geoinformatics',
+          'BSC-GEOLOGY': 'Bachelor of Science in Geology',
+          'BSC-METEOROLOGY': 'Bachelor of Science in Meteorology',
+          'BSC-PHYSICS': 'Bachelor of Science in Physics',
+        }[code]
+      } (extended)`,
+      qualificationType: 'extended_degree',
+      durationYears: 4,
+      faculty: 'Natural and Agricultural Sciences',
+      campus: ['Hatfield'],
+      admission: {
+        apsMinimum: { default: 32 },
+        subjectRequirements: [
+          { subject: 'english', status: 'required', minPercentage: 58 },
+          { subject: 'mathematics', status: 'required', minPercentage: 58 },
+          { subject: 'physicalScience', status: 'required', minPercentage: 58 },
+        ],
+        note: 'Extended (augmented) programme with additional academic support. Students transferring into a 4-year Bachelor of Engineering programme after year 1 need 70% in Mathematics/Physical Sciences and 65% in Languages.',
+      },
+      careers: ['Same career paths as the mainstream 3-year equivalent'],
+    })
+  ),
   ...[
-    ['BSC-AGRIC-PLANTSOIL-EXT', 'Bachelor of Science in Agriculture in Applied Plant and Soil Sciences (extended)', 5],
-    ['BSC-AGRIC-PLANTPATH-EXT', 'Bachelor of Science in Agriculture in Plant Pathology (extended)', 5],
+    [
+      'BSC-AGRIC-PLANTSOIL-EXT',
+      'Bachelor of Science in Agriculture in Applied Plant and Soil Sciences (extended)',
+      5,
+    ],
+    [
+      'BSC-AGRIC-PLANTPATH-EXT',
+      'Bachelor of Science in Agriculture in Plant Pathology (extended)',
+      5,
+    ],
     ['BSC-ECOLOGY-EXT', 'Bachelor of Science in Ecology (extended)', 4],
     ['BSC-HUMANPHYSIO-EXT', 'Bachelor of Science in Human Physiology (extended)', 4],
-  ].map(([code, name, years]): Programme => ({
-    qualificationCode: `UP-NAS-${code}`,
-    universityId: 'up',
-    name: name as string,
-    qualificationType: 'extended_degree',
-    durationYears: years as number,
-    faculty: 'Natural and Agricultural Sciences',
-    campus: ['Hatfield'],
-    admission: {
-      apsMinimum: { default: 30 },
-      subjectRequirements: [
-        { subject: 'english', status: 'required', minPercentage: 58 },
-        { subject: 'mathematics', status: 'required', minPercentage: 58 },
-        { subject: 'physicalScience', status: 'required', minPercentage: 58 },
-      ],
-      note: 'Extended (augmented) programme with additional academic support. Maximum 30 students per programme; preference given to quintile 1–4 school applicants.',
-    },
-    careers: ['Same career paths as the mainstream equivalent'],
-  })),
+  ].map(
+    ([code, name, years]): Programme => ({
+      qualificationCode: `UP-NAS-${code}`,
+      universityId: 'up',
+      name: name as string,
+      qualificationType: 'extended_degree',
+      durationYears: years as number,
+      faculty: 'Natural and Agricultural Sciences',
+      campus: ['Hatfield'],
+      admission: {
+        apsMinimum: { default: 30 },
+        subjectRequirements: [
+          { subject: 'english', status: 'required', minPercentage: 58 },
+          { subject: 'mathematics', status: 'required', minPercentage: 58 },
+          { subject: 'physicalScience', status: 'required', minPercentage: 58 },
+        ],
+        note: 'Extended (augmented) programme with additional academic support. Maximum 30 students per programme; preference given to quintile 1–4 school applicants.',
+      },
+      careers: ['Same career paths as the mainstream equivalent'],
+    })
+  ),
 ];
 
 // ─── FACULTY OF VETERINARY SCIENCE ─────────────────────────────────────────
@@ -3566,7 +3788,9 @@ export const UP_VET_SCIENCE_PROGRAMMES: Programme[] = [
       ],
       note: 'School-leaving applicants are conditionally selected on Grade 11 results; final NSC results must not drop Merit Point Score by more than 5% to retain the place. Only Mathematics is considered — Mathematical Literacy and Technical Mathematics are not accepted.',
     },
-    careers: ['Veterinarian (private practice, state veterinary services, research, wildlife management)'],
+    careers: [
+      'Veterinarian (private practice, state veterinary services, research, wildlife management)',
+    ],
   },
   {
     qualificationCode: 'UP-VET-BVETNURSING',
@@ -3597,7 +3821,8 @@ const UP: University = {
   logoUrl: '/logos/up.png',
   applicationSystem: 'Custom portal',
   applicationFee: 0,
-  feeNote: 'No application fee is stated in the sourced 2027 Undergraduate Prospectus text. Verify directly via UP\'s application portal before relying on this figure.',
+  feeNote:
+    "No application fee is stated in the sourced 2027 Undergraduate Prospectus text. Verify directly via UP's application portal before relying on this figure.",
   maxChoices: 1,
   choicesRanked: false,
   choicesIndependent: true,
@@ -3613,7 +3838,7 @@ const UP: University = {
   defaultClosingDate: '2026-06-30T23:59:00+02:00',
   applyUrl: 'https://www.up.ac.za/apply',
   notes: [
-    'UP\'s own online application form allows a first- and second-choice programme as a fallback mechanism — ApplyOnce restricts every student to ONE programme per university (a platform-wide rule), so maxChoices is set to 1 regardless of UP\'s own two-choice form.',
+    "UP's own online application form allows a first- and second-choice programme as a fallback mechanism — ApplyOnce restricts every student to ONE programme per university (a platform-wide rule), so maxChoices is set to 1 regardless of UP's own two-choice form.",
     'Applications for the Faculty of Veterinary Science close 31 May 2026 (earlier than all other faculties, which close 30 June 2026) — modelled via closingDateOverride on the two Veterinary Science programmes.',
     'Where the prospectus describes conditional admission on Grade 11 results with a different final NSC threshold, only the final/confirmed threshold is modelled — ApplyOnce applicants already hold final results.',
   ],
@@ -3634,7 +3859,6 @@ const UP: University = {
   website: 'https://www.up.ac.za',
   applicationPortal: 'https://www.up.ac.za/apply',
 };
-
 
 // ═══════════════════════════════════════════════════════════════════════════
 // STELLENBOSCH UNIVERSITY (SU) — full reference implementation
@@ -3707,7 +3931,6 @@ const UP: University = {
 //   (a single floor) cannot represent, and no distinct qualification code/name
 //   is given per programme for the ECP variant. Captured in a `note` instead.
 
-
 // ─── FACULTY OF AGRISCIENCES ────────────────────────────────────────────────
 
 export const SU_AGRISCIENCES_PROGRAMMES: Programme[] = [
@@ -3729,7 +3952,10 @@ export const SU_AGRISCIENCES_PROGRAMMES: Programme[] = [
       ],
       note: 'Also offered as a 4-year Extended Curriculum Programme (Mathematics/Physical Sciences band-combination admission — not modelled here, schema represents single-floor minimums only; see faculty selection guidelines).',
     },
-    careers: ['Agribusiness manager (crop or animal production)', 'Agricultural economist at a financial institution'],
+    careers: [
+      'Agribusiness manager (crop or animal production)',
+      'Agricultural economist at a financial institution',
+    ],
     note: 'Similar programmes: BScAgric in Agricultural Economic Analysis and Management; BCom (Management Sciences) focal area Agricultural Economics.',
   },
   {
@@ -3750,7 +3976,11 @@ export const SU_AGRISCIENCES_PROGRAMMES: Programme[] = [
       ],
       note: 'Fields of study: Agricultural Economic Analysis; Agricultural Economic Analysis and Management; Agricultural Economic Analysis and Management with Food Science; Agricultural Economics with Food Science. Also available as an Extended Curriculum Programme (see Agrisciences ECP note).',
     },
-    careers: ['Agricultural policy researcher', 'Agricultural economist (financial/marketing institution)', 'Food-processing manager'],
+    careers: [
+      'Agricultural policy researcher',
+      'Agricultural economist (financial/marketing institution)',
+      'Food-processing manager',
+    ],
   },
   {
     qualificationCode: 'SU-AGRI-BAGRIC-ELSENBURG',
@@ -3766,8 +3996,18 @@ export const SU_AGRISCIENCES_PROGRAMMES: Programme[] = [
         { subject: 'english', status: 'alternative', minPercentage: 50, altGroup: 'language' },
         { subject: 'afrikaans', status: 'alternative', minPercentage: 50, altGroup: 'language' },
         { subject: 'mathematics', status: 'alternative', minPercentage: 50, altGroup: 'maths' },
-        { subject: 'mathematicalLiteracy', status: 'alternative', minPercentage: 60, altGroup: 'maths' },
-        { subject: 'physicalScience', status: 'alternative', minPercentage: 50, altGroup: 'science' },
+        {
+          subject: 'mathematicalLiteracy',
+          status: 'alternative',
+          minPercentage: 60,
+          altGroup: 'maths',
+        },
+        {
+          subject: 'physicalScience',
+          status: 'alternative',
+          minPercentage: 50,
+          altGroup: 'science',
+        },
         { subject: 'lifeScience', status: 'alternative', minPercentage: 50, altGroup: 'science' },
       ],
       note: 'Science alternative also accepts Agricultural Sciences 50% (no SubjectKey exists for Agricultural Sciences — not modelled). Offered in collaboration with Elsenburg Agricultural Training Institute; students reside on the Elsenburg campus. Fields of study: Animal Production; Cellar Management; Cellar Technology; Extension and Animal Production; Extension and Plant Production; Plant Production; Plant and Animal Production. Not available as an ECP.',
@@ -3792,7 +4032,16 @@ export const SU_AGRISCIENCES_PROGRAMMES: Programme[] = [
       ],
       note: 'BScFor (Forestry and Wood Sciences), Forestry and Natural Resources Sciences field. Also available as a 4-year ECP with a Mathematics 55-59.9%/Physical Sciences >=50% OR Mathematics >=60%/Physical Sciences 45-49.9% combination (not modelled, see Agrisciences ECP note).',
     },
-    careers: ['Forestry expert', 'Timber grower', 'Environmental planner', 'Forest researcher', 'Extension officer/consultant', 'Logistics manager', 'Tree breeder', 'Rural development advisor'],
+    careers: [
+      'Forestry expert',
+      'Timber grower',
+      'Environmental planner',
+      'Forest researcher',
+      'Extension officer/consultant',
+      'Logistics manager',
+      'Tree breeder',
+      'Rural development advisor',
+    ],
   },
   {
     qualificationCode: 'SU-AGRI-BSCFOR-WOOD-PRODUCTS',
@@ -3812,7 +4061,13 @@ export const SU_AGRISCIENCES_PROGRAMMES: Programme[] = [
       ],
       note: 'BScFor (Forestry and Wood Sciences), Wood and Wood Products Sciences field. Also available as a 4-year ECP with a Mathematics 60-69.9%/Physical Sciences >=60% OR Mathematics >=70%/Physical Sciences 55-59.9% combination (not modelled, see Agrisciences ECP note).',
     },
-    careers: ['Wood products expert', 'Production plant manager', 'Product development manager', 'Quality assurance manager', 'Wood scientist'],
+    careers: [
+      'Wood products expert',
+      'Production plant manager',
+      'Product development manager',
+      'Quality assurance manager',
+      'Wood scientist',
+    ],
   },
   {
     qualificationCode: 'SU-AGRI-BSCAGRIC-PLANT-SOIL',
@@ -3832,7 +4087,13 @@ export const SU_AGRISCIENCES_PROGRAMMES: Programme[] = [
       ],
       note: 'Fields of study: Crop Production Systems; Crop Production Systems with Agronomy, Agricultural Economics and Animal Science; Crop Protection and Breeding; Soil and Water Management. Also available as an ECP (see Agrisciences ECP note).',
     },
-    careers: ['Agronomist', 'Crop protection specialist', 'Soil and water management consultant', 'Extension officer', 'Researcher'],
+    careers: [
+      'Agronomist',
+      'Crop protection specialist',
+      'Soil and water management consultant',
+      'Extension officer',
+      'Researcher',
+    ],
   },
   {
     qualificationCode: 'SU-AGRI-BSCAGRIC-VITICULTURE',
@@ -3852,7 +4113,14 @@ export const SU_AGRISCIENCES_PROGRAMMES: Programme[] = [
       ],
       note: 'Also available as an ECP (see Agrisciences ECP note).',
     },
-    careers: ['Winemaker', 'Viticulturist', 'Sensory specialist', 'Wine biotechnologist', 'Laboratory analyst', 'Production manager'],
+    careers: [
+      'Winemaker',
+      'Viticulturist',
+      'Sensory specialist',
+      'Wine biotechnologist',
+      'Laboratory analyst',
+      'Production manager',
+    ],
   },
   {
     qualificationCode: 'SU-AGRI-BSCAGRIC-ANIMAL-PRODUCTION',
@@ -3872,7 +4140,13 @@ export const SU_AGRISCIENCES_PROGRAMMES: Programme[] = [
       ],
       note: 'Field of study: Animal Science. Also available as an ECP (see Agrisciences ECP note).',
     },
-    careers: ['Consultant/manager/technician in animal sciences', 'Extension officer', 'Aquaculture industry', 'Stock farmer', 'Game farmer'],
+    careers: [
+      'Consultant/manager/technician in animal sciences',
+      'Extension officer',
+      'Aquaculture industry',
+      'Stock farmer',
+      'Game farmer',
+    ],
   },
   {
     qualificationCode: 'SU-AGRI-BSC-CONSERVATION-ECOLOGY',
@@ -3892,7 +4166,13 @@ export const SU_AGRISCIENCES_PROGRAMMES: Programme[] = [
       ],
       note: 'Also available as an ECP (see Agrisciences ECP note).',
     },
-    careers: ['Environmental impact assessor', 'Restoration ecologist', 'Conservation biologist', 'Game farm manager', 'Ecotourism'],
+    careers: [
+      'Environmental impact assessor',
+      'Restoration ecologist',
+      'Conservation biologist',
+      'Game farm manager',
+      'Ecotourism',
+    ],
   },
   {
     qualificationCode: 'SU-AGRI-BSC-FOOD-SCIENCE',
@@ -3912,7 +4192,12 @@ export const SU_AGRISCIENCES_PROGRAMMES: Programme[] = [
       ],
       note: 'Explicitly NOT available as an Extended Curriculum Programme (per prospectus exception list).',
     },
-    careers: ['Food scientist (quality assurance)', 'Product development', 'Technical support', 'Production management'],
+    careers: [
+      'Food scientist (quality assurance)',
+      'Product development',
+      'Technical support',
+      'Production management',
+    ],
   },
   {
     qualificationCode: 'SU-AGRI-BDATSCI-STATGENETICS',
@@ -3956,7 +4241,13 @@ export const SU_ARTS_SOCIAL_SCIENCES_PROGRAMMES: Programme[] = [
       ],
       note: 'If taking Organisational Informatics as a university subject: also Mathematics 50% OR Mathematical Literacy 70%. Also available as a 4-year Extended Curriculum Programme (marked # in prospectus; admission at Faculty discretion, no separate published minimums).',
     },
-    careers: ['Teacher', 'Psychologist', 'Language practitioner', 'Journalist', 'Town and regional planner'],
+    careers: [
+      'Teacher',
+      'Psychologist',
+      'Language practitioner',
+      'Journalist',
+      'Town and regional planner',
+    ],
   },
   {
     qualificationCode: 'SU-ARTS-BA-LANGUAGE-CULTURE',
@@ -3974,7 +4265,15 @@ export const SU_ARTS_SOCIAL_SCIENCES_PROGRAMMES: Programme[] = [
       ],
       note: 'Also available as a 4-year Extended Curriculum Programme (marked # in prospectus).',
     },
-    careers: ['Diplomatic service', 'Teacher', 'Publisher', 'Advertising', 'Tourism', 'Journalist', 'Translator'],
+    careers: [
+      'Diplomatic service',
+      'Teacher',
+      'Publisher',
+      'Advertising',
+      'Tourism',
+      'Journalist',
+      'Translator',
+    ],
   },
   {
     qualificationCode: 'SU-ARTS-BA-DEV-ENVIRONMENT',
@@ -3992,7 +4291,13 @@ export const SU_ARTS_SOCIAL_SCIENCES_PROGRAMMES: Programme[] = [
       ],
       note: 'If taking Economics as a university subject: also Mathematics 60%. Also available as a 4-year Extended Curriculum Programme (marked # in prospectus).',
     },
-    careers: ['Community development', 'Population development', 'Town and regional planner', 'Tourism', 'Environmental planner/manager'],
+    careers: [
+      'Community development',
+      'Population development',
+      'Town and regional planner',
+      'Tourism',
+      'Environmental planner/manager',
+    ],
   },
   {
     qualificationCode: 'SU-ARTS-BA-MUSIC',
@@ -4027,7 +4332,12 @@ export const SU_ARTS_SOCIAL_SCIENCES_PROGRAMMES: Programme[] = [
       note: 'A National Senior Certificate with at least 40% in each of four school subjects (excluding Life Orientation) — not modelled as a single aggregate figure. Requires a practical standard equivalent to Grade VII classical music plus Grade III/IV theory, and an audition/theory test.',
     },
     additionalRequirements: ['audition'],
-    careers: ['Instrumental/singing teacher', 'Choral conductor', 'Church organist', 'Orchestral musician'],
+    careers: [
+      'Instrumental/singing teacher',
+      'Choral conductor',
+      'Church organist',
+      'Orchestral musician',
+    ],
   },
   {
     qualificationCode: 'SU-ARTS-HCERT-MUSIC',
@@ -4062,7 +4372,13 @@ export const SU_ARTS_SOCIAL_SCIENCES_PROGRAMMES: Programme[] = [
       note: 'Candidates must be available for auditions and/or interviews at the Drama Department in August.',
     },
     additionalRequirements: ['audition'],
-    careers: ['Theatre/media industry', 'Public relations', 'Marketing', 'Teaching', 'Cultural affairs'],
+    careers: [
+      'Theatre/media industry',
+      'Public relations',
+      'Marketing',
+      'Teaching',
+      'Cultural affairs',
+    ],
   },
   {
     qualificationCode: 'SU-ARTS-BA-HR-MANAGEMENT',
@@ -4078,11 +4394,22 @@ export const SU_ARTS_SOCIAL_SCIENCES_PROGRAMMES: Programme[] = [
         { subject: 'homeLanguage', status: 'required', minPercentage: 50 },
         { subject: 'additionalLanguage', status: 'required', minPercentage: 40 },
         { subject: 'mathematics', status: 'alternative', minPercentage: 50, altGroup: 'maths' },
-        { subject: 'mathematicalLiteracy', status: 'alternative', minPercentage: 70, altGroup: 'maths' },
+        {
+          subject: 'mathematicalLiteracy',
+          status: 'alternative',
+          minPercentage: 70,
+          altGroup: 'maths',
+        },
       ],
       note: 'Also available as a 4-year Extended Curriculum Programme (marked # in prospectus).',
     },
-    careers: ['Development manager', 'Human resource manager', 'Psychometrician', 'Management consultant', 'Labour relations practitioner'],
+    careers: [
+      'Development manager',
+      'Human resource manager',
+      'Psychometrician',
+      'Management consultant',
+      'Labour relations practitioner',
+    ],
   },
   {
     qualificationCode: 'SU-ARTS-BA-INTL-STUDIES',
@@ -4100,7 +4427,13 @@ export const SU_ARTS_SOCIAL_SCIENCES_PROGRAMMES: Programme[] = [
       ],
       note: 'Also available as a 4-year Extended Curriculum Programme (marked # in prospectus).',
     },
-    careers: ['Diplomatic service', 'Parliament', 'Tourism industry', 'International journalism', 'Import/export industry'],
+    careers: [
+      'Diplomatic service',
+      'Parliament',
+      'Tourism industry',
+      'International journalism',
+      'Import/export industry',
+    ],
   },
   {
     qualificationCode: 'SU-ARTS-BMUS',
@@ -4119,7 +4452,15 @@ export const SU_ARTS_SOCIAL_SCIENCES_PROGRAMMES: Programme[] = [
       note: 'If taking Mathematics as a university subject: also Mathematics 70%. Requires a practical standard equivalent to Grade VII classical music plus Grade V theory, and an audition/theory test.',
     },
     additionalRequirements: ['audition'],
-    careers: ['Music educator', 'Performing artist', 'Accompanist', 'Music director', 'Musicologist', 'Composer', 'Conductor'],
+    careers: [
+      'Music educator',
+      'Performing artist',
+      'Accompanist',
+      'Music director',
+      'Musicologist',
+      'Composer',
+      'Conductor',
+    ],
   },
   {
     qualificationCode: 'SU-ARTS-BA-PPE',
@@ -4137,7 +4478,15 @@ export const SU_ARTS_SOCIAL_SCIENCES_PROGRAMMES: Programme[] = [
         { subject: 'mathematics', status: 'required', minPercentage: 60 },
       ],
     },
-    careers: ['Manager', 'Journalist', 'Business/investment analyst', 'Entrepreneur', 'Diplomat', 'Civil servant', 'Researcher'],
+    careers: [
+      'Manager',
+      'Journalist',
+      'Business/investment analyst',
+      'Entrepreneur',
+      'Diplomat',
+      'Civil servant',
+      'Researcher',
+    ],
   },
   {
     qualificationCode: 'SU-ARTS-BSW-SOCIAL-WORK',
@@ -4174,7 +4523,14 @@ export const SU_ARTS_SOCIAL_SCIENCES_PROGRAMMES: Programme[] = [
       note: '60 places in the programme. Requires a prescribed art portfolio by 1 September. Fields of study: Fine Arts; Jewellery and Metal Design; Visual Communication Design.',
     },
     additionalRequirements: ['portfolio'],
-    careers: ['Fine artist', 'Art teacher', 'Graphic designer', 'Illustrator', 'Jewellery designer', 'Art critic/theorist'],
+    careers: [
+      'Fine artist',
+      'Art teacher',
+      'Graphic designer',
+      'Illustrator',
+      'Jewellery designer',
+      'Art critic/theorist',
+    ],
   },
 ];
 
@@ -4195,7 +4551,12 @@ export const SU_ECONOMIC_MANAGEMENT_PROGRAMMES: Programme[] = [
         { subject: 'english', status: 'alternative', minPercentage: 50, altGroup: 'language' }, // Home Language
         { subject: 'english', status: 'alternative', minPercentage: 60, altGroup: 'language' }, // First Additional Language
         { subject: 'mathematics', status: 'alternative', minPercentage: 50, altGroup: 'maths' },
-        { subject: 'mathematicalLiteracy', status: 'alternative', minPercentage: 60, altGroup: 'maths' },
+        {
+          subject: 'mathematicalLiteracy',
+          status: 'alternative',
+          minPercentage: 60,
+          altGroup: 'maths',
+        },
       ],
       note: 'A third maths alternative exists (Mathematics 40% OR Mathematical Literacy 50%, AND 60% for Business Studies or Economics or Accounting) — not modelled, schema does not support a subject-conditional AND combination. Selection also weighs a combined score of NSC average plus a departmental interest/experience application form. Language of instruction is English.',
     },
@@ -4241,7 +4602,13 @@ export const SU_ECONOMIC_MANAGEMENT_PROGRAMMES: Programme[] = [
       ],
       note: 'Focal areas: Agricultural Economics; Business Analytics; Entrepreneurship and Innovation Management; Financial Management; Financial Planning; Human Resource Management; Information Systems Management; Investment Management; Logistics and Supply Chain Management; Marketing Management; Public and Development Management.',
     },
-    careers: ['Entrepreneur', 'General/financial manager', 'Logistics manager', 'Investment/marketing manager', 'HR practitioner'],
+    careers: [
+      'Entrepreneur',
+      'General/financial manager',
+      'Logistics manager',
+      'Investment/marketing manager',
+      'HR practitioner',
+    ],
   },
   {
     qualificationCode: 'SU-EMS-BCOM-MANAGEMENT-SCIENCES-ECP',
@@ -4284,7 +4651,12 @@ export const SU_ECONOMIC_MANAGEMENT_PROGRAMMES: Programme[] = [
       ],
       note: 'Focal areas: Data Science; Financial Risk Management; Operations Research.',
     },
-    careers: ['Actuarial analyst', 'Quantitative analyst', 'Data scientist', 'Operations research analyst'],
+    careers: [
+      'Actuarial analyst',
+      'Quantitative analyst',
+      'Data scientist',
+      'Operations research analyst',
+    ],
   },
   {
     qualificationCode: 'SU-EMS-BCOM-ACTUARIAL-SCIENCE',
@@ -4322,7 +4694,10 @@ export const SU_ECONOMIC_MANAGEMENT_PROGRAMMES: Programme[] = [
         { subject: 'english', status: 'alternative', minPercentage: 70, altGroup: 'language' }, // First Additional Language
       ],
     },
-    careers: ['Psychometrist (after further studies/registration)', 'Industrial psychologist (after further studies/registration)'],
+    careers: [
+      'Psychometrist (after further studies/registration)',
+      'Industrial psychologist (after further studies/registration)',
+    ],
   },
   {
     qualificationCode: 'SU-EMS-BACC',
@@ -4343,7 +4718,12 @@ export const SU_ECONOMIC_MANAGEMENT_PROGRAMMES: Programme[] = [
       ],
       note: 'Alternative path: Mathematics 60% AND Accounting 70% also satisfies the Mathematics requirement — not modelled (schema does not support an AND-combination across two subjects as a single alternative). Presented in English and Afrikaans (separate first-year groups).',
     },
-    careers: ['Chartered Accountant CA(SA) (via SAICA/IRBA path)', 'Auditor', 'Management accountant', 'Tax consultant'],
+    careers: [
+      'Chartered Accountant CA(SA) (via SAICA/IRBA path)',
+      'Auditor',
+      'Management accountant',
+      'Tax consultant',
+    ],
   },
   {
     qualificationCode: 'SU-EMS-BCOM-INTERNATIONAL-BUSINESS',
@@ -4362,7 +4742,12 @@ export const SU_ECONOMIC_MANAGEMENT_PROGRAMMES: Programme[] = [
       ],
       note: 'Strict selection programme with set criteria to progress each year; a limited number of students selected via a special selection process. Third year includes an international exchange semester. Language of instruction is English.',
     },
-    careers: ['Marketing manager', 'Financial manager', 'Entrepreneur', 'Innovation manager (international firms)'],
+    careers: [
+      'Marketing manager',
+      'Financial manager',
+      'Entrepreneur',
+      'Innovation manager (international firms)',
+    ],
   },
   {
     qualificationCode: 'SU-EMS-BDATSCI',
@@ -4383,7 +4768,12 @@ export const SU_ECONOMIC_MANAGEMENT_PROGRAMMES: Programme[] = [
       ],
       note: 'Interfaculty programme. This entry covers the focal areas named in the Economic and Management Sciences section of the prospectus: Geoinformatics, Analytics and Optimisation, Behavioural Economics, Statistical Learning. See also the Agrisciences and Science faculty BDatSci entries — identical admission requirements throughout.',
     },
-    careers: ['Data scientist', 'Business intelligence developer', 'Operations researcher', 'Behavioural economist'],
+    careers: [
+      'Data scientist',
+      'Business intelligence developer',
+      'Operations researcher',
+      'Behavioural economist',
+    ],
   },
   {
     qualificationCode: 'SU-EMS-BCOM-MANAGEMENT-ACCOUNTING',
@@ -4442,7 +4832,12 @@ export const SU_EDUCATION_PROGRAMMES: Programme[] = [
       apsMinimum: { withMathematics: 60, withMathematicalLiteracy: 60 },
       subjectRequirements: [
         { subject: 'mathematics', status: 'alternative', minPercentage: 40, altGroup: 'maths' },
-        { subject: 'mathematicalLiteracy', status: 'alternative', minPercentage: 60, altGroup: 'maths' },
+        {
+          subject: 'mathematicalLiteracy',
+          status: 'alternative',
+          minPercentage: 60,
+          altGroup: 'maths',
+        },
         { subject: 'homeLanguage', status: 'required', minPercentage: 60 },
       ],
       note: 'Language requirement branches by medium of instruction: taught in English -> English HL 60% + (Afrikaans OR isiXhosa, HL or FAL) 50%; taught in Afrikaans -> Afrikaans HL 60% + (English OR isiXhosa) 50%; taught in isiXhosa -> isiXhosa HL 60% + (English OR Afrikaans) 50%. isiXhosa has no dedicated SubjectKey in this schema, so only the generic homeLanguage 60% floor is modelled; the second-language alternative is not modelled. 125 places in the programme.',
@@ -4461,7 +4856,12 @@ export const SU_EDUCATION_PROGRAMMES: Programme[] = [
       apsMinimum: { withMathematics: 60, withMathematicalLiteracy: 60 },
       subjectRequirements: [
         { subject: 'mathematics', status: 'alternative', minPercentage: 40, altGroup: 'maths' },
-        { subject: 'mathematicalLiteracy', status: 'alternative', minPercentage: 60, altGroup: 'maths' },
+        {
+          subject: 'mathematicalLiteracy',
+          status: 'alternative',
+          minPercentage: 60,
+          altGroup: 'maths',
+        },
         { subject: 'homeLanguage', status: 'required', minPercentage: 60 },
       ],
       note: 'Same medium-of-instruction language branching as BEd (Foundation Phase) — see that entry’s note. Mathematics (Ed) is compulsory in first year (pass with 60% average); two further teaching modules chosen from Life Skills, Natural Sciences (Ed) (requires Life Sciences or Physical Sciences 50%), Social Sciences (Ed) (requires History or Geography 50%). 125 places in the programme.',
@@ -4485,13 +4885,21 @@ export const SU_LAW_PROGRAMMES: Programme[] = [
       apsMinimum: { default: 70 },
       subjectRequirements: [
         { subject: 'homeLanguage', status: 'alternative', minPercentage: 60, altGroup: 'language' },
-        { subject: 'additionalLanguage', status: 'alternative', minPercentage: 70, altGroup: 'language' },
+        {
+          subject: 'additionalLanguage',
+          status: 'alternative',
+          minPercentage: 70,
+          altGroup: 'language',
+        },
         { subject: 'mathematics', status: 'required', minPercentage: 60 },
       ],
       note: '80 places in the programme. Interfaculty (Law + Economic and Management Sciences). Write the NBTs AQL and MAT before 31 July.',
     },
     additionalRequirements: ['NBT'],
-    careers: ['Commercial law', 'Business world (entry route to the 2-year LLB for practising attorney/advocate)'],
+    careers: [
+      'Commercial law',
+      'Business world (entry route to the 2-year LLB for practising attorney/advocate)',
+    ],
   },
   {
     qualificationCode: 'SU-LAW-BACCLLB',
@@ -4505,13 +4913,21 @@ export const SU_LAW_PROGRAMMES: Programme[] = [
       apsMinimum: { default: 80 },
       subjectRequirements: [
         { subject: 'homeLanguage', status: 'alternative', minPercentage: 60, altGroup: 'language' },
-        { subject: 'additionalLanguage', status: 'alternative', minPercentage: 70, altGroup: 'language' },
+        {
+          subject: 'additionalLanguage',
+          status: 'alternative',
+          minPercentage: 70,
+          altGroup: 'language',
+        },
         { subject: 'mathematics', status: 'required', minPercentage: 70 },
       ],
       note: '35 places in the programme. Interfaculty (Law + Economic and Management Sciences). Write the NBTs AQL and MAT before 31 July. Alternative Mathematics path: Mathematics 60% AND Accounting 70% (AND-combination not modelled). Selection based on final Grade 11 (or Grade 12) results and NBT results in an 80:20 ratio.',
     },
     additionalRequirements: ['NBT'],
-    careers: ['Legal practitioner (attorney/advocate)', 'Chartered accountant (via postgraduate route)'],
+    careers: [
+      'Legal practitioner (attorney/advocate)',
+      'Chartered accountant (via postgraduate route)',
+    ],
   },
   {
     qualificationCode: 'SU-LAW-LLB-FOUR-YEAR',
@@ -4525,12 +4941,23 @@ export const SU_LAW_PROGRAMMES: Programme[] = [
       apsMinimum: { default: 70 },
       subjectRequirements: [
         { subject: 'homeLanguage', status: 'alternative', minPercentage: 60, altGroup: 'language' },
-        { subject: 'additionalLanguage', status: 'alternative', minPercentage: 70, altGroup: 'language' },
+        {
+          subject: 'additionalLanguage',
+          status: 'alternative',
+          minPercentage: 70,
+          altGroup: 'language',
+        },
       ],
       note: '120 places in the programme. Write the NBT AQL before 31 July. If taking Economics as a university subject: also Mathematics 60%.',
     },
     additionalRequirements: ['NBT'],
-    careers: ['Legal practitioner (attorney/advocate)', 'Judge/Magistrate', 'Public Prosecutor', 'Legal advisor', 'Compliance manager'],
+    careers: [
+      'Legal practitioner (attorney/advocate)',
+      'Judge/Magistrate',
+      'Public Prosecutor',
+      'Legal advisor',
+      'Compliance manager',
+    ],
     note: 'A related "LLB (three-year)" route exists but is a second bachelor’s degree pathway for existing graduates (selection based on a 60% aggregate in the prior degree, not NSC results) — out of scope for an NSC/matric-based applicant flow and omitted here.',
   },
   {
@@ -4545,7 +4972,12 @@ export const SU_LAW_PROGRAMMES: Programme[] = [
       apsMinimum: { default: 70 },
       subjectRequirements: [
         { subject: 'homeLanguage', status: 'alternative', minPercentage: 60, altGroup: 'language' },
-        { subject: 'additionalLanguage', status: 'alternative', minPercentage: 70, altGroup: 'language' },
+        {
+          subject: 'additionalLanguage',
+          status: 'alternative',
+          minPercentage: 70,
+          altGroup: 'language',
+        },
       ],
       note: '55 places in the programme. Interfaculty (Law + Arts and Social Sciences). Write the NBT AQL before 31 July. If taking Economics as a university subject: also Mathematics 60%.',
     },
@@ -4605,7 +5037,12 @@ export const SU_MEDICINE_HEALTH_SCIENCES_PROGRAMMES: Programme[] = [
       apsMinimum: { default: 60 },
       subjectRequirements: [
         { subject: 'mathematics', status: 'required', minPercentage: 50 },
-        { subject: 'physicalScience', status: 'alternative', minPercentage: 50, altGroup: 'science' },
+        {
+          subject: 'physicalScience',
+          status: 'alternative',
+          minPercentage: 50,
+          altGroup: 'science',
+        },
         { subject: 'lifeScience', status: 'alternative', minPercentage: 60, altGroup: 'science' },
       ],
       note: '~30 candidates selected annually. Also requires at least TWO of English/Afrikaans/a third South African language (Home Language or First Additional Language) at 60% each — not separately modelled (schema has no "any 2 of N languages" construct).',
@@ -4629,7 +5066,9 @@ export const SU_MEDICINE_HEALTH_SCIENCES_PROGRAMMES: Programme[] = [
       ],
       note: '~280 candidates selected annually. Selection also weighs academic and non-academic merit per category (current Grade 12, recent school leavers, registered SU students only for MBChB, or applicants with tertiary qualifications/work experience).',
     },
-    careers: ['Independent Medical Practitioner (HPCSA, after 2-year internship + community service year)'],
+    careers: [
+      'Independent Medical Practitioner (HPCSA, after 2-year internship + community service year)',
+    ],
   },
   {
     qualificationCode: 'SU-MED-BNURS',
@@ -4643,7 +5082,12 @@ export const SU_MEDICINE_HEALTH_SCIENCES_PROGRAMMES: Programme[] = [
       apsMinimum: { withMathematics: 60, withMathematicalLiteracy: 60 },
       subjectRequirements: [
         { subject: 'mathematics', status: 'alternative', minPercentage: 40, altGroup: 'maths' },
-        { subject: 'mathematicalLiteracy', status: 'alternative', minPercentage: 70, altGroup: 'maths' },
+        {
+          subject: 'mathematicalLiteracy',
+          status: 'alternative',
+          minPercentage: 70,
+          altGroup: 'maths',
+        },
         { subject: 'lifeScience', status: 'required', minPercentage: 50 },
       ],
       note: '~50 candidates selected annually.',
@@ -4692,7 +5136,14 @@ export const SU_SCIENCE_PROGRAMMES: Programme[] = [
       ],
       note: 'Focal areas: Climate Change Ecology; Plant and Animal Biodiversity; Plants and Microbes. Bare minimum shown — actual Faculty selection uses a weighted Selection Mark (SM) higher than this floor: SM = [(Mathematics x 2) + 5 other subjects incl. at least one English/Afrikaans, excl. LO] / 7 (see faculty-level facultyScoring; not re-derived per programme).',
     },
-    careers: ['Botanist', 'Zoologist', 'Conservation scientist', 'Forensic scientist', 'Marine scientist', 'Ecologist'],
+    careers: [
+      'Botanist',
+      'Zoologist',
+      'Conservation scientist',
+      'Forensic scientist',
+      'Marine scientist',
+      'Ecologist',
+    ],
   },
   {
     qualificationCode: 'SU-SCI-BSC-HUMAN-LIFE-SCIENCES',
@@ -4712,7 +5163,14 @@ export const SU_SCIENCE_PROGRAMMES: Programme[] = [
       ],
       note: 'Mathematics 60% suffices if taking Mathematics (Bio) and Physics (Bio) as first-year subjects (70% for the standard Mathematics + Physics track). Focal areas: Biology; Biology with Psychology. Actual selection uses the weighted Selection Mark (SM), higher than this bare minimum — see faculty-level facultyScoring.',
     },
-    careers: ['Forensic scientist', 'Physiologist', 'Biomedical scientist', 'Biochemist', 'Human geneticist', 'Nutritionist'],
+    careers: [
+      'Forensic scientist',
+      'Physiologist',
+      'Biomedical scientist',
+      'Biochemist',
+      'Human geneticist',
+      'Nutritionist',
+    ],
   },
   {
     qualificationCode: 'SU-SCI-BSC-MOLECULAR-BIO-BIOTECH',
@@ -4732,7 +5190,13 @@ export const SU_SCIENCE_PROGRAMMES: Programme[] = [
       ],
       note: 'Mathematics 60% suffices for the Mathematics (Bio)/Physics (Bio) first-year track. Actual selection uses the weighted Selection Mark (SM) — see faculty-level facultyScoring.',
     },
-    careers: ['Plant biotechnologist', 'Forensic scientist', 'Biochemist', 'Geneticist', 'Microbiologist'],
+    careers: [
+      'Plant biotechnologist',
+      'Forensic scientist',
+      'Biochemist',
+      'Geneticist',
+      'Microbiologist',
+    ],
   },
   {
     qualificationCode: 'SU-SCI-BSC-SPORT-SCIENCE',
@@ -4772,7 +5236,13 @@ export const SU_SCIENCE_PROGRAMMES: Programme[] = [
       ],
       note: 'Focal areas: Chemistry and Polymer Science; Chemical Biology; Applied and Sustainable Chemistry; Chemistry with Chemical Engineering. Actual selection uses the weighted Selection Mark (SM) — see faculty-level facultyScoring.',
     },
-    careers: ['Research scientist', 'Analytical chemist', 'Toxicologist', 'Environmental scientist', 'Forensic analyst'],
+    careers: [
+      'Research scientist',
+      'Analytical chemist',
+      'Toxicologist',
+      'Environmental scientist',
+      'Forensic analyst',
+    ],
   },
   {
     qualificationCode: 'SU-SCI-BSC-EARTH-SCIENCE',
@@ -4792,7 +5262,13 @@ export const SU_SCIENCE_PROGRAMMES: Programme[] = [
       ],
       note: 'Mathematics 60% suffices for the Mathematics (Bio)/Physics (Bio) first-year track. Focal areas: Applied Earth Science; Geo-environmental Science. Actual selection uses the weighted Selection Mark (SM) — see faculty-level facultyScoring.',
     },
-    careers: ['Environmental consultant', 'Geologist', 'Geophysicist', 'Seismologist', 'Mining geologist'],
+    careers: [
+      'Environmental consultant',
+      'Geologist',
+      'Geophysicist',
+      'Seismologist',
+      'Mining geologist',
+    ],
   },
   {
     qualificationCode: 'SU-SCI-BSC-GEOINFORMATICS',
@@ -4812,7 +5288,13 @@ export const SU_SCIENCE_PROGRAMMES: Programme[] = [
       ],
       note: 'Mathematics rises to 70% if choosing Computer Science as a university subject. Actual selection uses the weighted Selection Mark (SM) — see faculty-level facultyScoring.',
     },
-    careers: ['GIS technician', 'Remote sensing specialist', 'Cartographer', 'Geospatial software engineer', 'Meteorologist'],
+    careers: [
+      'GIS technician',
+      'Remote sensing specialist',
+      'Cartographer',
+      'Geospatial software engineer',
+      'Meteorologist',
+    ],
   },
   {
     qualificationCode: 'SU-SCI-BSC-PHYSICS',
@@ -4832,7 +5314,13 @@ export const SU_SCIENCE_PROGRAMMES: Programme[] = [
       ],
       note: 'Focal areas: Laser Physics (Physical); Laser Physics (Biological); Theoretical Physics. Actual selection uses the weighted Selection Mark (SM) — see faculty-level facultyScoring.',
     },
-    careers: ['Medical physicist', 'Nanotechnologist', 'Geophysicist', 'Data analyst', 'Astrophysicist'],
+    careers: [
+      'Medical physicist',
+      'Nanotechnologist',
+      'Geophysicist',
+      'Data analyst',
+      'Astrophysicist',
+    ],
   },
   {
     qualificationCode: 'SU-SCI-BSC-MATHEMATICAL-SCIENCES',
@@ -4851,7 +5339,12 @@ export const SU_SCIENCE_PROGRAMMES: Programme[] = [
       ],
       note: 'Physical Sciences 50% required only if taking Chemistry or Physics as a university subject — not modelled as an unconditional gate. Focal areas: Applied Mathematics; Mathematics; Operations Research. Actual selection uses the weighted Selection Mark (SM) — see faculty-level facultyScoring.',
     },
-    careers: ['Actuarial analyst', 'Quantitative analyst', 'Mathematics teacher', 'Operations researcher'],
+    careers: [
+      'Actuarial analyst',
+      'Quantitative analyst',
+      'Mathematics teacher',
+      'Operations researcher',
+    ],
   },
   {
     qualificationCode: 'SU-SCI-BSC-COMPUTER-SCIENCE',
@@ -4870,7 +5363,12 @@ export const SU_SCIENCE_PROGRAMMES: Programme[] = [
       ],
       note: 'Physical Sciences 50% required only if taking Chemistry or Physics as a university subject — not modelled as an unconditional gate. Focal areas: General Computer Science; Computer Systems; Data Science. Actual selection uses the weighted Selection Mark (SM) — see faculty-level facultyScoring.',
     },
-    careers: ['Software developer', 'Data scientist', 'Computer systems analyst', 'Database administrator'],
+    careers: [
+      'Software developer',
+      'Data scientist',
+      'Computer systems analyst',
+      'Database administrator',
+    ],
   },
   {
     qualificationCode: 'SU-SCI-BSC-INTERDISCIPLINARY',
@@ -4890,7 +5388,12 @@ export const SU_SCIENCE_PROGRAMMES: Programme[] = [
       ],
       note: 'Focal areas: Biomedical Mathematical Sciences; Applied Medicinal Chemistry; Bioinformatics and Computational Biology; Biomathematics. Actual selection uses the weighted Selection Mark (SM) — see faculty-level facultyScoring.',
     },
-    careers: ['Medical scientist', 'Bioinformatician', 'Pharmaceutical scientist', 'Biomedical engineer'],
+    careers: [
+      'Medical scientist',
+      'Bioinformatician',
+      'Pharmaceutical scientist',
+      'Biomedical engineer',
+    ],
   },
   {
     qualificationCode: 'SU-SCI-BDATSCI',
@@ -4911,7 +5414,12 @@ export const SU_SCIENCE_PROGRAMMES: Programme[] = [
       ],
       note: 'Interfaculty programme. This entry covers the focal areas named in the Science section: Computer Science, Applied Mathematics, Statistical Physics. See also the Agrisciences and Economic and Management Sciences faculty BDatSci entries — identical admission requirements throughout.',
     },
-    careers: ['Data scientist', 'Machine learning engineer', 'Applications architect', 'Statistician'],
+    careers: [
+      'Data scientist',
+      'Machine learning engineer',
+      'Applications architect',
+      'Statistician',
+    ],
   },
 ];
 
@@ -4922,7 +5430,8 @@ const SU: University = {
   logoUrl: '/logos/su.png',
   applicationSystem: 'Custom portal',
   applicationFee: 100,
-  feeNote: 'UNCONFIRMED against the sourced 2027 prospectus text (which did not include a general application-fee page) — carried over from prior data. Verify via www.maties.com before relying on this figure.',
+  feeNote:
+    'UNCONFIRMED against the sourced 2027 prospectus text (which did not include a general application-fee page) — carried over from prior data. Verify via www.maties.com before relying on this figure.',
   maxChoices: 1,
   choicesRanked: false,
   choicesIndependent: true,
@@ -4938,7 +5447,8 @@ const SU: University = {
         faculty: 'Science',
         scoreName: 'Selection Mark (SM)',
         scoreMax: 100,
-        transform: 'SM = [(Mathematics % x 2) + 5 other subjects % (excl. Life Orientation, at least one must be English or Afrikaans)] / 7. Selection uses SM, which is a higher threshold than the bare-minimum aggregate published per programme.',
+        transform:
+          'SM = [(Mathematics % x 2) + 5 other subjects % (excl. Life Orientation, at least one must be English or Afrikaans)] / 7. Selection uses SM, which is a higher threshold than the bare-minimum aggregate published per programme.',
         usesNBT: false,
         note: 'Grade 11 marks used for current Grade 12 learners; final Grade 12 marks used once available. Full selection criteria: "Faculty of Science admission and selection guidelines" at www.maties.com.',
       },
@@ -4946,7 +5456,8 @@ const SU: University = {
         faculty: 'Law',
         scoreName: 'Weighted selection (academic + NBT)',
         scoreMax: 100,
-        transform: 'BAccLLB selection uses Grade 11 (or final Grade 12) results and NBT results in an 80:20 ratio. Other Law degrees select by academic + non-academic merit per the faculty guidelines.',
+        transform:
+          'BAccLLB selection uses Grade 11 (or final Grade 12) results and NBT results in an 80:20 ratio. Other Law degrees select by academic + non-academic merit per the faculty guidelines.',
         usesNBT: true,
         note: 'NBTs (AQL, and MAT for BCom(Law)/BAccLLB) must be written before 31 July. NBTs are NOT modelled by this platform (out of scope) — the plain aggregate/subject minimums are used as apsMinimum.',
       },
@@ -4959,7 +5470,7 @@ const SU: University = {
     'NBTs are NOT required for 2027 admission at SU except for all Faculty of Law programmes (and narrow exceptions not relevant to NSC applicants: School of Tomorrow, American High School Diploma, online schools) — the inverse of UCT/UP, where NBTs are near-universal.',
     'All programmes are selection programmes: SU receives more applications than places available, so meeting the minimum admission requirements does not guarantee admission — actual selection thresholds (especially in Science) run higher than the published floor.',
     'Most programmes accept English OR Afrikaans (Home or First Additional Language) at a stated percentage — modelled as an alternative subject-requirement group.',
-    'A second-degree LLB (three-year) route for existing bachelor\'s graduates, and postgraduate-entry qualifications (PGCE, Advanced Diploma in Practical Music), are out of scope for this platform\'s NSC/matric-results applicant model and are not included below.',
+    "A second-degree LLB (three-year) route for existing bachelor's graduates, and postgraduate-entry qualifications (PGCE, Advanced Diploma in Practical Music), are out of scope for this platform's NSC/matric-results applicant model and are not included below.",
   ],
   programmes: [
     ...SU_AGRISCIENCES_PROGRAMMES,
@@ -4976,7 +5487,6 @@ const SU: University = {
   website: 'https://www.sun.ac.za',
   applicationPortal: 'https://www.maties.com/application',
 };
-
 
 // ═══════════════════════════════════════════════════════════════════════════
 // UNIVERSITY OF THE FREE STATE (UFS) — full reference implementation
@@ -5051,7 +5561,6 @@ const SU: University = {
 //   closingDateOverride (they equal the University-level default of 30
 //   Sept 2026) — only the 31 May and 31 July items above get an explicit
 //   override.
-
 
 // ─────────────────────────────────────────────────────────────────────────
 // FACULTY OF ECONOMIC AND MANAGEMENT SCIENCES
@@ -7434,7 +7943,11 @@ export const UFS_NAS_PROGRAMMES: Programme[] = [
     durationYears: 3,
     faculty: 'Natural and Agricultural Sciences',
     campus: ['Bloemfontein'],
-    additionalRequirements: ['selection', 'age 22+', 'proof of full-time employment in the construction industry'],
+    additionalRequirements: [
+      'selection',
+      'age 22+',
+      'proof of full-time employment in the construction industry',
+    ],
     admission: {
       apsMinimum: { default: 30 },
       subjectRequirements: [
@@ -7454,7 +7967,11 @@ export const UFS_NAS_PROGRAMMES: Programme[] = [
     durationYears: 3,
     faculty: 'Natural and Agricultural Sciences',
     campus: ['Bloemfontein'],
-    additionalRequirements: ['selection', 'age 22+', 'proof of full-time employment in the construction industry'],
+    additionalRequirements: [
+      'selection',
+      'age 22+',
+      'proof of full-time employment in the construction industry',
+    ],
     admission: {
       apsMinimum: { default: 30 },
       subjectRequirements: [
@@ -7796,7 +8313,9 @@ export const UFS_HUMANITIES_PROGRAMMES: Programme[] = [
     additionalRequirements: ['audition', 'interview'],
     admission: {
       apsMinimum: { default: 30 },
-      subjectRequirements: [{ subject: 'english', status: 'required', minRating: 5, homeLanguageRating: 5 }],
+      subjectRequirements: [
+        { subject: 'english', status: 'required', minRating: 5, homeLanguageRating: 5 },
+      ],
       note: 'English Home Language Level 5 (60%) OR at least 65% First/Second Additional Language. Drama experience recommended; compulsory audition and interview. Closing date 30 September 2026 (matches university default).',
     },
   },
@@ -7958,7 +8477,8 @@ const UFS: University = {
   logoUrl: '/logos/ufs.png',
   applicationSystem: 'Custom portal',
   applicationFee: 150,
-  feeNote: 'UNCONFIRMED against the sourced 2027 prospectus text (no domestic application-fee figure found) — carried over from prior data. Verify via apply.ufs.ac.za before relying on this figure.',
+  feeNote:
+    'UNCONFIRMED against the sourced 2027 prospectus text (no domestic application-fee figure found) — carried over from prior data. Verify via apply.ufs.ac.za before relying on this figure.',
   maxChoices: 1,
   choicesRanked: false,
   choicesIndependent: true,
@@ -7968,7 +8488,8 @@ const UFS: University = {
     subjectsCounted: 6,
     includesLifeOrientation: true,
     scale: 'nsc_8point',
-    bonusPoints: 'Life Orientation contributes exactly 1 bonus point if Level 5 (60%) or higher, else 0 — it is not scored on the main 8-point table like the other six subjects.',
+    bonusPoints:
+      'Life Orientation contributes exactly 1 bonus point if Level 5 (60%) or higher, else 0 — it is not scored on the main 8-point table like the other six subjects.',
     note: 'Six best academic subjects (no points below 30%) converted via an 8-point table: NSC Level 7 at 90-100% = AP 8, Level 7 at 80-89% = AP 7, Level 6 = AP 6, Level 5 = AP 5, Level 4 = AP 4, Level 3 = AP 3, Level 2 = AP 2, Level 1 = 0. Max AP = 49 (6x8 + 1 LO bonus). Selection is merit-based beyond the minimum threshold, starting from the highest AP — meeting the minimum does not guarantee admission.',
   },
   applicationsOpen: '2026-04-01',
@@ -7994,7 +8515,6 @@ const UFS: University = {
   website: 'https://www.ufs.ac.za',
   applicationPortal: 'https://apply.ufs.ac.za',
 };
-
 
 // ═══════════════════════════════════════════════════════════════════════════
 // UNIVERSITY OF KWAZULU-NATAL (UKZN) — full reference implementation
@@ -8023,7 +8543,6 @@ const UFS: University = {
 // subjectRequirement, separately from the APS-total exclusion, which lives in the
 // university-level ApsRule and is not re-stated per programme).
 
-
 export const UKZN_AES_PROGRAMMES: Programme[] = [
   // ─── ARCHITECTURE ──────────────────────────────────────────────────
   {
@@ -8043,7 +8562,12 @@ export const UKZN_AES_PROGRAMMES: Programme[] = [
         { subject: 'geography', status: 'alternative', minRating: 5, altGroup: 'bar_elective' },
         { subject: 'lifeScience', status: 'alternative', minRating: 5, altGroup: 'bar_elective' },
         { subject: 'homeLanguage', status: 'alternative', minRating: 5, altGroup: 'bar_elective' },
-        { subject: 'additionalLanguage', status: 'alternative', minRating: 5, altGroup: 'bar_elective' },
+        {
+          subject: 'additionalLanguage',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'bar_elective',
+        },
       ],
       note: 'One elective at Level 5 also satisfiable by Business Studies, Consumer Studies, Dramatic Arts, Economics, History, Information Technology, Music or Religion Studies/Visual Arts — none of these map to an existing SubjectKey so are not individually modelled. Applicants also required to submit a portfolio, write an essay and complete a questionnaire; selection influenced by these.',
     },
@@ -9202,7 +9726,7 @@ export const UKZN_HEALTH_SCIENCES_PROGRAMMES: Programme[] = [
         { subject: 'mathematics', status: 'alternative', minRating: 3, altGroup: 'maths' },
         { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 3, altGroup: 'maths' },
       ],
-      note: 'Only first choice applications will be considered by UKZN (not relevant to ApplyOnce, which is one-programme-per-university already). Life Orientation points are explicitly stated as NOT included in the 30-point APS requirement, consistent with UKZN\'s nsc_8point scale (LO excluded from total).',
+      note: "Only first choice applications will be considered by UKZN (not relevant to ApplyOnce, which is one-programme-per-university already). Life Orientation points are explicitly stated as NOT included in the 30-point APS requirement, consistent with UKZN's nsc_8point scale (LO excluded from total).",
     },
     careers: ['General Nurse', 'Psychiatric Nurse', 'Midwife', 'Community Health Nurse'],
   },
@@ -9254,7 +9778,6 @@ export const UKZN_HEALTH_SCIENCES_PROGRAMMES: Programme[] = [
 // Pietermaritzburg) are real, distinct application codes, so each campus
 // variant is encoded as its own Programme record rather than merged under a
 // single code with a multi-value campus array.
-
 
 // Shared elective gate used across most Humanities/BA/BSocSc programmes:
 // "English & LO at Level 4, plus ONE of: any language HL/FAL, Business
@@ -9346,11 +9869,21 @@ export const UKZN_HUMANITIES_PROGRAMMES: Programme[] = [
         { subject: 'english', status: 'required', minRating: 4 },
         { subject: 'lifeOrientation', status: 'required', minRating: 4 },
         { subject: 'homeLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'additionalLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'additionalLanguage',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
         { subject: 'geography', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'lifeScience', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'mathematics', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'mathematicalLiteracy',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
       ],
       note: `Consists of two majors plus free elective modules. Available majors (Howard College): Anthropology, Community Development, Criminology, Cultural and Heritage Tourism, Development Studies, Drama and Performance Studies, Economic History, English Studies, Fine Art, French, Greek, History, Industrial Psychology, IsiZulu, Latin, Media and Cultural Studies, Philosophy, Political Science, Psychology, Religion, Sociology; plus Economics, Geography, HR Management, Information Systems and Technology, Legal Studies, Management, Marketing (from other Colleges). Alternative Senior Certificate route: Matriculation Endorsement with at least 32 points. ${HUMANITIES_ELECTIVE_NOTE}`,
     },
@@ -9369,11 +9902,21 @@ export const UKZN_HUMANITIES_PROGRAMMES: Programme[] = [
         { subject: 'english', status: 'required', minRating: 4 },
         { subject: 'lifeOrientation', status: 'required', minRating: 4 },
         { subject: 'homeLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'additionalLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'additionalLanguage',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
         { subject: 'geography', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'lifeScience', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'mathematics', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'mathematicalLiteracy',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
       ],
       note: `Consists of two majors plus free elective modules. Available majors (Pietermaritzburg): Anthropology, Drama and Performance Studies, English Studies, French, Greek, History, Industrial/Organisational and Labour Studies, IsiZulu, Latin, Linguistics, Media and Cultural Studies, Philosophy, Political Science, Psychology, Religion, Sociology, Theology, Biblical Studies, Classical Civilisation, Ethics Studies, Digital Arts; plus Economics, Geography, HR Management, Legal Studies (from other Colleges). Alternative Senior Certificate route: Matriculation Endorsement with at least 32 points. ${HUMANITIES_ELECTIVE_NOTE}`,
     },
@@ -9435,11 +9978,21 @@ export const UKZN_HUMANITIES_PROGRAMMES: Programme[] = [
         { subject: 'english', status: 'required', minRating: 4 },
         { subject: 'lifeOrientation', status: 'required', minRating: 4 },
         { subject: 'homeLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'additionalLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'additionalLanguage',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
         { subject: 'geography', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'lifeScience', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'mathematics', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'mathematicalLiteracy',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
       ],
       note: `Consists of two majors plus a group of cognate electives. Available majors (Howard College): Anthropology, Community Development, Criminology, Cultural and Heritage Tourism, Development Studies, Industrial Psychology, Political Science, Psychology, Sociology; plus Computer Science, Economics, Geography, HR Management, Information Systems and Technology, Legal Studies, Management, Marketing. ${HUMANITIES_ELECTIVE_NOTE}`,
     },
@@ -9458,11 +10011,21 @@ export const UKZN_HUMANITIES_PROGRAMMES: Programme[] = [
         { subject: 'english', status: 'required', minRating: 4 },
         { subject: 'lifeOrientation', status: 'required', minRating: 4 },
         { subject: 'homeLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'additionalLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'additionalLanguage',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
         { subject: 'geography', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'lifeScience', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'mathematics', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'mathematicalLiteracy',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
       ],
       note: `Consists of two majors plus a group of cognate electives. Available majors (Pietermaritzburg): Anthropology, Political Science, Psychology, Sociology; plus Economics, Geography, HR Management, Legal Studies. ${HUMANITIES_ELECTIVE_NOTE}`,
     },
@@ -9483,11 +10046,21 @@ export const UKZN_HUMANITIES_PROGRAMMES: Programme[] = [
         { subject: 'english', status: 'required', minRating: 4 },
         { subject: 'lifeOrientation', status: 'required', minRating: 4 },
         { subject: 'homeLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'additionalLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'additionalLanguage',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
         { subject: 'geography', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'lifeScience', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'mathematics', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'mathematicalLiteracy',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
       ],
       note: `Core of Geography and Environmental Science modules plus environmental management skills. Not a formal requirement, but highly recommended that both Mathematics and Geography were taken as Grade 12 subjects. ${HUMANITIES_ELECTIVE_NOTE}`,
     },
@@ -9507,11 +10080,21 @@ export const UKZN_HUMANITIES_PROGRAMMES: Programme[] = [
         { subject: 'english', status: 'required', minRating: 4 },
         { subject: 'lifeOrientation', status: 'required', minRating: 4 },
         { subject: 'homeLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'additionalLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'additionalLanguage',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
         { subject: 'geography', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'lifeScience', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'mathematics', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'mathematicalLiteracy',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
       ],
       note: `Core of Geography and Environmental Science modules plus environmental management skills. Not a formal requirement, but highly recommended that both Mathematics and Geography were taken as Grade 12 subjects. ${HUMANITIES_ELECTIVE_NOTE}`,
     },
@@ -9555,11 +10138,21 @@ export const UKZN_HUMANITIES_PROGRAMMES: Programme[] = [
         { subject: 'english', status: 'required', minRating: 4 },
         { subject: 'lifeOrientation', status: 'required', minRating: 4 },
         { subject: 'homeLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'additionalLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'additionalLanguage',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
         { subject: 'geography', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'lifeScience', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'mathematics', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'mathematicalLiteracy',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
       ],
       note: `28/30 points do not guarantee acceptance due to limited space. Applicants with Mature Age Exemption may be admitted. Registerable with the South African Council for Social Service Professionals (SACSSP) on graduation. ${HUMANITIES_ELECTIVE_NOTE}`,
     },
@@ -9581,11 +10174,21 @@ export const UKZN_HUMANITIES_PROGRAMMES: Programme[] = [
         { subject: 'english', status: 'required', minRating: 4 },
         { subject: 'lifeOrientation', status: 'required', minRating: 4 },
         { subject: 'homeLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'additionalLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'additionalLanguage',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
         { subject: 'geography', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'lifeScience', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'mathematics', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'mathematicalLiteracy',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
       ],
       note: `An APS of at least 30 is required to register for ANY Law modules in the College of Humanities (applies to PPL, a Legal Studies major, or Law electives for BA/BSocSc). Involves majoring in one or more of Philosophy, Politics and Law, with the remainder structured from the other two disciplines plus electives. ${HUMANITIES_ELECTIVE_NOTE}`,
     },
@@ -9605,11 +10208,21 @@ export const UKZN_HUMANITIES_PROGRAMMES: Programme[] = [
         { subject: 'english', status: 'required', minRating: 4 },
         { subject: 'lifeOrientation', status: 'required', minRating: 4 },
         { subject: 'homeLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'additionalLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'additionalLanguage',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
         { subject: 'geography', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'lifeScience', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'mathematics', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'mathematicalLiteracy',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
       ],
       note: `An APS of at least 30 is required to register for ANY Law modules in the College of Humanities (applies to PPL, a Legal Studies major, or Law electives for BA/BSocSc). Involves majoring in one or more of Philosophy, Politics and Law, with the remainder structured from the other two disciplines plus electives. ${HUMANITIES_ELECTIVE_NOTE}`,
     },
@@ -9651,11 +10264,21 @@ export const UKZN_HUMANITIES_PROGRAMMES: Programme[] = [
         { subject: 'english', status: 'required', minRating: 4 },
         { subject: 'lifeOrientation', status: 'required', minRating: 4 },
         { subject: 'homeLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'additionalLanguage', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'additionalLanguage',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
         { subject: 'geography', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'lifeScience', status: 'alternative', minRating: 5, altGroup: 'elective' },
         { subject: 'mathematics', status: 'alternative', minRating: 5, altGroup: 'elective' },
-        { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 5, altGroup: 'elective' },
+        {
+          subject: 'mathematicalLiteracy',
+          status: 'alternative',
+          minRating: 5,
+          altGroup: 'elective',
+        },
       ],
       note: `Combines training in government and business fields with a foundation in ethics, aiming for flexibility across education, public service and entrepreneurial career paths. ${HUMANITIES_ELECTIVE_NOTE}`,
     },
@@ -9726,7 +10349,12 @@ export const UKZN_LAW_MANAGEMENT_PROGRAMMES: Programme[] = [
     admission: {
       apsMinimum: { default: 32 },
       subjectRequirements: [
-        { subject: 'english', status: 'required', homeLanguageRating: 5, additionalLanguageRating: 6 },
+        {
+          subject: 'english',
+          status: 'required',
+          homeLanguageRating: 5,
+          additionalLanguageRating: 6,
+        },
         { subject: 'mathematics', status: 'alternative', minRating: 3, altGroup: 'maths' },
         { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 5, altGroup: 'maths' },
         { subject: 'lifeOrientation', status: 'required', minRating: 4 },
@@ -9747,7 +10375,12 @@ export const UKZN_LAW_MANAGEMENT_PROGRAMMES: Programme[] = [
     admission: {
       apsMinimum: { default: 32 },
       subjectRequirements: [
-        { subject: 'english', status: 'required', homeLanguageRating: 5, additionalLanguageRating: 6 },
+        {
+          subject: 'english',
+          status: 'required',
+          homeLanguageRating: 5,
+          additionalLanguageRating: 6,
+        },
         { subject: 'mathematics', status: 'alternative', minRating: 3, altGroup: 'maths' },
         { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 5, altGroup: 'maths' },
         { subject: 'lifeOrientation', status: 'required', minRating: 4 },
@@ -9768,7 +10401,12 @@ export const UKZN_LAW_MANAGEMENT_PROGRAMMES: Programme[] = [
     admission: {
       apsMinimum: { default: 32 },
       subjectRequirements: [
-        { subject: 'english', status: 'required', homeLanguageRating: 5, additionalLanguageRating: 6 },
+        {
+          subject: 'english',
+          status: 'required',
+          homeLanguageRating: 5,
+          additionalLanguageRating: 6,
+        },
         { subject: 'mathematics', status: 'alternative', minRating: 3, altGroup: 'maths' },
         { subject: 'mathematicalLiteracy', status: 'alternative', minRating: 5, altGroup: 'maths' },
         { subject: 'lifeOrientation', status: 'required', minRating: 4 },
@@ -9811,7 +10449,12 @@ export const UKZN_LAW_MANAGEMENT_PROGRAMMES: Programme[] = [
     admission: {
       apsMinimum: { default: 26 },
       subjectRequirements: [
-        { subject: 'english', status: 'required', homeLanguageRating: 4, additionalLanguageRating: 4 },
+        {
+          subject: 'english',
+          status: 'required',
+          homeLanguageRating: 4,
+          additionalLanguageRating: 4,
+        },
         { subject: 'mathematics', status: 'required', minRating: 3 },
         { subject: 'lifeOrientation', status: 'required', minRating: 4 },
       ],
@@ -9831,7 +10474,12 @@ export const UKZN_LAW_MANAGEMENT_PROGRAMMES: Programme[] = [
     admission: {
       apsMinimum: { default: 26 },
       subjectRequirements: [
-        { subject: 'english', status: 'required', homeLanguageRating: 4, additionalLanguageRating: 4 },
+        {
+          subject: 'english',
+          status: 'required',
+          homeLanguageRating: 4,
+          additionalLanguageRating: 4,
+        },
         { subject: 'mathematics', status: 'required', minRating: 3 },
         { subject: 'lifeOrientation', status: 'required', minRating: 4 },
       ],
@@ -9858,7 +10506,12 @@ export const UKZN_LAW_MANAGEMENT_PROGRAMMES: Programme[] = [
       ],
       note: 'Honours-equivalent, high-performing-student programme with heavier mathematical/statistical emphasis than the BCom. Applicants with APS 37 (English & Life Orientation Level 4, Mathematics Level 6) considered for early selection. Candidates not meeting the Mathematics requirement are advised toward the College’s Alternative Access Programmes.',
     },
-    careers: ['Chartered Financial Analyst', 'Investment Analyst', 'Certified Financial Planner', 'Economist'],
+    careers: [
+      'Chartered Financial Analyst',
+      'Investment Analyst',
+      'Certified Financial Planner',
+      'Economist',
+    ],
   },
   // ── Bachelor of Business Science in Investment Science — Westville ──────────
   {
@@ -9878,7 +10531,12 @@ export const UKZN_LAW_MANAGEMENT_PROGRAMMES: Programme[] = [
       ],
       note: 'Honours-equivalent, high-performing-student programme with heavier mathematical/statistical emphasis than the BCom. Applicants with APS 37 (English & Life Orientation Level 4, Mathematics Level 6) considered for early selection. Candidates not meeting the Mathematics requirement are advised toward the College’s Alternative Access Programmes.',
     },
-    careers: ['Chartered Financial Analyst', 'Investment Analyst', 'Certified Financial Planner', 'Economist'],
+    careers: [
+      'Chartered Financial Analyst',
+      'Investment Analyst',
+      'Certified Financial Planner',
+      'Economist',
+    ],
   },
 
   // ── Bachelor of Commerce (General) — Pietermaritzburg ───────────────────────
@@ -10057,7 +10715,8 @@ const UKZN: University = {
   logoUrl: '/logos/ukzn.png',
   applicationSystem: 'CAO',
   applicationFee: 210,
-  feeNote: 'R210 on-time direct-to-UKZN application (R420 late). First-time SA undergrad applicants alternatively apply via the CAO (Central Applications Office) for R250 before 31 October 2026 (R470 late), which also covers other KZN institutions — CAO admin fee is separate from and not doubled with the direct UKZN fee.',
+  feeNote:
+    'R210 on-time direct-to-UKZN application (R420 late). First-time SA undergrad applicants alternatively apply via the CAO (Central Applications Office) for R250 before 31 October 2026 (R470 late), which also covers other KZN institutions — CAO admin fee is separate from and not doubled with the direct UKZN fee.',
   maxChoices: 1,
   choicesRanked: false,
   choicesIndependent: true,
@@ -10074,7 +10733,7 @@ const UKZN: University = {
   applyUrl: 'https://www.ukzn.ac.za',
   notes: [
     'The CAO (shared with other KZN institutions) allows six ranked choices — ApplyOnce restricts every student to ONE programme per university (a platform-wide rule), so maxChoices is set to 1 regardless.',
-    'MBChB closes 30 June 2026 (earlier than all other programmes, which close 30 September 2026) and uses a percentage-aggregate gate (60% per subject, 65% aggregate) rather than the standard APS scale — captured in that programme\'s note since the schema does not have a per-programme alternate scale mechanism.',
+    "MBChB closes 30 June 2026 (earlier than all other programmes, which close 30 September 2026) and uses a percentage-aggregate gate (60% per subject, 65% aggregate) rather than the standard APS scale — captured in that programme's note since the schema does not have a per-programme alternate scale mechanism.",
     'Some programmes with identical qualifications are offered on multiple campuses under DISTINCT real CAO codes (e.g. Civil Engineering at Howard College vs Pietermaritzburg) — each is modelled as its own Programme entry rather than merged, since qualificationCode is the primary key and each code is a separately trackable real application path.',
   ],
   programmes: [
@@ -10107,25 +10766,158 @@ const REMAINING_UNIS: Array<{
   type: 'traditional' | 'university_of_technology' | 'comprehensive';
   logo?: string;
 }> = [
-  { id: 'nwu', name: 'North-West University', shortName: 'NWU', fee: 150, type: 'traditional' as const, logo: '/logos/nwu.png' },
-  { id: 'nmu', name: 'Nelson Mandela University', shortName: 'NMU', fee: 200, type: 'comprehensive' as const, logo: '/logos/nmu.png' },
-  { id: 'uwc', name: 'University of the Western Cape', shortName: 'UWC', fee: 100, type: 'traditional' as const, logo: '/logos/uwc.png' },
-  { id: 'rhodes', name: 'Rhodes University', shortName: 'Rhodes', fee: 100, type: 'traditional' as const, logo: '/logos/rhodes.png' },
-  { id: 'unisa', name: 'University of South Africa', shortName: 'UNISA', fee: 115, type: 'traditional' as const, logo: '/logos/unisa.png' },
-  { id: 'tut', name: 'Tshwane University of Technology', shortName: 'TUT', fee: 240, type: 'university_of_technology' as const, logo: '/logos/tut.png' },
-  { id: 'dut', name: 'Durban University of Technology', shortName: 'DUT', fee: 270, type: 'university_of_technology' as const, logo: '/logos/dut.png' },
-  { id: 'cput', name: 'Cape Peninsula University of Technology', shortName: 'CPUT', fee: 100, type: 'university_of_technology' as const, logo: '/logos/cput.png' },
-  { id: 'vut', name: 'Vaal University of Technology', shortName: 'VUT', fee: 200, type: 'university_of_technology' as const, logo: '/logos/vut.png' },
-  { id: 'cut', name: 'Central University of Technology', shortName: 'CUT', fee: 180, type: 'university_of_technology' as const, logo: '/logos/cut.png' },
-  { id: 'mut', name: 'Mangosuthu University of Technology', shortName: 'MUT', fee: 270, type: 'university_of_technology' as const, logo: '/logos/mut.png' },
-  { id: 'unizulu', name: 'University of Zululand', shortName: 'UniZulu', fee: 150, type: 'traditional' as const, logo: '/logos/unizulu.png' },
-  { id: 'ufh', name: 'University of Fort Hare', shortName: 'UFH', fee: 150, type: 'traditional' as const, logo: '/logos/ufh.png' },
-  { id: 'wsu', name: 'Walter Sisulu University', shortName: 'WSU', fee: 150, type: 'comprehensive' as const, logo: '/logos/wsu.png' },
-  { id: 'smu', name: 'Sefako Makgatho Health Sciences University', shortName: 'SMU', fee: 200, type: 'traditional' as const, logo: '/logos/smu.png' },
-  { id: 'spu', name: 'Sol Plaatje University', shortName: 'SPU', fee: 100, type: 'traditional' as const, logo: '/logos/spu.png' },
-  { id: 'ump', name: 'University of Mpumalanga', shortName: 'UMP', fee: 100, type: 'traditional' as const, logo: '/logos/ump.png' },
-  { id: 'ul', name: 'University of Limpopo', shortName: 'UL', fee: 200, type: 'traditional' as const, logo: '/logos/ul.png' },
-  { id: 'univen', name: 'University of Venda', shortName: 'UNIVEN', fee: 150, type: 'traditional' as const, logo: '/logos/univen.png' },
+  {
+    id: 'nwu',
+    name: 'North-West University',
+    shortName: 'NWU',
+    fee: 150,
+    type: 'traditional' as const,
+    logo: '/logos/nwu.png',
+  },
+  {
+    id: 'nmu',
+    name: 'Nelson Mandela University',
+    shortName: 'NMU',
+    fee: 200,
+    type: 'comprehensive' as const,
+    logo: '/logos/nmu.png',
+  },
+  {
+    id: 'uwc',
+    name: 'University of the Western Cape',
+    shortName: 'UWC',
+    fee: 100,
+    type: 'traditional' as const,
+    logo: '/logos/uwc.png',
+  },
+  {
+    id: 'rhodes',
+    name: 'Rhodes University',
+    shortName: 'Rhodes',
+    fee: 100,
+    type: 'traditional' as const,
+    logo: '/logos/rhodes.png',
+  },
+  {
+    id: 'unisa',
+    name: 'University of South Africa',
+    shortName: 'UNISA',
+    fee: 115,
+    type: 'traditional' as const,
+    logo: '/logos/unisa.png',
+  },
+  {
+    id: 'tut',
+    name: 'Tshwane University of Technology',
+    shortName: 'TUT',
+    fee: 240,
+    type: 'university_of_technology' as const,
+    logo: '/logos/tut.png',
+  },
+  {
+    id: 'dut',
+    name: 'Durban University of Technology',
+    shortName: 'DUT',
+    fee: 270,
+    type: 'university_of_technology' as const,
+    logo: '/logos/dut.png',
+  },
+  {
+    id: 'cput',
+    name: 'Cape Peninsula University of Technology',
+    shortName: 'CPUT',
+    fee: 100,
+    type: 'university_of_technology' as const,
+    logo: '/logos/cput.png',
+  },
+  {
+    id: 'vut',
+    name: 'Vaal University of Technology',
+    shortName: 'VUT',
+    fee: 200,
+    type: 'university_of_technology' as const,
+    logo: '/logos/vut.png',
+  },
+  {
+    id: 'cut',
+    name: 'Central University of Technology',
+    shortName: 'CUT',
+    fee: 180,
+    type: 'university_of_technology' as const,
+    logo: '/logos/cut.png',
+  },
+  {
+    id: 'mut',
+    name: 'Mangosuthu University of Technology',
+    shortName: 'MUT',
+    fee: 270,
+    type: 'university_of_technology' as const,
+    logo: '/logos/mut.png',
+  },
+  {
+    id: 'unizulu',
+    name: 'University of Zululand',
+    shortName: 'UniZulu',
+    fee: 150,
+    type: 'traditional' as const,
+    logo: '/logos/unizulu.png',
+  },
+  {
+    id: 'ufh',
+    name: 'University of Fort Hare',
+    shortName: 'UFH',
+    fee: 150,
+    type: 'traditional' as const,
+    logo: '/logos/ufh.png',
+  },
+  {
+    id: 'wsu',
+    name: 'Walter Sisulu University',
+    shortName: 'WSU',
+    fee: 150,
+    type: 'comprehensive' as const,
+    logo: '/logos/wsu.png',
+  },
+  {
+    id: 'smu',
+    name: 'Sefako Makgatho Health Sciences University',
+    shortName: 'SMU',
+    fee: 200,
+    type: 'traditional' as const,
+    logo: '/logos/smu.png',
+  },
+  {
+    id: 'spu',
+    name: 'Sol Plaatje University',
+    shortName: 'SPU',
+    fee: 100,
+    type: 'traditional' as const,
+    logo: '/logos/spu.png',
+  },
+  {
+    id: 'ump',
+    name: 'University of Mpumalanga',
+    shortName: 'UMP',
+    fee: 100,
+    type: 'traditional' as const,
+    logo: '/logos/ump.png',
+  },
+  {
+    id: 'ul',
+    name: 'University of Limpopo',
+    shortName: 'UL',
+    fee: 200,
+    type: 'traditional' as const,
+    logo: '/logos/ul.png',
+  },
+  {
+    id: 'univen',
+    name: 'University of Venda',
+    shortName: 'UNIVEN',
+    fee: 150,
+    type: 'traditional' as const,
+    logo: '/logos/univen.png',
+  },
 ];
 
 for (const uni of REMAINING_UNIS) {
@@ -10139,23 +10931,30 @@ for (const uni of REMAINING_UNIS) {
     choicesRanked: false,
     choicesIndependent: true,
     choicesFinal: true,
-    apsRule: { method: 'standard_aps', subjectsCounted: 6, includesLifeOrientation: false, scale: 'nsc_7point' },
+    apsRule: {
+      method: 'standard_aps',
+      subjectsCounted: 6,
+      includesLifeOrientation: false,
+      scale: 'nsc_7point',
+    },
     defaultClosingDate: '2026-09-30T23:59:00+02:00',
     applyUrl: `https://www.${uni.id}.ac.za/apply`,
-    programmes: [{
-      qualificationCode: `${uni.id.toUpperCase()}-PLACEHOLDER`,
-      universityId: uni.id,
-      name: 'Programmes pending prospectus data',
-      qualificationType: 'degree',
-      durationYears: 3,
-      faculty: 'Various',
-      campus: ['Main Campus'],
-      admission: {
-        apsMinimum: { default: 0 },
-        subjectRequirements: [],
-        note: 'Programme requirements not yet available — prospectus data pending.',
+    programmes: [
+      {
+        qualificationCode: `${uni.id.toUpperCase()}-PLACEHOLDER`,
+        universityId: uni.id,
+        name: 'Programmes pending prospectus data',
+        qualificationType: 'degree',
+        durationYears: 3,
+        faculty: 'Various',
+        campus: ['Main Campus'],
+        admission: {
+          apsMinimum: { default: 0 },
+          subjectRequirements: [],
+          note: 'Programme requirements not yet available — prospectus data pending.',
+        },
       },
-    }],
+    ],
     type: uni.type,
     city: 'TBD',
     province: 'gauteng',
@@ -10170,6 +10969,6 @@ for (const uni of REMAINING_UNIS) {
 export const UNIVERSITIES: University[] = [UJ, WITS, UCT, UP, SU, UFS, UKZN, ...PLACEHOLDERS];
 
 export const UNIVERSITY_COUNT = UNIVERSITIES.length; // Should be 26
-export const getUniversityById = (id: string) => UNIVERSITIES.find(u => u.id === id);
+export const getUniversityById = (id: string) => UNIVERSITIES.find((u) => u.id === id);
 
 export const SERVICE_FEE_ZAR = 5; // ApplyOnce fee per application

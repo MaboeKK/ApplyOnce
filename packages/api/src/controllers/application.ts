@@ -17,74 +17,72 @@ import { BadRequestError, ConflictError, NotFoundError, ForbiddenError } from '.
  * - Application starts as 'draft' status
  * - Student must have uploaded matric certificate + ID before they can pay
  */
-export const createApplication = asyncHandler(
-  async (req: AuthRequest, res: Response) => {
-    const studentId = req.student!.studentId;
-    const { universityId, universityName, programmeId, programmeName, facultyName } = req.body;
+export const createApplication = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const studentId = req.student!.studentId;
+  const { universityId, universityName, programmeId, programmeName, facultyName } = req.body;
 
-    // Rule: Only one programme per university
-    const existingApplication = await prisma.application.findFirst({
-      where: {
+  // Rule: Only one programme per university
+  const existingApplication = await prisma.application.findFirst({
+    where: {
+      studentId,
+      universityId,
+      status: { in: ['draft', 'submitted'] },
+    },
+  });
+
+  if (existingApplication) {
+    throw new BadRequestError(
+      `You already have an application to ${universityName}. Remove it first to choose a different programme.`
+    );
+  }
+
+  // Create draft application. The findFirst check above handles the
+  // common case; the DB-level unique constraint on [studentId, universityId]
+  // is the source of truth and closes the race between two concurrent requests.
+  let application;
+  try {
+    application = await prisma.application.create({
+      data: {
         studentId,
         universityId,
-        status: { in: ['draft', 'submitted'] },
+        universityName,
+        programmeId,
+        programmeName,
+        facultyName,
+        status: 'draft',
       },
     });
-
-    if (existingApplication) {
-      throw new BadRequestError(
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+      throw new ConflictError(
         `You already have an application to ${universityName}. Remove it first to choose a different programme.`
       );
     }
-
-    // Create draft application. The findFirst check above handles the
-    // common case; the DB-level unique constraint on [studentId, universityId]
-    // is the source of truth and closes the race between two concurrent requests.
-    let application;
-    try {
-      application = await prisma.application.create({
-        data: {
-          studentId,
-          universityId,
-          universityName,
-          programmeId,
-          programmeName,
-          facultyName,
-          status: 'draft',
-        },
-      });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
-        throw new ConflictError(
-          `You already have an application to ${universityName}. Remove it first to choose a different programme.`
-        );
-      }
-      throw err;
-    }
-
-    // Log event
-    await prisma.applicationEvent.create({
-      data: {
-        applicationId: application.id,
-        eventType: 'created',
-        toStatus: 'draft',
-      },
-    });
-
-    res.status(201).json({
-      application: {
-        id: application.id,
-        universityId: application.universityId,
-        universityName: application.universityName,
-        programmeId: application.programmeId,
-        programmeName: application.programmeName,
-        facultyName: application.facultyName,
-        status: application.status,
-        createdAt: application.createdAt.toISOString(),
-      },
-    });
+    throw err;
   }
-);
+
+  // Log event
+  await prisma.applicationEvent.create({
+    data: {
+      applicationId: application.id,
+      eventType: 'created',
+      toStatus: 'draft',
+    },
+  });
+
+  res.status(201).json({
+    application: {
+      id: application.id,
+      universityId: application.universityId,
+      universityName: application.universityName,
+      programmeId: application.programmeId,
+      programmeName: application.programmeName,
+      facultyName: application.facultyName,
+      status: application.status,
+      createdAt: application.createdAt.toISOString(),
+    },
+  });
+});
 
 /**
  * GET /v1/applications

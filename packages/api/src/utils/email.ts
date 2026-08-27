@@ -28,10 +28,7 @@ function getTransporter() {
   return transporter;
 }
 
-export async function sendVerificationEmail(
-  email: string,
-  code: string
-): Promise<void> {
+export async function sendVerificationEmail(email: string, code: string): Promise<void> {
   if (config.email.mode === 'dev') {
     logger.info({ email, code }, 'DEV MODE: Verification code (not sent)');
     return;
@@ -109,10 +106,7 @@ export async function sendDecisionEmail(params: {
       `,
     });
 
-    logger.info(
-      { email: studentEmail, universityName, decision },
-      'Decision notification sent'
-    );
+    logger.info({ email: studentEmail, universityName, decision }, 'Decision notification sent');
   } catch (error) {
     logger.error({ error: error, email: studentEmail }, 'Failed to send decision notification');
     throw error;

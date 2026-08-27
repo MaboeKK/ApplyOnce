@@ -15,13 +15,14 @@ services:
       POSTGRES_PASSWORD: applyonce_dev_password
       POSTGRES_DB: applyonce
     ports:
-      - "127.0.0.1:3610:5432"   # localhost ONLY — not reachable from internet
+      - '127.0.0.1:3610:5432' # localhost ONLY — not reachable from internet
     volumes:
       - kmaboe_applyonce_pgdata:/var/lib/postgresql/data
+      - ./scripts/db-init:/docker-entrypoint-initdb.d:ro
     networks:
       - kmaboe-net
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U applyonce"]
+      test: ['CMD-SHELL', 'pg_isready -U applyonce']
       interval: 5s
       timeout: 5s
       retries: 5
@@ -30,7 +31,7 @@ services:
     image: redis:7-alpine
     container_name: kmaboe-applyonce-redis
     ports:
-      - "127.0.0.1:3611:6379"   # localhost ONLY — 6379 belongs to GoTurbo
+      - '127.0.0.1:3611:6379' # localhost ONLY — 6379 belongs to GoTurbo
     volumes:
       - kmaboe_applyonce_redisdata:/data
     networks:

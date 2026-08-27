@@ -44,7 +44,12 @@ import { AxiosError } from 'axios';
 import DashboardLayout from '@/components/Layout/DashboardLayout';
 import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
-import { calculateAPS as calculateAPSShared, getUniversityById, type SubjectResult as SharedSubjectResult, type Address } from '@applyonce/shared';
+import {
+  calculateAPS as calculateAPSShared,
+  getUniversityById,
+  type SubjectResult as SharedSubjectResult,
+  type Address,
+} from '@applyonce/shared';
 
 type SubjectResult = SharedSubjectResult;
 
@@ -133,7 +138,9 @@ export default function ApplicationDetailPage() {
         console.error('Error fetching application:', err);
         const axiosErr = err as AxiosError<{ message?: string }>;
         if (axiosErr.response?.status === 403) {
-          setError('You do not have permission to view this application. It may belong to another university.');
+          setError(
+            'You do not have permission to view this application. It may belong to another university.'
+          );
         } else if (axiosErr.response?.status === 404) {
           setError('Application not found.');
         } else {
@@ -179,7 +186,10 @@ export default function ApplicationDetailPage() {
     } catch (err) {
       console.error('Error submitting decision:', err);
       const axiosErr = err as AxiosError<{ message?: string; code?: string }>;
-      if (axiosErr.response?.status === 400 && axiosErr.response?.data?.code === 'ALREADY_DECIDED') {
+      if (
+        axiosErr.response?.status === 400 &&
+        axiosErr.response?.data?.code === 'ALREADY_DECIDED'
+      ) {
         setSubmitError('This application has already been decided.');
       } else if (axiosErr.response?.status === 403) {
         setSubmitError('You do not have permission to decide on this application.');
@@ -410,7 +420,9 @@ export default function ApplicationDetailPage() {
 
           {/* Subject Results */}
           <Paper sx={{ p: 3, mb: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}
+            >
               <Typography variant="h6" sx={{ fontWeight: 600 }}>
                 Subject Results
               </Typography>
@@ -459,7 +471,13 @@ export default function ApplicationDetailPage() {
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {student.documents.map((doc) => (
                   <Card key={doc.id} variant="outlined">
-                    <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <CardContent
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
                       <Box>
                         <Typography variant="body1" sx={{ fontWeight: 500 }}>
                           {doc.fileName}
@@ -498,9 +516,7 @@ export default function ApplicationDetailPage() {
                 <Typography variant="body2" color="text.secondary">
                   University Reference
                 </Typography>
-                <Typography variant="body1">
-                  {application.universityReference || 'N/A'}
-                </Typography>
+                <Typography variant="body1">{application.universityReference || 'N/A'}</Typography>
               </Box>
 
               <Box>

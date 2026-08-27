@@ -3,7 +3,6 @@
 
 import { Response } from 'express';
 import path from 'path';
-import fs from 'fs';
 import { AuthRequest } from '../types/express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { prisma } from '../utils/prisma';
@@ -11,6 +10,7 @@ import { ValidationError, NotFoundError } from '../utils/errors';
 import { parseMatricCertificate, parseIdDocument } from '../utils/ocr';
 import { logger } from '../utils/logger';
 import { UPLOAD_DIR } from '../config/multer';
+import { pathExists, safeUnlink } from '../utils/fs';
 
 /**
  * POST /v1/documents/upload
@@ -33,10 +33,7 @@ export const uploadDocument = asyncHandler(async (req: AuthRequest, res: Respons
 
   // Delete old file if replacing
   if (existing) {
-    const oldPath = path.join(UPLOAD_DIR, existing.storageKey);
-    if (fs.existsSync(oldPath)) {
-      fs.unlinkSync(oldPath);
-    }
+    await safeUnlink(path.join(UPLOAD_DIR, existing.storageKey));
     await prisma.document.delete({
       where: { id: existing.id },
     });
@@ -108,10 +105,7 @@ export const scanMatricCertificate = asyncHandler(async (req: AuthRequest, res: 
     });
 
     if (existing) {
-      const oldPath = path.join(UPLOAD_DIR, existing.storageKey);
-      if (fs.existsSync(oldPath)) {
-        fs.unlinkSync(oldPath);
-      }
+      await safeUnlink(path.join(UPLOAD_DIR, existing.storageKey));
       await prisma.document.delete({
         where: { id: existing.id },
       });
@@ -146,9 +140,7 @@ export const scanMatricCertificate = asyncHandler(async (req: AuthRequest, res: 
     });
   } catch (error) {
     // Clean up uploaded file on error
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
+    await safeUnlink(filePath);
     throw error;
   }
 });
@@ -195,10 +187,7 @@ export const scanIdDocument = asyncHandler(async (req: AuthRequest, res: Respons
     });
 
     if (existing) {
-      const oldPath = path.join(UPLOAD_DIR, existing.storageKey);
-      if (fs.existsSync(oldPath)) {
-        fs.unlinkSync(oldPath);
-      }
+      await safeUnlink(path.join(UPLOAD_DIR, existing.storageKey));
       await prisma.document.delete({
         where: { id: existing.id },
       });
@@ -216,9 +205,7 @@ export const scanIdDocument = asyncHandler(async (req: AuthRequest, res: Respons
     });
 
     // Clean up temp file
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
+    await safeUnlink(filePath);
 
     res.json({
       message: 'ID document scanned successfully',
@@ -236,9 +223,7 @@ export const scanIdDocument = asyncHandler(async (req: AuthRequest, res: Respons
     });
   } catch (error) {
     // Clean up uploaded file on error
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
+    await safeUnlink(filePath);
     throw error;
   }
 });
@@ -283,7 +268,7 @@ export const downloadDocument = asyncHandler(async (req: AuthRequest, res: Respo
 
   const filePath = path.join(UPLOAD_DIR, document.storageKey);
 
-  if (!fs.existsSync(filePath)) {
+  if (!(await pathExists(filePath))) {
     throw new NotFoundError('File not found on server');
   }
 
@@ -308,9 +293,7 @@ export const deleteDocument = asyncHandler(async (req: AuthRequest, res: Respons
 
   // Delete file from disk
   const filePath = path.join(UPLOAD_DIR, document.storageKey);
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-  }
+  await safeUnlink(filePath);
 
   // Delete record
   await prisma.document.delete({

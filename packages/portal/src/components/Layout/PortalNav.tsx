@@ -45,7 +45,9 @@ export default function PortalNav() {
     api
       .get('/applications')
       .then((res) => {
-        const drafts = (res.data.applications || []).filter((a: PortalApplication) => a.status === 'draft');
+        const drafts = (res.data.applications || []).filter(
+          (a: PortalApplication) => a.status === 'draft'
+        );
         setCartCount(drafts.length);
       })
       .catch(() => {});
@@ -75,7 +77,11 @@ export default function PortalNav() {
         >
           <MenuIcon />
         </IconButton>
-        <Menu anchorEl={navMenuAnchor} open={!!navMenuAnchor} onClose={() => setNavMenuAnchor(null)}>
+        <Menu
+          anchorEl={navMenuAnchor}
+          open={!!navMenuAnchor}
+          onClose={() => setNavMenuAnchor(null)}
+        >
           {navLinks.map((link) => (
             <MenuItem
               key={link.href}
@@ -103,7 +109,11 @@ export default function PortalNav() {
           </Typography>
         </Stack>
 
-        <Stack direction="row" spacing={0.5} sx={{ flexGrow: 1, display: { xs: 'none', sm: 'flex' } }}>
+        <Stack
+          direction="row"
+          spacing={0.5}
+          sx={{ flexGrow: 1, display: { xs: 'none', sm: 'flex' } }}
+        >
           {navLinks.map((link) => {
             const active = router.pathname.startsWith(link.href);
             return (
@@ -141,7 +151,14 @@ export default function PortalNav() {
           </Box>
         </Button>
 
-        <Box sx={{ width: '1px', height: 28, bgcolor: 'rgba(255,255,255,0.25)', display: { xs: 'none', sm: 'block' } }} />
+        <Box
+          sx={{
+            width: '1px',
+            height: 28,
+            bgcolor: 'rgba(255,255,255,0.25)',
+            display: { xs: 'none', sm: 'block' },
+          }}
+        />
 
         <Box>
           <Button
@@ -149,7 +166,15 @@ export default function PortalNav() {
             endIcon={<ExpandMoreIcon />}
             sx={{ color: 'white', textTransform: 'none', minWidth: 0, px: { xs: 1, sm: 2 } }}
           >
-            <Avatar sx={{ width: 30, height: 30, fontSize: '0.8rem', bgcolor: 'rgba(255,255,255,0.2)', mr: { xs: 0, sm: 1 } }}>
+            <Avatar
+              sx={{
+                width: 30,
+                height: 30,
+                fontSize: '0.8rem',
+                bgcolor: 'rgba(255,255,255,0.2)',
+                mr: { xs: 0, sm: 1 },
+              }}
+            >
               {initials || <PersonOutlineIcon fontSize="small" />}
             </Avatar>
             <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>

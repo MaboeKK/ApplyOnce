@@ -55,17 +55,3 @@ export class ValidationError extends AppError {
     this.name = 'ValidationError';
   }
 }
-
-export class TooManyRequestsError extends AppError {
-  constructor(message = 'Too many requests') {
-    super(429, message, 'RATE_LIMIT_EXCEEDED');
-    this.name = 'TooManyRequestsError';
-  }
-}
-
-export class InternalError extends AppError {
-  constructor(message = 'Internal server error') {
-    super(500, message, 'INTERNAL_ERROR');
-    this.name = 'InternalError';
-  }
-}

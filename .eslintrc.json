@@ -6,28 +6,37 @@
     "sourceType": "module"
   },
   "plugins": ["@typescript-eslint"],
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended"
-  ],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   "env": {
     "node": true,
     "es2022": true
   },
-  "ignorePatterns": [
-    "node_modules",
-    "dist",
-    "build",
-    "coverage",
-    "*.js"
-  ],
+  "ignorePatterns": ["node_modules", "dist", "build", "coverage", "*.js"],
   "rules": {
-    "@typescript-eslint/no-explicit-any": "warn",
-    "@typescript-eslint/no-unused-vars": ["error", {
-      "argsIgnorePattern": "^_",
-      "varsIgnorePattern": "^_",
-      "caughtErrorsIgnorePattern": "^_",
-      "ignoreRestSiblings": true
-    }]
-  }
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_",
+        "ignoreRestSiblings": true
+      }
+    ],
+    "max-lines": ["warn", { "max": 1000, "skipBlankLines": true, "skipComments": true }],
+    "complexity": ["warn", { "max": 15 }]
+  },
+  "overrides": [
+    {
+      "files": [
+        "packages/shared/src/services/aps-calculator.ts",
+        "packages/shared/src/types/university.ts",
+        "packages/shared/src/utils/subject-mapping.ts",
+        "packages/api/src/workflows/submission.ts"
+      ],
+      "rules": {
+        "complexity": "off"
+      }
+    }
+  ]
 }

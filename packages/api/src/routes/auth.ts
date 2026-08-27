@@ -48,11 +48,7 @@ const router = Router();
  *       409:
  *         description: Email or ID number already registered
  */
-router.post(
-  '/register',
-  validateBody(registerSchema),
-  asyncHandler(authController.register)
-);
+router.post('/register', validateBody(registerSchema), asyncHandler(authController.register));
 
 /**
  * @swagger
@@ -80,11 +76,7 @@ router.post(
  *       400:
  *         description: Invalid or expired code
  */
-router.post(
-  '/verify',
-  validateBody(verifyEmailSchema),
-  asyncHandler(authController.verifyEmail)
-);
+router.post('/verify', validateBody(verifyEmailSchema), asyncHandler(authController.verifyEmail));
 
 /**
  * @swagger
@@ -112,11 +104,7 @@ router.post(
  *       401:
  *         description: Invalid credentials or email not verified
  */
-router.post(
-  '/login',
-  validateBody(loginSchema),
-  asyncHandler(authController.login)
-);
+router.post('/login', validateBody(loginSchema), asyncHandler(authController.login));
 
 /**
  * @swagger

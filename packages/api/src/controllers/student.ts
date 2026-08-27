@@ -41,7 +41,12 @@ export const getMyProfile = asyncHandler(async (req: AuthRequest, res: Response)
   }
 
   // Remove sensitive fields
-  const { passwordHash: _passwordHash, emailVerifyToken: _emailVerifyToken, emailVerifyExpires: _emailVerifyExpires, ...studentData } = student;
+  const {
+    passwordHash: _passwordHash,
+    emailVerifyToken: _emailVerifyToken,
+    emailVerifyExpires: _emailVerifyExpires,
+    ...studentData
+  } = student;
 
   res.json({
     student: {
@@ -63,7 +68,13 @@ export const updateMyProfile = asyncHandler(async (req: AuthRequest, res: Respon
 
   // Cannot update certain fields via this endpoint
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { id: _id, email: _email, passwordHash: _passwordHash, emailVerified: _emailVerified, ...allowedUpdates } = updates;
+  const {
+    id: _id,
+    email: _email,
+    passwordHash: _passwordHash,
+    emailVerified: _emailVerified,
+    ...allowedUpdates
+  } = updates;
 
   // SECURITY: If idNumber is present, auto-derive DOB and gender from it
   // and IGNORE any client-submitted DOB/gender values to prevent spoofing
@@ -89,7 +100,12 @@ export const updateMyProfile = asyncHandler(async (req: AuthRequest, res: Respon
       },
     });
 
-    const { passwordHash: _passwordHash, emailVerifyToken: _emailVerifyToken, emailVerifyExpires: _emailVerifyExpires, ...studentData } = student;
+    const {
+      passwordHash: _passwordHash,
+      emailVerifyToken: _emailVerifyToken,
+      emailVerifyExpires: _emailVerifyExpires,
+      ...studentData
+    } = student;
 
     res.json({
       message: 'Profile updated successfully',

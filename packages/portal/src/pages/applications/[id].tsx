@@ -28,17 +28,37 @@ import type { PortalApplication, ApplicationStatus, ApplicationEvent } from '@/t
 function getStatusConfig(status: ApplicationStatus) {
   switch (status) {
     case 'draft':
-      return { color: 'default' as const, label: 'Draft', icon: <HourglassEmptyIcon fontSize="small" /> };
+      return {
+        color: 'default' as const,
+        label: 'Draft',
+        icon: <HourglassEmptyIcon fontSize="small" />,
+      };
     case 'submitted':
-      return { color: 'info' as const, label: 'Submitted', icon: <HourglassEmptyIcon fontSize="small" /> };
+      return {
+        color: 'info' as const,
+        label: 'Submitted',
+        icon: <HourglassEmptyIcon fontSize="small" />,
+      };
     case 'accepted':
-      return { color: 'success' as const, label: 'Accepted', icon: <CheckCircleIcon fontSize="small" /> };
+      return {
+        color: 'success' as const,
+        label: 'Accepted',
+        icon: <CheckCircleIcon fontSize="small" />,
+      };
     case 'rejected':
       return { color: 'error' as const, label: 'Rejected', icon: <CancelIcon fontSize="small" /> };
     case 'submission_failed':
-      return { color: 'error' as const, label: 'Submission Failed', icon: <ErrorIcon fontSize="small" /> };
+      return {
+        color: 'error' as const,
+        label: 'Submission Failed',
+        icon: <ErrorIcon fontSize="small" />,
+      };
     default:
-      return { color: 'default' as const, label: status, icon: <HourglassEmptyIcon fontSize="small" /> };
+      return {
+        color: 'default' as const,
+        label: status,
+        icon: <HourglassEmptyIcon fontSize="small" />,
+      };
   }
 }
 
@@ -125,7 +145,10 @@ export default function ApplicationDetailPage() {
           )}
 
           {application.decision && (
-            <Alert severity={application.decision === 'accepted' ? 'success' : 'error'} sx={{ mt: 3 }}>
+            <Alert
+              severity={application.decision === 'accepted' ? 'success' : 'error'}
+              sx={{ mt: 3 }}
+            >
               <Typography variant="body2" fontWeight={600}>
                 {application.decision === 'accepted' ? 'Accepted' : 'Rejected'}
               </Typography>

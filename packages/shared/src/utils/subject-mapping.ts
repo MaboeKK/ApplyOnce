@@ -16,7 +16,8 @@ export function normalizeSubjectName(raw: string): string {
   // Detect Home Language vs First Additional Language (CRITICAL - order matters)
   const isHomeLanguage = normalized.includes('home language') || normalized.includes(' hl');
   const isFirstAdditional = normalized.includes('first additional') || normalized.includes(' fal');
-  const isSecondAdditional = normalized.includes('second additional') || normalized.includes(' sal');
+  const isSecondAdditional =
+    normalized.includes('second additional') || normalized.includes(' sal');
 
   // Languages - must distinguish HL vs FAL
   if (normalized.includes('english')) {
@@ -86,8 +87,10 @@ export function normalizeSubjectName(raw: string): string {
   if (normalized.includes('religion')) return 'religion_studies';
 
   // Technical
-  if (normalized.includes('information technology') || normalized.includes('it ')) return 'information_technology';
-  if (normalized.includes('computer applications') || normalized.includes('cat ')) return 'computer_applications_technology';
+  if (normalized.includes('information technology') || normalized.includes('it '))
+    return 'information_technology';
+  if (normalized.includes('computer applications') || normalized.includes('cat '))
+    return 'computer_applications_technology';
   if (normalized.includes('engineering graphics')) return 'engineering_graphics_design';
   if (normalized.includes('electrical')) return 'electrical_technology';
   if (normalized.includes('mechanical')) return 'mechanical_technology';

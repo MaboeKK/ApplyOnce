@@ -68,7 +68,9 @@ export default function CartPage() {
         api.get('/students/me'),
       ]);
 
-      const drafts = (appsRes.data.applications || []).filter((a: PortalApplication) => a.status === 'draft');
+      const drafts = (appsRes.data.applications || []).filter(
+        (a: PortalApplication) => a.status === 'draft'
+      );
       setApplications(drafts);
 
       const fees: Record<string, number> = {};
@@ -78,7 +80,9 @@ export default function CartPage() {
       setFeeByUni(fees);
 
       const student = studentRes.data.student;
-      setHasMatricCert(!!student?.documents?.some((d: { type: string }) => d.type === 'matric_certificate'));
+      setHasMatricCert(
+        !!student?.documents?.some((d: { type: string }) => d.type === 'matric_certificate')
+      );
       setHasIdDoc(!!student?.documents?.some((d: { type: string }) => d.type === 'id_document'));
 
       try {
@@ -194,7 +198,15 @@ export default function CartPage() {
               {applications.map((app) => {
                 const tier = strategyByCode[`${app.universityId}:${app.programmeId}`];
                 return (
-                  <Paper key={app.id} sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Paper
+                    key={app.id}
+                    sx={{
+                      p: 3,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
                     <Box>
                       <Typography variant="subtitle1" fontWeight={600}>
                         {app.programmeName}
@@ -207,7 +219,11 @@ export default function CartPage() {
                           Fee: R{feeByUni[app.universityId] ?? '—'} + R{SERVICE_FEE_ZAR} service
                         </Typography>
                         {tier && strategyLabel[tier] && (
-                          <Chip label={strategyLabel[tier]} size="small" color={strategyColor[tier]} />
+                          <Chip
+                            label={strategyLabel[tier]}
+                            size="small"
+                            color={strategyColor[tier]}
+                          />
                         )}
                       </Stack>
                     </Box>
@@ -229,7 +245,9 @@ export default function CartPage() {
                 <Typography variant="body2">R{universityFees}</Typography>
               </Stack>
               <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
-                <Typography variant="body2">ApplyOnce service fees ({applications.length} × R{SERVICE_FEE_ZAR})</Typography>
+                <Typography variant="body2">
+                  ApplyOnce service fees ({applications.length} × R{SERVICE_FEE_ZAR})
+                </Typography>
                 <Typography variant="body2">R{serviceFees}</Typography>
               </Stack>
               <Divider sx={{ my: 2 }} />

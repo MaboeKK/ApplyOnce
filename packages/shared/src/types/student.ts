@@ -2,12 +2,12 @@
 
 export interface Student {
   id: string;
-  idNumber: string;         // SA ID number (13 digits)
+  idNumber: string; // SA ID number (13 digits)
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
-  dateOfBirth: string;      // ISO date
+  dateOfBirth: string; // ISO date
   gender: 'male' | 'female' | 'other' | 'prefer_not_to_say';
   race: 'african' | 'coloured' | 'indian' | 'white' | 'other' | 'prefer_not_to_say'; // Required by many SA universities
   nationality: string;
@@ -47,16 +47,16 @@ export interface Guardian {
   phone: string;
   email?: string;
   employed: boolean;
-  annualIncome?: number;    // For NSFAS eligibility (Phase 2)
+  annualIncome?: number; // For NSFAS eligibility (Phase 2)
 }
 
 export interface SubjectResult {
   id: string;
   studentId: string;
   subject: NSCSubject;
-  mark: number;             // 0–100
-  level?: number;           // 1–7 (derived from mark)
-  year: number;             // year achieved (may differ for repeats)
+  mark: number; // 0–100
+  level?: number; // 1–7 (derived from mark)
+  year: number; // year achieved (may differ for repeats)
 }
 
 export type NSCSubject =

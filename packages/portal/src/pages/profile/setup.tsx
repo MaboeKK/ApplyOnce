@@ -161,10 +161,13 @@ export default function ProfileSetup() {
     const stepKeys = ['personal', 'address', 'guardian', 'school', 'results', 'review'];
     const currentKey = stepKeys[activeStep];
 
-    setProfileData((prev) => ({
-      ...prev,
-      [currentKey]: stepData,
-    } as ProfileWizardData));
+    setProfileData(
+      (prev) =>
+        ({
+          ...prev,
+          [currentKey]: stepData,
+        }) as ProfileWizardData
+    );
 
     setActiveStep((prev) => prev + 1);
     setError('');
@@ -229,15 +232,15 @@ export default function ProfileSetup() {
       router.push('/dashboard');
     } catch (err) {
       // Extract validation details if available
-      const axiosErr = err as AxiosError<{ error?: { message?: string; details?: Array<{ path: string; message: string }> } }>;
+      const axiosErr = err as AxiosError<{
+        error?: { message?: string; details?: Array<{ path: string; message: string }> };
+      }>;
       const errorData = axiosErr.response?.data?.error;
       let message = errorData?.message || 'Failed to save profile';
 
       // Append validation details if present
       if (errorData?.details && Array.isArray(errorData.details)) {
-        const fieldErrors = errorData.details
-          .map((d) => `${d.path}: ${d.message}`)
-          .join(', ');
+        const fieldErrors = errorData.details.map((d) => `${d.path}: ${d.message}`).join(', ');
         message = `${message} — ${fieldErrors}`;
       }
 
@@ -251,21 +254,9 @@ export default function ProfileSetup() {
   const renderStepContent = () => {
     switch (activeStep) {
       case 0:
-        return (
-          <PersonalStep
-            data={profileData.personal}
-            onNext={handleNext}
-            user={user}
-          />
-        );
+        return <PersonalStep data={profileData.personal} onNext={handleNext} user={user} />;
       case 1:
-        return (
-          <AddressStep
-            data={profileData.address}
-            onNext={handleNext}
-            onBack={handleBack}
-          />
-        );
+        return <AddressStep data={profileData.address} onNext={handleNext} onBack={handleBack} />;
       case 2:
         return (
           <GuardianStep
@@ -277,13 +268,7 @@ export default function ProfileSetup() {
           />
         );
       case 3:
-        return (
-          <SchoolStep
-            data={profileData.school}
-            onNext={handleNext}
-            onBack={handleBack}
-          />
-        );
+        return <SchoolStep data={profileData.school} onNext={handleNext} onBack={handleBack} />;
       case 4:
         return (
           <ResultsStep

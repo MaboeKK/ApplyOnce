@@ -31,7 +31,9 @@ export async function parseMatricCertificate(filePath: string): Promise<OCRResul
   try {
     // Run OCR
     logger.info({ filePath }, 'Starting OCR on matric certificate');
-    const { data: { text } } = await Tesseract.recognize(filePath, 'eng', {
+    const {
+      data: { text },
+    } = await Tesseract.recognize(filePath, 'eng', {
       logger: (m) => {
         if (m.status === 'recognizing text') {
           logger.debug({ progress: m.progress }, 'OCR progress');
@@ -55,9 +57,7 @@ export async function parseMatricCertificate(filePath: string): Promise<OCRResul
     let aps: number | null = null;
     if (subjects.length >= 6) {
       // Filter out Life Orientation and take best 6 subjects based on level
-      const nonLO = subjects.filter(
-        (s) => s.subject !== 'life_orientation' && s.level !== null
-      );
+      const nonLO = subjects.filter((s) => s.subject !== 'life_orientation' && s.level !== null);
       const sorted = [...nonLO].sort((a, b) => (b.level || 0) - (a.level || 0));
       const best6 = sorted.slice(0, 6);
       aps = best6.reduce((sum, s) => sum + (s.level || 0), 0);
@@ -66,9 +66,10 @@ export async function parseMatricCertificate(filePath: string): Promise<OCRResul
     }
 
     // Determine overall confidence
-    const avgConfidence = subjects.length > 0
-      ? subjects.filter((s) => s.confidence === 'high').length / subjects.length
-      : 0;
+    const avgConfidence =
+      subjects.length > 0
+        ? subjects.filter((s) => s.confidence === 'high').length / subjects.length
+        : 0;
     const confidence: 'high' | 'medium' | 'low' =
       avgConfidence > 0.7 ? 'high' : avgConfidence > 0.4 ? 'medium' : 'low';
 
@@ -194,12 +195,16 @@ function parseSubjects(text: string, warnings: string[]): ExtractedSubject[] {
 /**
  * Parse SA ID document to extract ID number
  */
-export async function parseIdDocument(filePath: string): Promise<{ idNumber: string | null; confidence: 'high' | 'medium' | 'low'; warnings: string[] }> {
+export async function parseIdDocument(
+  filePath: string
+): Promise<{ idNumber: string | null; confidence: 'high' | 'medium' | 'low'; warnings: string[] }> {
   const warnings: string[] = [];
 
   try {
     logger.info({ filePath }, 'Starting OCR on ID document');
-    const { data: { text } } = await Tesseract.recognize(filePath, 'eng', {
+    const {
+      data: { text },
+    } = await Tesseract.recognize(filePath, 'eng', {
       logger: (m) => {
         if (m.status === 'recognizing text') {
           logger.debug({ progress: m.progress }, 'OCR progress');

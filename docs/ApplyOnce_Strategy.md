@@ -22,15 +22,15 @@ The government's Central Application Service (CAS), launched as a pilot in 2026,
 
 Every year, hundreds of thousands of South African matric students and past matriculants apply to universities. The process is fragmented, stressful, and unnecessarily complicated.
 
-| Step | Current Reality | Cost |
-|---|---|---|
-| Research universities | Visit each university website separately | Hours of browsing |
-| Check APS requirements | Calculate manually per university | Manual, error-prone |
-| Create accounts | Separate account per university | 5+ accounts for 5 unis |
-| Upload documents | Re-upload ID, results, certificates each time | Repeated effort |
-| Pay application fees | Separate payment per university | R100–R250 each time |
-| Track applications | Check each portal separately | No unified view |
-| Receive offers | Different channels per university | Easy to miss offers |
+| Step                   | Current Reality                               | Cost                   |
+| ---------------------- | --------------------------------------------- | ---------------------- |
+| Research universities  | Visit each university website separately      | Hours of browsing      |
+| Check APS requirements | Calculate manually per university             | Manual, error-prone    |
+| Create accounts        | Separate account per university               | 5+ accounts for 5 unis |
+| Upload documents       | Re-upload ID, results, certificates each time | Repeated effort        |
+| Pay application fees   | Separate payment per university               | R100–R250 each time    |
+| Track applications     | Check each portal separately                  | No unified view        |
+| Receive offers         | Different channels per university             | Easy to miss offers    |
 
 ### 2.2 Why This Has Not Been Solved
 
@@ -49,6 +49,7 @@ The government's own CAS is described as a pilot project and currently functions
 ApplyOnce is a mobile application (Android and iOS) that serves as the single application layer between South African university applicants and all participating institutions.
 
 **The student experience:**
+
 1. Register once with your South African ID number and basic personal details
 2. Build your student profile: personal info, matric results (scanned and auto-processed), supporting documents
 3. Browse universities and programmes with automatic APS matching
@@ -62,6 +63,7 @@ ApplyOnce is a mobile application (Android and iOS) that serves as the single ap
 The chosen name is **ApplyOnce**. It communicates the core value proposition instantly: you apply to everything, once. Simple, memorable, and accessible to first-generation applicants.
 
 **Alternative names considered:**
+
 - ApplyZA — clear SA branding but less descriptive
 - UniHub — clean but generic
 - OneApply — similar concept but less distinctive
@@ -74,10 +76,12 @@ The chosen name is **ApplyOnce**. It communicates the core value proposition ins
 ### 4.1 Target Users
 
 **Primary:** Current Grade 12 (matric) students preparing to apply for undergraduate study
+
 - Approximately 600,000–800,000 matric candidates sit the NSC annually
 - A significant portion qualify for and seek university entry
 
 **Secondary:** Post-matric applicants — individuals who completed Grade 12 in a prior year and are applying or re-applying
+
 - Large and often underserved population
 - May have updated results or changed career direction
 
@@ -97,17 +101,18 @@ Phase 1: 26 public universities only. TVET colleges, private higher education in
 
 ApplyOnce generates revenue through a per-application service fee added on top of each university's standard application fee.
 
-| Element | Description |
-|---|---|
-| University fee | Collected from student and passed directly to the university (e.g. R200) |
-| ApplyOnce service fee | A small fee added per application, retained by ApplyOnce |
-| Student pays | University fee + ApplyOnce service fee in a single transaction |
-| University receives | Their standard application fee, unchanged |
-| ApplyOnce earns | The service fee per application submitted |
+| Element               | Description                                                              |
+| --------------------- | ------------------------------------------------------------------------ |
+| University fee        | Collected from student and passed directly to the university (e.g. R200) |
+| ApplyOnce service fee | A small fee added per application, retained by ApplyOnce                 |
+| Student pays          | University fee + ApplyOnce service fee in a single transaction           |
+| University receives   | Their standard application fee, unchanged                                |
+| ApplyOnce earns       | The service fee per application submitted                                |
 
 **Initial service fee:** R5 per application
 
 **Revenue projection (illustrative):**
+
 - At R5/application × 100,000 applications = R500,000/year
 - At R10/application × 100,000 applications = R1,000,000/year
 - A student applying to 5 universities pays R25–R50 in total service fees — a compelling value exchange for the convenience offered
@@ -127,6 +132,7 @@ A registered payment gateway (PayFast, Peach Payments, or Yoco) will be used. Th
 ### 6.1 The Core Technical Challenge
 
 Every South African university runs a different application system:
+
 - Oracle PeopleSoft (UCT, UFS, others)
 - ITS / i-Enabler (NMU, TUT, VUT)
 - CAO system (DUT, UKZN, MUT)
@@ -148,6 +154,7 @@ There is no common standard. ApplyOnce becomes the universal interface layer —
 ### 6.3 University Integration
 
 Formal API agreements with each university's IT department. Each agreement covers:
+
 - Data format and submission standards
 - Application fee pass-through arrangements
 - System change notification (30–60 days notice required)
@@ -163,12 +170,12 @@ Universities that decline integration are either not listed or shown as "Apply D
 
 ### 6.5 Platform Decisions
 
-| Platform | Decision |
-|---|---|
-| Mobile app (Android + iOS) | Phase 1 — primary platform |
-| Web app | Phase 2 |
-| WhatsApp integration | Phase 2 |
-| USSD | Not planned — document uploads make USSD impractical |
+| Platform                   | Decision                                             |
+| -------------------------- | ---------------------------------------------------- |
+| Mobile app (Android + iOS) | Phase 1 — primary platform                           |
+| Web app                    | Phase 2                                              |
+| WhatsApp integration       | Phase 2                                              |
+| USSD                       | Not planned — document uploads make USSD impractical |
 
 ---
 
@@ -181,6 +188,7 @@ Point of contact: IT department (owns the student information system and API). R
 ### 7.2 Onboarding Approach
 
 Start with high-volume institutions with known IT capacity. Sign an MOU before going live. MOU covers:
+
 - Data format and submission standards
 - Application fee pass-through
 - System change notification obligations
@@ -224,21 +232,21 @@ Encrypted storage at rest and in transit, secure authentication, regular securit
 
 ### 9.1 The Government's CAS — Not a Competitor
 
-| | CAS | ApplyOnce |
-|---|---|---|
-| What it does | Clearing house for unplaced students after the cycle | Proactive applications before and during the cycle |
-| Student role | Passive — profile submitted, institutions contact student | Active — student chooses universities and programmes |
-| Status | Pilot project, 2026 | To be built |
-| Problem solved | "I have no offers, what now?" | "I want to apply to multiple universities easily" |
+|                | CAS                                                       | ApplyOnce                                            |
+| -------------- | --------------------------------------------------------- | ---------------------------------------------------- |
+| What it does   | Clearing house for unplaced students after the cycle      | Proactive applications before and during the cycle   |
+| Student role   | Passive — profile submitted, institutions contact student | Active — student chooses universities and programmes |
+| Status         | Pilot project, 2026                                       | To be built                                          |
+| Problem solved | "I have no offers, what now?"                             | "I want to apply to multiple universities easily"    |
 
 ### 9.2 Existing Private Solutions
 
-| Platform | What It Does | Limitation |
-|---|---|---|
-| UniApplyForMe | APS tools, guidance, application support | Does not submit to all universities |
-| 4applications.org | Applies for students at 4 institutions for R250 | Only 4 institutions; not scalable |
-| CAO (cao.ac.za) | Centralised for KZN universities | Regional only |
-| SA Universities app | Info, prospectus, fees, dates | No application submission |
+| Platform            | What It Does                                    | Limitation                          |
+| ------------------- | ----------------------------------------------- | ----------------------------------- |
+| UniApplyForMe       | APS tools, guidance, application support        | Does not submit to all universities |
+| 4applications.org   | Applies for students at 4 institutions for R250 | Only 4 institutions; not scalable   |
+| CAO (cao.ac.za)     | Centralised for KZN universities                | Regional only                       |
+| SA Universities app | Info, prospectus, fees, dates                   | No application submission           |
 
 ### 9.3 Competitive Moat
 
@@ -275,14 +283,14 @@ National launch from day one. Progressive university integration rollout. Availa
 
 ### 11.1 Required Actions Before Launch
 
-| Requirement | Details |
-|---|---|
-| CIPC Registration | Register a Pty Ltd. Required for bank account and university contracts. |
-| POPIA Compliance | Information Officer, Privacy Policy, consent flow, data deletion, breach notification. |
-| Payment Processing | Use a registered gateway (PayFast/Peach/Yoco). No separate licence needed. |
-| Terms of Service | State ApplyOnce is an intermediary, not a university. Cap liability for platform errors. |
-| University MOUs | Sign before going live with each integration. |
-| Cyber Liability Insurance | Strongly recommended before launch given volume of sensitive data. |
+| Requirement               | Details                                                                                  |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| CIPC Registration         | Register a Pty Ltd. Required for bank account and university contracts.                  |
+| POPIA Compliance          | Information Officer, Privacy Policy, consent flow, data deletion, breach notification.   |
+| Payment Processing        | Use a registered gateway (PayFast/Peach/Yoco). No separate licence needed.               |
+| Terms of Service          | State ApplyOnce is an intermediary, not a university. Cap liability for platform errors. |
+| University MOUs           | Sign before going live with each integration.                                            |
+| Cyber Liability Insurance | Strongly recommended before launch given volume of sensitive data.                       |
 
 ### 11.2 Licensing as an Admissions Intermediary
 
@@ -296,15 +304,15 @@ Terms of Service must clearly limit liability to the technology service provided
 
 ## 12. Risks & Mitigations
 
-| Risk | Likelihood | Mitigation |
-|---|---|---|
-| Universities refuse API integration | Medium | Start with willing institutions; approach with working prototype |
-| Government mandates CAS exclusively | Low | CAS is a clearing house, not a primary application tool |
-| Competitor copies the model | Medium | Move fast; lock in university agreements; build brand trust |
-| Data breach | Low–Medium | Cyber insurance, modern security, regular audits |
-| Low student adoption | Low–Medium | Social media marketing; strong UX; word-of-mouth |
-| Payment gateway failure | Low | Use established provider; configure backup gateway |
-| DBE/Umalusi integration delayed | High (initially) | Launch with manual upload; automate as Phase 2 |
+| Risk                                | Likelihood       | Mitigation                                                       |
+| ----------------------------------- | ---------------- | ---------------------------------------------------------------- |
+| Universities refuse API integration | Medium           | Start with willing institutions; approach with working prototype |
+| Government mandates CAS exclusively | Low              | CAS is a clearing house, not a primary application tool          |
+| Competitor copies the model         | Medium           | Move fast; lock in university agreements; build brand trust      |
+| Data breach                         | Low–Medium       | Cyber insurance, modern security, regular audits                 |
+| Low student adoption                | Low–Medium       | Social media marketing; strong UX; word-of-mouth                 |
+| Payment gateway failure             | Low              | Use established provider; configure backup gateway               |
+| DBE/Umalusi integration delayed     | High (initially) | Launch with manual upload; automate as Phase 2                   |
 
 ---
 
@@ -322,41 +330,41 @@ Terms of Service must clearly limit liability to the technology service provided
 
 ## Appendix A: SA University Application Systems
 
-| University | Application System | Notes |
-|---|---|---|
-| UCT | Oracle PeopleSoft | Direct portal |
-| Wits | Custom portal | www.wits.ac.za/apply-online |
-| UP (Pretoria) | Custom portal | Direct application |
-| Stellenbosch | Custom portal | www.maties.com/application |
-| UJ | Custom portal | www.uj.ac.za/apply |
-| UKZN | CAO | Via cao.ac.za |
-| UFS | PeopleSoft / custom | Direct portal |
-| NWU | Custom portal | Direct application |
-| NMU | ITS / i-Enabler | Direct portal |
-| UWC | Custom portal | Direct application |
-| Rhodes | Custom portal | Direct application |
-| TUT | Custom portal | Register and create account |
-| DUT | CAO | Must apply via CAO |
-| CPUT | Custom portal | Direct application |
-| VUT | i-Enabler | Via vut.ac.za |
-| CUT | Custom portal | Direct application |
-| MUT | CAO | Via CAO |
-| UNISA | Own system | Distance learning; separate intake cycles |
+| University    | Application System  | Notes                                     |
+| ------------- | ------------------- | ----------------------------------------- |
+| UCT           | Oracle PeopleSoft   | Direct portal                             |
+| Wits          | Custom portal       | www.wits.ac.za/apply-online               |
+| UP (Pretoria) | Custom portal       | Direct application                        |
+| Stellenbosch  | Custom portal       | www.maties.com/application                |
+| UJ            | Custom portal       | www.uj.ac.za/apply                        |
+| UKZN          | CAO                 | Via cao.ac.za                             |
+| UFS           | PeopleSoft / custom | Direct portal                             |
+| NWU           | Custom portal       | Direct application                        |
+| NMU           | ITS / i-Enabler     | Direct portal                             |
+| UWC           | Custom portal       | Direct application                        |
+| Rhodes        | Custom portal       | Direct application                        |
+| TUT           | Custom portal       | Register and create account               |
+| DUT           | CAO                 | Must apply via CAO                        |
+| CPUT          | Custom portal       | Direct application                        |
+| VUT           | i-Enabler           | Via vut.ac.za                             |
+| CUT           | Custom portal       | Direct application                        |
+| MUT           | CAO                 | Via CAO                                   |
+| UNISA         | Own system          | Distance learning; separate intake cycles |
 
 ---
 
 ## Appendix B: Glossary
 
-| Term | Definition |
-|---|---|
-| APS | Admission Point Score — calculated from matric marks to determine programme eligibility |
-| NSC | National Senior Certificate — the matric qualification |
-| POPIA | Protection of Personal Information Act — SA's primary data protection law |
-| CAS | Central Application Service — government clearing house for unplaced students (2026 pilot) |
-| CAO | Central Applications Office — centralised system for KZN universities |
-| DBE | Department of Basic Education — responsible for NSC results |
-| DHET | Department of Higher Education and Training — oversees public universities |
-| Umalusi | Quality council that certifies matric results and qualifications |
-| MOU | Memorandum of Understanding — formal agreement with each partner university |
-| MVP | Minimum Viable Product — first working version with core features only |
-| CIPC | Companies and Intellectual Property Commission — company registration body in SA |
+| Term    | Definition                                                                                 |
+| ------- | ------------------------------------------------------------------------------------------ |
+| APS     | Admission Point Score — calculated from matric marks to determine programme eligibility    |
+| NSC     | National Senior Certificate — the matric qualification                                     |
+| POPIA   | Protection of Personal Information Act — SA's primary data protection law                  |
+| CAS     | Central Application Service — government clearing house for unplaced students (2026 pilot) |
+| CAO     | Central Applications Office — centralised system for KZN universities                      |
+| DBE     | Department of Basic Education — responsible for NSC results                                |
+| DHET    | Department of Higher Education and Training — oversees public universities                 |
+| Umalusi | Quality council that certifies matric results and qualifications                           |
+| MOU     | Memorandum of Understanding — formal agreement with each partner university                |
+| MVP     | Minimum Viable Product — first working version with core features only                     |
+| CIPC    | Companies and Intellectual Property Commission — company registration body in SA           |
