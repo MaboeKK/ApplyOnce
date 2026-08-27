@@ -18,6 +18,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import api from '@/config/api';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { getErrorMessage } from '@/utils/error-message';
+import { formatZAR } from '@/utils/formatters';
 import type { PortalPayment } from '@/types';
 
 export default function PaymentCheckoutPage() {
@@ -123,7 +124,7 @@ function PaymentCheckoutContent() {
                 <Typography variant="body2">
                   {item.programmeName} ({item.universityName})
                 </Typography>
-                <Typography variant="body2">R{item.totalZAR}</Typography>
+                <Typography variant="body2">{formatZAR(item.totalZAR)}</Typography>
               </Stack>
             ))}
           </Stack>
@@ -131,7 +132,7 @@ function PaymentCheckoutContent() {
           <Divider sx={{ mb: 2 }} />
           <Stack direction="row" justifyContent="space-between" sx={{ mb: 3 }}>
             <Typography variant="h6">Total</Typography>
-            <Typography variant="h6">R{payment.totalAmountZAR}</Typography>
+            <Typography variant="h6">{formatZAR(payment.totalAmountZAR)}</Typography>
           </Stack>
 
           {error && (
@@ -142,7 +143,7 @@ function PaymentCheckoutContent() {
 
           <Stack spacing={1.5}>
             <Button variant="contained" size="large" onClick={handlePay} disabled={processing}>
-              {processing ? 'Processing…' : `Pay R${payment.totalAmountZAR} Now`}
+              {processing ? 'Processing…' : `Pay ${formatZAR(payment.totalAmountZAR)} Now`}
             </Button>
             <Button variant="text" onClick={handleCancel} disabled={processing}>
               Cancel

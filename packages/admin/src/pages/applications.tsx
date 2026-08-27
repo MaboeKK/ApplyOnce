@@ -9,6 +9,7 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import DashboardLayout from '@/components/Layout/DashboardLayout';
 import { useAuthStore } from '@/store/auth';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { getStatusColor } from '@/utils/applicationStatus';
 import api from '@/config/api';
 
 interface Application {
@@ -61,19 +62,6 @@ function ApplicationsContent() {
 
     fetchApplications();
   }, []);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'submitted':
-        return 'info';
-      case 'accepted':
-        return 'success';
-      case 'rejected':
-        return 'error';
-      default:
-        return 'default';
-    }
-  };
 
   const columns: GridColDef[] = [
     {

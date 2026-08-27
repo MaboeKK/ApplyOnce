@@ -22,6 +22,7 @@ import api from '@/config/api';
 import PortalNav from '@/components/Layout/PortalNav';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { getErrorMessage } from '@/utils/error-message';
+import { formatZAR } from '@/utils/formatters';
 import type { PortalApplication, ProgrammeMatch } from '@/types';
 
 const strategyColor: Record<string, 'error' | 'success' | 'primary' | 'warning'> = {
@@ -219,7 +220,11 @@ function CartContent() {
                       </Typography>
                       <Stack direction="row" spacing={1} sx={{ mt: 1 }} alignItems="center">
                         <Typography variant="caption" color="text.secondary">
-                          Fee: R{feeByUni[app.universityId] ?? '—'} + R{SERVICE_FEE_ZAR} service
+                          Fee:{' '}
+                          {feeByUni[app.universityId] !== undefined
+                            ? formatZAR(feeByUni[app.universityId])
+                            : '—'}{' '}
+                          + {formatZAR(SERVICE_FEE_ZAR)} service
                         </Typography>
                         {tier && strategyLabel[tier] && (
                           <Chip
@@ -246,18 +251,18 @@ function CartContent() {
             <Paper sx={{ p: 3 }}>
               <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
                 <Typography variant="body2">University fees</Typography>
-                <Typography variant="body2">R{universityFees}</Typography>
+                <Typography variant="body2">{formatZAR(universityFees)}</Typography>
               </Stack>
               <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
                 <Typography variant="body2">
-                  ApplyOnce service fees ({applications.length} × R{SERVICE_FEE_ZAR})
+                  ApplyOnce service fees ({applications.length} × {formatZAR(SERVICE_FEE_ZAR)})
                 </Typography>
-                <Typography variant="body2">R{serviceFees}</Typography>
+                <Typography variant="body2">{formatZAR(serviceFees)}</Typography>
               </Stack>
               <Divider sx={{ my: 2 }} />
               <Stack direction="row" justifyContent="space-between" sx={{ mb: 3 }}>
                 <Typography variant="h6">Total</Typography>
-                <Typography variant="h6">R{total}</Typography>
+                <Typography variant="h6">{formatZAR(total)}</Typography>
               </Stack>
 
               {missingDocs && (
@@ -278,7 +283,7 @@ function CartContent() {
                 disabled={missingDocs || submitting}
                 onClick={handleCheckout}
               >
-                {submitting ? 'Starting payment…' : `Pay R${total} and Submit All`}
+                {submitting ? 'Starting payment…' : `Pay ${formatZAR(total)} and Submit All`}
               </Button>
             </Paper>
           </>

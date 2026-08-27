@@ -3,6 +3,7 @@
 
 import { Box, Button, Typography, Paper, Grid, Divider, Alert, Chip } from '@mui/material';
 import { subjectLabel } from '@/utils/subject-labels';
+import { formatZAR } from '@/utils/formatters';
 import type { User } from '@/store/auth';
 import type { ProfileWizardData } from '@/pages/profile/setup';
 import type { Subject } from '@/components/Profile/ResultsStep';
@@ -147,9 +148,7 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
               <Typography variant="body2" color="text.secondary">
                 Annual Income
               </Typography>
-              <Typography variant="body1">
-                R{data.guardian.annualIncome.toLocaleString()}
-              </Typography>
+              <Typography variant="body1">{formatZAR(data.guardian.annualIncome)}</Typography>
             </Grid>
           )}
         </Grid>

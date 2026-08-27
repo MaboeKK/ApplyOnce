@@ -44,6 +44,7 @@ import { AxiosError } from 'axios';
 import DashboardLayout from '@/components/Layout/DashboardLayout';
 import { useAuthStore } from '@/store/auth';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { getStatusColor } from '@/utils/applicationStatus';
 import api from '@/config/api';
 import {
   calculateAPS as calculateAPSShared,
@@ -220,19 +221,6 @@ function ApplicationDetailContent() {
     } catch (err) {
       console.error('Error downloading document:', err);
       alert('Failed to download document');
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'submitted':
-        return 'info';
-      case 'accepted':
-        return 'success';
-      case 'rejected':
-        return 'error';
-      default:
-        return 'default';
     }
   };
 
