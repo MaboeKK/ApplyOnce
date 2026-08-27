@@ -28,7 +28,6 @@ ApplyOnce is a South African web platform where matric students apply to all 26 
 - **Frontend:** Next.js 13 + MUI 6 (student portal and university-admin portal)
 - **Backend:** Express 4 + TypeScript
 - **Database:** PostgreSQL 16 (via Prisma 6)
-- **Cache/sessions:** Redis 7
 - **Auth:** JWT in httpOnly cookies
 - **Payments:** Mock PayGate (swapped for a real merchant account post-MVP)
 - **Language:** TypeScript throughout

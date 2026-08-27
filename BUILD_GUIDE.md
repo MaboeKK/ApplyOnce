@@ -43,12 +43,12 @@ claude
 ```
 Read CLAUDE.md fully before doing anything. Then:
 1. Confirm we are in /home/kmaboe/applyonce and summarise back to me the sandbox safety rules (ports, kmaboe- prefixes, what you must not touch).
-2. Run scripts/setup.sh — it verifies tools, checks our ports (3600/3601/3602/3610/3611) are free, starts ONLY the kmaboe-applyonce Postgres + Redis containers, installs npm deps, runs Prisma migrations, and seeds the 26 universities + admin accounts + demo student.
+2. Run scripts/setup.sh — it verifies tools, checks our ports (3600/3601/3602/3610) are free, starts ONLY the kmaboe-applyonce Postgres container, installs npm deps, runs Prisma migrations, and seeds the 26 universities + admin accounts + demo student.
 3. Initialise a LOCAL git repo (no remote, no GitHub) and make the first commit.
 4. STOP and report: what ran, what's now running (docker ps for kmaboe- containers only), and the seeded credentials. Do NOT write any application code yet.
 ```
 
-**QUICK CHECK (you):** `docker ps` shows `kmaboe-applyonce-postgres` and `kmaboe-applyonce-redis` running. Setup printed the seeded credentials. No errors.
+**QUICK CHECK (you):** `docker ps` shows `kmaboe-applyonce-postgres` running. Setup printed the seeded credentials. No errors.
 
 ---
 
@@ -197,6 +197,6 @@ Tell Claude CLI exactly what you saw (the error, or "the health check didn't loa
 ## Reminder of the safety rules (already in CLAUDE.md and ~/CLAUDE.md)
 
 - Only kmaboe- Docker containers; never touch goturbo-\*
-- Ports 3600/3601/3602 (apps), 3610/3611 (DB/Redis, localhost only)
+- Ports 3600/3601/3602 (apps), 3610 (DB, localhost only)
 - Work only inside /home/kmaboe/applyonce
 - Local git only — backups go to your Google Drive

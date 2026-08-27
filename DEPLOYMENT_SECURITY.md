@@ -206,15 +206,14 @@ curl -H "Cookie: accessToken=..." https://api.applyonce.co.za/v1/documents/:id
 openssl rand -hex 64
 ```
 
-### 8. PostgreSQL & Redis Binding
+### 8. PostgreSQL Binding
 
 - **Status:** ✅ **CONFIGURED** (via docker-compose.yml)
-- **Requirement:** Database and Redis MUST bind to `127.0.0.1` ONLY
+- **Requirement:** Database MUST bind to `127.0.0.1` ONLY
 - **Current:** Configured in `docker-compose.yml`
 - **Verification:**
   ```bash
   ss -tlnp | grep 3610  # PostgreSQL should show 127.0.0.1:3610
-  ss -tlnp | grep 3611  # Redis should show 127.0.0.1:3611
   ```
 
 **NEVER expose:**
@@ -264,7 +263,7 @@ Before deploying to production, verify ALL of the following:
 - [ ] Strong JWT secrets generated (64+ characters, random)
 - [ ] Production CORS origins configured (no wildcards)
 - [ ] Email SMTP configured and tested
-- [ ] PostgreSQL and Redis bind to `127.0.0.1` only
+- [ ] PostgreSQL binds to `127.0.0.1` only
 - [ ] uploads/ directory NOT served by nginx
 - [ ] Document download routes enforce isolation (student/admin)
 - [ ] Parental consent field added (POPIA compliance)

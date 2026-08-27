@@ -16,7 +16,7 @@
     "format": "prettier --write .",
     "typecheck": "npm run typecheck --workspaces",
     "test": "npm run test --workspaces",
-    "db:up": "docker compose up postgres redis -d",
+    "db:up": "docker compose up postgres -d",
     "infra:up": "docker compose up -d",
     "infra:down": "docker compose down",
     "setup": "bash scripts/setup.sh",

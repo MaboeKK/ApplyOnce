@@ -87,19 +87,9 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      redis:
-        image: redis:7
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     env:
       NODE_ENV: test
       DATABASE_URL: postgresql://applyonce:applyonce@localhost:5432/applyonce_test
-      REDIS_URL: redis://localhost:6379
       JWT_ACCESS_SECRET: ci-test-jwt-access-secret-change-me
       JWT_REFRESH_SECRET: ci-test-jwt-refresh-secret-change-me
       PAYGATE_ID: ci-test-paygate-id

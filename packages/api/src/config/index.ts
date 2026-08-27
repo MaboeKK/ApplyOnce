@@ -32,7 +32,6 @@ export const config = {
 
   // Database
   databaseUrl: required('DATABASE_URL'),
-  redisUrl: optional('REDIS_URL', 'redis://localhost:3611'),
 
   // CORS
   corsOrigins: optional('CORS_ORIGINS', 'http://localhost:3601,http://localhost:3602')

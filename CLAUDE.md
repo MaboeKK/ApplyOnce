@@ -93,7 +93,6 @@ applyonce/
 | Runtime          | Node.js 22                             |
 | ORM              | Prisma 6                               |
 | Database         | PostgreSQL 16 (Docker)                 |
-| Cache/sessions   | Redis 7 — ioredis (Docker)             |
 | Auth             | JWT + httpOnly cookies                 |
 | Passwords        | bcryptjs                               |
 | Email            | Nodemailer                             |
@@ -106,6 +105,8 @@ applyonce/
 | Tooling          | TypeScript 5, ESLint, Prettier, Husky  |
 | Server           | Ubuntu (hosted VPS)                    |
 | Infrastructure   | Docker + Docker Compose + nginx        |
+
+**Redis — removed 2026-08-27.** It was provisioned (docker-compose service, `REDIS_URL` config) from the start but nothing in the API ever actually used it — no sessions, no caching, no rate-limit store were ever built against it. Removed rather than left as dead infrastructure; re-add when there's a real feature that needs it (e.g. Redis-backed rate limiting, distributed sessions).
 
 ## NOT in MVP
 
@@ -293,7 +294,6 @@ Node v22.22.2, npm 10.9.7, Docker 29.1.3, Docker Compose 2.40.3, Git 2.43.0, Pyt
 | Student portal (Next.js)   | 3601 | public (0.0.0.0) — needed for demo |
 | University admin (Next.js) | 3602 | public (0.0.0.0) — needed for demo |
 | PostgreSQL (Docker)        | 3610 | **127.0.0.1 ONLY** — never expose  |
-| Redis (Docker)             | 3611 | **127.0.0.1 ONLY** — never expose  |
 
 Always run `ss -tlnp` to confirm a port is free before binding.
 
@@ -301,7 +301,7 @@ Always run `ss -tlnp` to confirm a port is free before binding.
 
 The server has no software firewall. Every listening port on 0.0.0.0 is reachable from the internet. Therefore:
 
-- PostgreSQL and Redis MUST bind to 127.0.0.1 only (done in docker-compose.yml). Never change this to 0.0.0.0.
+- PostgreSQL MUST bind to 127.0.0.1 only (done in docker-compose.yml). Never change this to 0.0.0.0.
 - The three apps are intentionally public for the demo. Before real student data goes in, revisit: put them behind auth/TLS, or proxy through a controlled port.
 - Never log secrets. Never commit .env.
 
@@ -309,7 +309,7 @@ The server has no software firewall. Every listening port on 0.0.0.0 is reachabl
 
 - Existing containers are all `goturbo-prod-*` — NEVER stop/restart/remove them
 - Existing network: `go-turbo-deploy_internal` — NEVER attach to it
-- ApplyOnce containers MUST be prefixed `kmaboe-` (kmaboe-applyonce-postgres, kmaboe-applyonce-redis)
+- ApplyOnce containers MUST be prefixed `kmaboe-` (e.g. kmaboe-applyonce-postgres)
 - ApplyOnce network MUST be `kmaboe-net`
 - GoTurbo uses postgres 14 + redis (separate containers/ports from ours — no conflict)
 
@@ -323,7 +323,7 @@ CANNOT: get root shell, read other users' files, modify nginx config. Do not att
 - All work inside `/home/kmaboe/applyonce/` only
 - Never touch other users, /var/www, /srv, /opt, GoTurbo files, nginx, or system files
 - Never rm -rf outside /home/kmaboe
-- Only Postgres + Redis run in Docker; API/portal/admin run on the host via npm
+- Only Postgres runs in Docker; API/portal/admin run on the host via npm
 - When unsure if something is safe — STOP and ask
 
 ---

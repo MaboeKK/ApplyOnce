@@ -3,7 +3,7 @@
 # SAFETY:
 #   - container names prefixed "kmaboe-"
 #   - isolated on "kmaboe-net" (never go-turbo-deploy_internal)
-#   - Postgres + Redis bound to 127.0.0.1 ONLY (UFW is off — must not expose DB to internet)
+#   - Postgres bound to 127.0.0.1 ONLY (UFW is off — must not expose DB to internet)
 #   - ports avoid all taken ports: 22, 53, 80, 3000, 3200, 6379, 8090, 32947
 
 services:
@@ -27,16 +27,6 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
-    image: redis:7-alpine
-    container_name: kmaboe-applyonce-redis
-    ports:
-      - '127.0.0.1:3611:6379' # localhost ONLY — 6379 belongs to GoTurbo
-    volumes:
-      - kmaboe_applyonce_redisdata:/data
-    networks:
-      - kmaboe-net
-
 networks:
   kmaboe-net:
     name: kmaboe-net
@@ -44,4 +34,3 @@ networks:
 
 volumes:
   kmaboe_applyonce_pgdata:
-  kmaboe_applyonce_redisdata:
