@@ -20,9 +20,9 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import ErrorIcon from '@mui/icons-material/Error';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
 import PortalNav from '@/components/Layout/PortalNav';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import type { PortalApplication, ApplicationStatus, ApplicationEvent } from '@/types';
 
 function getStatusConfig(status: ApplicationStatus) {
@@ -70,19 +70,22 @@ const eventLabels: Record<string, string> = {
 };
 
 export default function ApplicationDetailPage() {
+  return (
+    <ProtectedRoute>
+      <ApplicationDetailContent />
+    </ProtectedRoute>
+  );
+}
+
+function ApplicationDetailContent() {
   const router = useRouter();
   const { id } = router.query;
-  const { isAuthenticated } = useAuthStore();
 
   const [application, setApplication] = useState<PortalApplication | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/login');
-      return;
-    }
     if (!id) return;
 
     api
@@ -90,9 +93,9 @@ export default function ApplicationDetailPage() {
       .then((res) => setApplication(res.data.application))
       .catch((err) => setError(err.response?.data?.error?.message || 'Application not found'))
       .finally(() => setLoading(false));
-  }, [isAuthenticated, id, router]);
+  }, [id]);
 
-  if (!isAuthenticated || loading) {
+  if (loading) {
     return (
       <>
         <PortalNav />

@@ -45,9 +45,9 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import LanguageIcon from '@mui/icons-material/Language';
-import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
 import PortalNav from '@/components/Layout/PortalNav';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { getErrorMessage } from '@/utils/error-message';
 import type { ProgrammeMatch, PortalApplication } from '@/types';
 import type { Programme } from '@applyonce/shared';
@@ -96,8 +96,15 @@ const brand = {
 type SortOption = 'name-asc' | 'name-desc' | 'programmes-desc';
 
 export default function UniversitiesPage() {
+  return (
+    <ProtectedRoute>
+      <UniversitiesContent />
+    </ProtectedRoute>
+  );
+}
+
+function UniversitiesContent() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
   const [universities, setUniversities] = useState<University[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -113,10 +120,6 @@ export default function UniversitiesPage() {
   const [howItWorksOpen, setHowItWorksOpen] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/login');
-      return;
-    }
     api
       .get('/universities')
       .then((res) => setUniversities(res.data.universities || []))
@@ -131,7 +134,7 @@ export default function UniversitiesPage() {
         setDraftApplications(drafts);
       })
       .catch(() => {});
-  }, [isAuthenticated, router]);
+  }, []);
 
   const fetchMatches = async () => {
     setMatchesLoading(true);
@@ -215,7 +218,7 @@ export default function UniversitiesPage() {
     setProvince('all');
   };
 
-  if (!isAuthenticated || loading) return null;
+  if (loading) return null;
 
   return (
     <>

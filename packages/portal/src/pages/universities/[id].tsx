@@ -20,9 +20,9 @@ import {
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
 import PortalNav from '@/components/Layout/PortalNav';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { getErrorMessage } from '@/utils/error-message';
 import type { PortalApplication, ProgrammeMatch } from '@/types';
 import type { University, Programme, ChoiceStrategy } from '@applyonce/shared';
@@ -42,9 +42,16 @@ const strategyLabel: Record<ChoiceStrategy, string> = {
 };
 
 export default function UniversityDetailPage() {
+  return (
+    <ProtectedRoute>
+      <UniversityDetailContent />
+    </ProtectedRoute>
+  );
+}
+
+function UniversityDetailContent() {
   const router = useRouter();
   const { id } = router.query;
-  const { isAuthenticated } = useAuthStore();
 
   const [university, setUniversity] = useState<University | null>(null);
   const [matchByCode, setMatchByCode] = useState<Record<string, ProgrammeMatch>>({});
@@ -56,14 +63,10 @@ export default function UniversityDetailPage() {
   const [toast, setToast] = useState('');
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/login');
-      return;
-    }
     if (!id) return;
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, id]);
+  }, [id]);
 
   const load = async () => {
     setLoading(true);
@@ -132,7 +135,7 @@ export default function UniversityDetailPage() {
     }
   };
 
-  if (!isAuthenticated || loading) {
+  if (loading) {
     return (
       <>
         <PortalNav />

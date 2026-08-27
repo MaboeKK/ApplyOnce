@@ -21,9 +21,9 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DescriptionIcon from '@mui/icons-material/Description';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
-import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
 import PortalNav from '@/components/Layout/PortalNav';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { getErrorMessage } from '@/utils/error-message';
 import type { PortalDocument } from '@/types';
 
@@ -34,21 +34,24 @@ const documentTypeLabels: Record<string, string> = {
 };
 
 export default function DocumentsPage() {
+  return (
+    <ProtectedRoute>
+      <DocumentsContent />
+    </ProtectedRoute>
+  );
+}
+
+function DocumentsContent() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
   const [documents, setDocuments] = useState<PortalDocument[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/login');
-      return;
-    }
-
     fetchDocuments();
-  }, [isAuthenticated, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchDocuments = async () => {
     try {
@@ -116,10 +119,6 @@ export default function DocumentsPage() {
   };
 
   const requiredTypes = ['matric_certificate', 'id_document'];
-
-  if (!isAuthenticated) {
-    return null;
-  }
 
   if (loading) {
     return (

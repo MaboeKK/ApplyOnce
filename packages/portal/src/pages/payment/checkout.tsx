@@ -15,15 +15,22 @@ import {
   Box,
 } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
-import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { getErrorMessage } from '@/utils/error-message';
 import type { PortalPayment } from '@/types';
 
 export default function PaymentCheckoutPage() {
+  return (
+    <ProtectedRoute>
+      <PaymentCheckoutContent />
+    </ProtectedRoute>
+  );
+}
+
+function PaymentCheckoutContent() {
   const router = useRouter();
   const { paymentId } = router.query;
-  const { isAuthenticated } = useAuthStore();
 
   const [payment, setPayment] = useState<PortalPayment | null>(null);
   const [loading, setLoading] = useState(true);
@@ -31,10 +38,6 @@ export default function PaymentCheckoutPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/login');
-      return;
-    }
     if (!paymentId) return;
 
     api
@@ -42,7 +45,7 @@ export default function PaymentCheckoutPage() {
       .then((res) => setPayment(res.data.payment))
       .catch((err) => setError(err.response?.data?.error?.message || 'Payment not found'))
       .finally(() => setLoading(false));
-  }, [isAuthenticated, paymentId, router]);
+  }, [paymentId]);
 
   const handlePay = async () => {
     setProcessing(true);
@@ -76,7 +79,7 @@ export default function PaymentCheckoutPage() {
     }
   };
 
-  if (!isAuthenticated || loading) {
+  if (loading) {
     return (
       <Container sx={{ py: 8, textAlign: 'center' }}>
         <CircularProgress />

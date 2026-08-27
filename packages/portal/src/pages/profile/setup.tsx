@@ -15,6 +15,7 @@ import {
   Alert,
 } from '@mui/material';
 import { useAuthStore } from '@/store/auth';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import PersonalStep from '@/components/Profile/PersonalStep';
 import AddressStep from '@/components/Profile/AddressStep';
 import GuardianStep from '@/components/Profile/GuardianStep';
@@ -56,8 +57,16 @@ interface WizardDraft {
 }
 
 export default function ProfileSetup() {
+  return (
+    <ProtectedRoute>
+      <ProfileSetupContent />
+    </ProtectedRoute>
+  );
+}
+
+function ProfileSetupContent() {
   const router = useRouter();
-  const { isAuthenticated, user } = useAuthStore();
+  const { user } = useAuthStore();
   const [activeStep, setActiveStep] = useState(0);
   const [profileData, setProfileData] = useState<ProfileWizardData>({
     personal: {},
@@ -72,11 +81,6 @@ export default function ProfileSetup() {
   const [resumedFromDraft, setResumedFromDraft] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/login');
-      return;
-    }
-
     // Fetch existing profile data to allow resuming
     const fetchExistingProfile = async () => {
       try {
@@ -149,7 +153,7 @@ export default function ProfileSetup() {
     };
 
     fetchExistingProfile();
-  }, [isAuthenticated, router, user?.id]);
+  }, [user?.id]);
 
   // Auto-save wizard progress so a refresh or interrupted session resumes where the user left off.
   useEffect(() => {
@@ -293,10 +297,6 @@ export default function ProfileSetup() {
         return null;
     }
   };
-
-  if (!isAuthenticated) {
-    return null;
-  }
 
   return (
     <Container maxWidth="md" sx={{ py: 6 }}>

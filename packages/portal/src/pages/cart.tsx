@@ -18,9 +18,9 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { SERVICE_FEE_ZAR } from '@applyonce/shared';
-import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
 import PortalNav from '@/components/Layout/PortalNav';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { getErrorMessage } from '@/utils/error-message';
 import type { PortalApplication, ProgrammeMatch } from '@/types';
 
@@ -37,8 +37,15 @@ const strategyLabel: Record<string, string> = {
 };
 
 export default function CartPage() {
+  return (
+    <ProtectedRoute>
+      <CartContent />
+    </ProtectedRoute>
+  );
+}
+
+function CartContent() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
 
   const [applications, setApplications] = useState<PortalApplication[]>([]);
   const [feeByUni, setFeeByUni] = useState<Record<string, number>>({});
@@ -51,13 +58,9 @@ export default function CartPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/login');
-      return;
-    }
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated]);
+  }, []);
 
   const load = async () => {
     setLoading(true);
@@ -131,7 +134,7 @@ export default function CartPage() {
     }
   };
 
-  if (!isAuthenticated || loading) {
+  if (loading) {
     return (
       <>
         <PortalNav />

@@ -8,6 +8,7 @@ import { Box, Typography, Paper, Chip, CircularProgress, Alert } from '@mui/mate
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import DashboardLayout from '@/components/Layout/DashboardLayout';
 import { useAuthStore } from '@/store/auth';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import api from '@/config/api';
 
 interface Application {
@@ -27,23 +28,22 @@ interface Application {
 }
 
 export default function ApplicationsPage() {
+  return (
+    <ProtectedRoute>
+      <ApplicationsContent />
+    </ProtectedRoute>
+  );
+}
+
+function ApplicationsContent() {
   const router = useRouter();
-  const { isAuthenticated, user } = useAuthStore();
+  const { user } = useAuthStore();
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Auth guard - redirect to login if not authenticated
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/login');
-    }
-  }, [isAuthenticated, router]);
-
   // Fetch applications
   useEffect(() => {
-    if (!isAuthenticated) return;
-
     const fetchApplications = async () => {
       try {
         setLoading(true);
@@ -60,7 +60,7 @@ export default function ApplicationsPage() {
     };
 
     fetchApplications();
-  }, [isAuthenticated]);
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -130,8 +130,8 @@ export default function ApplicationsPage() {
     },
   ];
 
-  if (!isAuthenticated || !user) {
-    return null; // Will redirect via useEffect
+  if (!user) {
+    return null;
   }
 
   return (

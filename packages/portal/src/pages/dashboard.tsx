@@ -28,6 +28,7 @@ import ErrorIcon from '@mui/icons-material/Error';
 import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
 import PortalNav from '@/components/Layout/PortalNav';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import type { StudentProfile, PortalApplication, ApplicationStatus } from '@/types';
 
 // Helper to render application status with appropriate color and icon
@@ -65,20 +66,24 @@ function getStatusConfig(status: ApplicationStatus) {
 }
 
 export default function DashboardPage() {
+  return (
+    <ProtectedRoute>
+      <DashboardContent />
+    </ProtectedRoute>
+  );
+}
+
+function DashboardContent() {
   const router = useRouter();
-  const { user, isAuthenticated } = useAuthStore();
+  const { user } = useAuthStore();
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [applications, setApplications] = useState<PortalApplication[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/login');
-      return;
-    }
-
     fetchProfile();
-  }, [isAuthenticated, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchProfile = async () => {
     try {
@@ -95,7 +100,7 @@ export default function DashboardPage() {
     }
   };
 
-  if (!isAuthenticated || loading) {
+  if (loading) {
     return null;
   }
 

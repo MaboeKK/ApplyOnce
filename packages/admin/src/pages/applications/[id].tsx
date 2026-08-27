@@ -43,6 +43,7 @@ import {
 import { AxiosError } from 'axios';
 import DashboardLayout from '@/components/Layout/DashboardLayout';
 import { useAuthStore } from '@/store/auth';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import api from '@/config/api';
 import {
   calculateAPS as calculateAPSShared,
@@ -102,9 +103,17 @@ interface Application {
 }
 
 export default function ApplicationDetailPage() {
+  return (
+    <ProtectedRoute>
+      <ApplicationDetailContent />
+    </ProtectedRoute>
+  );
+}
+
+function ApplicationDetailContent() {
   const router = useRouter();
   const { id } = router.query;
-  const { isAuthenticated, user } = useAuthStore();
+  const { user } = useAuthStore();
 
   const [application, setApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
@@ -117,16 +126,9 @@ export default function ApplicationDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // Auth guard
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/login');
-    }
-  }, [isAuthenticated, router]);
-
   // Fetch application detail
   useEffect(() => {
-    if (!isAuthenticated || !id) return;
+    if (!id) return;
 
     const fetchApplication = async () => {
       try {
@@ -152,7 +154,7 @@ export default function ApplicationDetailPage() {
     };
 
     fetchApplication();
-  }, [isAuthenticated, id]);
+  }, [id]);
 
   const handleDecisionSubmit = async () => {
     if (!decision || !reason.trim()) {
@@ -240,8 +242,8 @@ export default function ApplicationDetailPage() {
     return calculateAPSShared(subjectResults, university).totalAPS;
   };
 
-  if (!isAuthenticated || !user) {
-    return null; // Will redirect via useEffect
+  if (!user) {
+    return null;
   }
 
   if (loading) {
