@@ -14,7 +14,8 @@ describe('End-to-End Flow with Isolation', () => {
   let witsAdminToken: string;
 
   beforeAll(async () => {
-    // Clean up test data
+    // Full-table wipe — safe only because src/__tests__/jest.setup.ts has
+    // already aborted the whole run if DATABASE_URL isn't a dedicated test DB.
     await prisma.applicationEvent.deleteMany({});
     await prisma.application.deleteMany({});
     await prisma.payment.deleteMany({});
@@ -71,7 +72,8 @@ describe('End-to-End Flow with Isolation', () => {
   });
 
   afterAll(async () => {
-    // Clean up test data
+    // Full-table wipe — safe only because src/__tests__/jest.setup.ts has
+    // already aborted the whole run if DATABASE_URL isn't a dedicated test DB.
     await prisma.applicationEvent.deleteMany({});
     await prisma.application.deleteMany({});
     await prisma.payment.deleteMany({});
@@ -175,7 +177,8 @@ describe('End-to-End Flow with Isolation', () => {
       .put('/v1/students/me/subjects')
       .set('Cookie', [`accessToken=${studentToken}`])
       .send({
-        results: [ // Schema expects "results", not "subjects"
+        results: [
+          // Schema expects "results", not "subjects"
           { subject: 'english_home', mark: 75, level: 6, year: 2024 },
           { subject: 'mathematics', mark: 80, level: 7, year: 2024 },
           { subject: 'accounting', mark: 82, level: 7, year: 2024 },
@@ -262,23 +265,27 @@ describe('End-to-End Flow with Isolation', () => {
       .set('Cookie', [`accessToken=${studentToken}`])
       .send({
         applicationIds: [applicationId],
-        returnUrl: 'http://localhost:3000/payment/success',
-        cancelUrl: 'http://localhost:3000/payment/cancel',
+        returnUrl: 'http://localhost:3601/payment/success',
+        cancelUrl: 'http://localhost:3601/payment/cancel',
       });
 
     expect(paymentResponse.status).toBe(200);
     expect(paymentResponse.body.payment.id).toBeDefined();
+    // UJ's seeded applicationFeeZAR is 200 (see prisma/seed.ts), service fee
+    // is 5. Guards the Decimal-based fee summation in controllers/payment.ts
+    // - asserting exact values here, not just "the request didn't fail".
+    expect(paymentResponse.body.payment.universityFeesZAR).toBe(200);
+    expect(paymentResponse.body.payment.serviceFeesZAR).toBe(5);
+    expect(paymentResponse.body.payment.totalAmountZAR).toBe(205);
 
     const paymentId = paymentResponse.body.payment.id;
 
     // Simulate PayGate ITN callback
-    const itnResponse = await request(app)
-      .post('/v1/payments/notify')
-      .send({
-        paymentId: paymentId,
-        status: 'COMPLETE',
-        gatewayReference: 'MOCK-TXN-001',
-      });
+    const itnResponse = await request(app).post('/v1/payments/notify').send({
+      paymentId: paymentId,
+      status: 'COMPLETE',
+      gatewayReference: 'MOCK-TXN-001',
+    });
 
     expect(itnResponse.status).toBe(200);
 
@@ -325,8 +332,9 @@ describe('End-to-End Flow with Isolation', () => {
       .set('Cookie', [`accessToken=${witsAdminToken}`]);
 
     expect(witsInboxResponse.status).toBe(200);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const witsApp = witsInboxResponse.body.applications.find((app: any) => app.id === applicationId);
+    const witsApp = witsInboxResponse.body.applications.find(
+      (app: { id: string }) => app.id === applicationId
+    );
     expect(witsApp).toBeUndefined();
 
     // ============================================================
@@ -349,7 +357,7 @@ describe('End-to-End Flow with Isolation', () => {
       .set('Cookie', [`accessToken=${witsAdminToken}`])
       .send({
         decision: 'accepted',
-        reason: 'Trying to accept another university\'s application',
+        reason: "Trying to accept another university's application",
       });
 
     expect(witsDecisionResponse.status).toBe(403);
@@ -364,7 +372,8 @@ describe('End-to-End Flow with Isolation', () => {
       .set('Cookie', [`accessToken=${ujAdminToken}`])
       .send({
         decision: 'accepted',
-        reason: 'Excellent academic performance. Strong APS score and well-rounded subject choices.',
+        reason:
+          'Excellent academic performance. Strong APS score and well-rounded subject choices.',
       });
 
     expect(ujDecisionResponse.status).toBe(200);
@@ -383,7 +392,9 @@ describe('End-to-End Flow with Isolation', () => {
     expect(decisionCheckResponse.status).toBe(200);
     expect(decisionCheckResponse.body.application.status).toBe('accepted');
     expect(decisionCheckResponse.body.application.decision).toBe('accepted');
-    expect(decisionCheckResponse.body.application.decisionReason).toContain('Excellent academic performance');
+    expect(decisionCheckResponse.body.application.decisionReason).toContain(
+      'Excellent academic performance'
+    );
 
     // ============================================================
     // STEP 15: Student's application list reflects acceptance
@@ -394,8 +405,9 @@ describe('End-to-End Flow with Isolation', () => {
       .set('Cookie', [`accessToken=${studentToken}`]);
 
     expect(appListResponse.status).toBe(200);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const acceptedApp = appListResponse.body.applications.find((app: any) => app.id === applicationId);
+    const acceptedApp = appListResponse.body.applications.find(
+      (app: { id: string; status: string }) => app.id === applicationId
+    );
     expect(acceptedApp).toBeDefined();
     expect(acceptedApp.status).toBe('accepted');
 

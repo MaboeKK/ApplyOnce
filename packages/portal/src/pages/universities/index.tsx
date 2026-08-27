@@ -1,7 +1,7 @@
 // packages/portal/src/pages/universities/index.tsx
 // University browser: search/filter all 26 universities, optional APS-match view
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import {
   Box,
@@ -45,9 +45,9 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import LanguageIcon from '@mui/icons-material/Language';
-import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
 import PortalNav from '@/components/Layout/PortalNav';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { getErrorMessage } from '@/utils/error-message';
 import type { ProgrammeMatch, PortalApplication } from '@/types';
 import type { Programme } from '@applyonce/shared';
@@ -96,8 +96,15 @@ const brand = {
 type SortOption = 'name-asc' | 'name-desc' | 'programmes-desc';
 
 export default function UniversitiesPage() {
+  return (
+    <ProtectedRoute>
+      <UniversitiesContent />
+    </ProtectedRoute>
+  );
+}
+
+function UniversitiesContent() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
   const [universities, setUniversities] = useState<University[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -111,33 +118,40 @@ export default function UniversitiesPage() {
   const [draftApplications, setDraftApplications] = useState<PortalApplication[]>([]);
   const [cardMenu, setCardMenu] = useState<{ el: HTMLElement; uni: University } | null>(null);
   const [howItWorksOpen, setHowItWorksOpen] = useState(false);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/login');
-      return;
-    }
     api
       .get('/universities')
-      .then((res) => setUniversities(res.data.universities || []))
-      .finally(() => setLoading(false));
+      .then((res) => {
+        if (mountedRef.current) setUniversities(res.data.universities || []);
+      })
+      .finally(() => {
+        if (mountedRef.current) setLoading(false);
+      });
 
     api
       .get('/applications')
       .then((res) => {
+        if (!mountedRef.current) return;
         const drafts = (res.data.applications || []).filter(
           (a: PortalApplication) => a.status === 'draft'
         );
         setDraftApplications(drafts);
       })
       .catch(() => {});
-  }, [isAuthenticated, router]);
+
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const fetchMatches = async () => {
     setMatchesLoading(true);
     setMatchesError('');
     try {
       const res = await api.get('/aps/matches');
+      if (!mountedRef.current) return;
       const grouped: Record<string, ProgrammeMatch[]> = {};
       for (const m of (res.data.matches || []) as ProgrammeMatch[]) {
         grouped[m.universityId] = grouped[m.universityId] || [];
@@ -150,12 +164,16 @@ export default function UniversitiesPage() {
       setMatchesByUni(grouped);
       setApsByUni(apsMap);
     } catch (err) {
+      if (!mountedRef.current) return;
       setMatchesError(
-        getErrorMessage(err, 'Upload your matric results to see which universities you qualify for.')
+        getErrorMessage(
+          err,
+          'Upload your matric results to see which universities you qualify for.'
+        )
       );
       setApsToggle(false);
     } finally {
-      setMatchesLoading(false);
+      if (mountedRef.current) setMatchesLoading(false);
     }
   };
 
@@ -212,13 +230,16 @@ export default function UniversitiesPage() {
     setProvince('all');
   };
 
-  if (!isAuthenticated || loading) return null;
+  if (loading) return null;
 
   return (
     <>
       <PortalNav />
       <Box sx={{ bgcolor: brand.pageBg, minHeight: '100vh' }}>
-        <Container maxWidth={false} sx={{ maxWidth: 1400, mx: 'auto', px: { xs: 2.5, md: 6.5 }, py: { xs: 3, md: 3.5 } }}>
+        <Container
+          maxWidth={false}
+          sx={{ maxWidth: 1400, mx: 'auto', px: { xs: 2.5, md: 6.5 }, py: { xs: 3, md: 3.5 } }}
+        >
           {/* Hero */}
           <Stack
             direction={{ xs: 'column', md: 'row' }}
@@ -228,20 +249,35 @@ export default function UniversitiesPage() {
             sx={{ mb: 4 }}
           >
             <Box sx={{ maxWidth: 640 }}>
-              <Typography sx={{ fontSize: { xs: 28, md: 36 }, fontWeight: 700, color: brand.navy, lineHeight: 1.2 }}>
+              <Typography
+                sx={{
+                  fontSize: { xs: 28, md: 36 },
+                  fontWeight: 700,
+                  color: brand.navy,
+                  lineHeight: 1.2,
+                }}
+              >
                 Find your university
               </Typography>
               <Typography sx={{ fontSize: 15, lineHeight: 1.5, color: brand.secondaryText, mt: 1 }}>
-                Explore South Africa&apos;s public universities and add programmes to your application.
+                Explore South Africa&apos;s public universities and add programmes to your
+                application.
               </Typography>
 
-              <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 2.5, flexWrap: 'wrap', rowGap: 1 }}>
+              <Stack
+                direction="row"
+                spacing={2}
+                alignItems="center"
+                sx={{ mt: 2.5, flexWrap: 'wrap', rowGap: 1 }}
+              >
                 <Stack direction="row" spacing={1} alignItems="center">
                   <AccountBalanceIcon sx={{ color: brand.purple, fontSize: 20 }} />
                   <Typography sx={{ fontSize: 14, color: brand.navy, fontWeight: 600 }}>
                     {universities.length}
                   </Typography>
-                  <Typography sx={{ fontSize: 14, color: brand.mutedText }}>universities</Typography>
+                  <Typography sx={{ fontSize: 14, color: brand.mutedText }}>
+                    universities
+                  </Typography>
                 </Stack>
                 <Box sx={{ width: '1px', height: 16, bgcolor: brand.border }} />
                 <Stack direction="row" spacing={1} alignItems="center">
@@ -298,7 +334,9 @@ export default function UniversitiesPage() {
                     Your application
                   </Typography>
                   <Typography sx={{ fontSize: 13, color: brand.mutedText }}>
-                    {cartUniversityCount} {cartUniversityCount === 1 ? 'university' : 'universities'} • {draftApplications.length}{' '}
+                    {cartUniversityCount}{' '}
+                    {cartUniversityCount === 1 ? 'university' : 'universities'} •{' '}
+                    {draftApplications.length}{' '}
                     {draftApplications.length === 1 ? 'programme' : 'programmes'}
                   </Typography>
                 </Box>
@@ -389,7 +427,11 @@ export default function UniversitiesPage() {
                   <MenuItem value="matches">Show my APS matches</MenuItem>
                 </TextField>
                 <Tooltip title="Uses your uploaded matric results to check which programmes you qualify for.">
-                  <IconButton size="small" sx={{ color: brand.mutedText }}>
+                  <IconButton
+                    size="small"
+                    sx={{ color: brand.mutedText }}
+                    aria-label="How APS matching works"
+                  >
                     <InfoOutlinedIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
@@ -400,7 +442,11 @@ export default function UniversitiesPage() {
                   onClick={clearFilters}
                   startIcon={<ReplayIcon fontSize="small" />}
                   variant="outlined"
-                  sx={{ color: brand.secondaryText, borderColor: brand.border, whiteSpace: 'nowrap' }}
+                  sx={{
+                    color: brand.secondaryText,
+                    borderColor: brand.border,
+                    whiteSpace: 'nowrap',
+                  }}
                 >
                   Clear filters
                 </Button>
@@ -427,7 +473,9 @@ export default function UniversitiesPage() {
             >
               <Box>
                 <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                  <Typography sx={{ fontSize: 13, color: brand.mutedText }}>Active filters:</Typography>
+                  <Typography sx={{ fontSize: 13, color: brand.mutedText }}>
+                    Active filters:
+                  </Typography>
                   {search && (
                     <Chip
                       label={`"${search}"`}
@@ -458,7 +506,11 @@ export default function UniversitiesPage() {
                 </Stack>
               </Box>
 
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ sm: 'center' }}>
+              <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={1.5}
+                alignItems={{ sm: 'center' }}
+              >
                 <Typography sx={{ fontSize: 13, color: brand.mutedText }}>
                   {filtered.length} {filtered.length === 1 ? 'university' : 'universities'} found
                 </Typography>
@@ -482,7 +534,9 @@ export default function UniversitiesPage() {
           <Grid container spacing={2.5}>
             {filtered.map((uni) => {
               const uniMatches = matchesByUni[uni.id] || [];
-              const qualifying = uniMatches.filter((m) => m.meetsRequirements || m.outcome === 'waitlist');
+              const qualifying = uniMatches.filter(
+                (m) => m.meetsRequirements || m.outcome === 'waitlist'
+              );
               const qualifies = apsToggle && uniMatches.length > 0 && qualifying.length > 0;
               const doesNotQualify = apsToggle && uniMatches.length > 0 && qualifying.length === 0;
               const minRequiredAPS = uniMatches.length
@@ -515,7 +569,8 @@ export default function UniversitiesPage() {
                       border: `1px solid ${brand.border}`,
                       borderRadius: '14px',
                       boxShadow: '0 3px 12px rgba(20, 25, 50, 0.045)',
-                      transition: 'transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease',
+                      transition:
+                        'transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease',
                       '&:hover': {
                         transform: 'translateY(-2px)',
                         borderColor: '#d8ccff',
@@ -572,7 +627,10 @@ export default function UniversitiesPage() {
                         )}
                       </Box>
                       <Box sx={{ minWidth: 0, flex: 1 }}>
-                        <Typography sx={{ fontSize: 16, fontWeight: 700, color: brand.navy }} noWrap>
+                        <Typography
+                          sx={{ fontSize: 16, fontWeight: 700, color: brand.navy }}
+                          noWrap
+                        >
                           {uni.shortName}
                         </Typography>
                         <Typography sx={{ fontSize: 14, color: brand.secondaryText }}>
@@ -581,7 +639,9 @@ export default function UniversitiesPage() {
                         {uni.city && (
                           <Stack direction="row" spacing={0.5} alignItems="center" sx={{ mt: 0.5 }}>
                             <LocationOnIcon sx={{ fontSize: 15, color: brand.mutedText }} />
-                            <Typography sx={{ fontSize: 12, color: brand.mutedText }}>{uni.city}</Typography>
+                            <Typography sx={{ fontSize: 12, color: brand.mutedText }}>
+                              {uni.city}
+                            </Typography>
                           </Stack>
                         )}
                       </Box>
@@ -597,8 +657,18 @@ export default function UniversitiesPage() {
                         flexGrow: 1,
                       }}
                     >
-                      <Box sx={{ flex: '0 0 40%', p: 1.5, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                        <Typography sx={{ fontSize: 22, fontWeight: 700, color: brand.purple, lineHeight: 1 }}>
+                      <Box
+                        sx={{
+                          flex: '0 0 40%',
+                          p: 1.5,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <Typography
+                          sx={{ fontSize: 22, fontWeight: 700, color: brand.purple, lineHeight: 1 }}
+                        >
                           {uni.programmes?.length || 0}
                         </Typography>
                         <Typography sx={{ fontSize: 12, color: brand.navy }}>
@@ -617,8 +687,8 @@ export default function UniversitiesPage() {
                           bgcolor: qualifies
                             ? '#f3faf7'
                             : doesNotQualify
-                            ? alpha('#F43F5E', 0.05)
-                            : 'transparent',
+                              ? alpha('#F43F5E', 0.05)
+                              : 'transparent',
                         }}
                       >
                         {qualifies ? (
@@ -629,7 +699,9 @@ export default function UniversitiesPage() {
                                 APS Match
                               </Typography>
                             </Stack>
-                            <Typography sx={{ fontSize: 12, color: brand.success, fontWeight: 500 }}>
+                            <Typography
+                              sx={{ fontSize: 12, color: brand.success, fontWeight: 500 }}
+                            >
                               {bestTier ? strategyLabel[bestTier] : 'You qualify'}
                             </Typography>
                           </>
@@ -642,7 +714,9 @@ export default function UniversitiesPage() {
                               </Typography>
                             </Stack>
                             <Typography sx={{ fontSize: 12, color: '#F43F5E', fontWeight: 500 }}>
-                              {minRequiredAPS ? `APS ${minRequiredAPS} required` : 'Below requirements'}
+                              {minRequiredAPS
+                                ? `APS ${minRequiredAPS} required`
+                                : 'Below requirements'}
                             </Typography>
                           </>
                         ) : (
@@ -650,8 +724,8 @@ export default function UniversitiesPage() {
                             {matchesLoading
                               ? 'Checking…'
                               : apsToggle
-                              ? 'Admission requirements not listed yet'
-                              : 'Enable APS matching to check eligibility'}
+                                ? 'Admission requirements not listed yet'
+                                : 'Enable APS matching to check eligibility'}
                           </Typography>
                         )}
                       </Box>
@@ -771,19 +845,41 @@ export default function UniversitiesPage() {
       </Menu>
 
       {/* How it works */}
-      <Dialog open={howItWorksOpen} onClose={() => setHowItWorksOpen(false)} maxWidth="xs" fullWidth>
+      <Dialog
+        open={howItWorksOpen}
+        onClose={() => setHowItWorksOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
         <DialogTitle sx={{ fontWeight: 700 }}>How ApplyOnce works</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             {[
-              ['1. Complete your profile', 'Add your personal, address, guardian and school details once.'],
-              ['2. Upload your matric results', 'We calculate your APS automatically from your results.'],
-              ['3. Browse and add programmes', 'Add programmes from as many universities as you like to your cart.'],
-              ['4. Pay once, submit to all', 'One payment submits every application in your cart simultaneously.'],
-              ['5. Track every decision', 'Follow each application’s status from your dashboard as universities respond.'],
+              [
+                '1. Complete your profile',
+                'Add your personal, address, guardian and school details once.',
+              ],
+              [
+                '2. Upload your matric results',
+                'We calculate your APS automatically from your results.',
+              ],
+              [
+                '3. Browse and add programmes',
+                'Add programmes from as many universities as you like to your cart.',
+              ],
+              [
+                '4. Pay once, submit to all',
+                'One payment submits every application in your cart simultaneously.',
+              ],
+              [
+                '5. Track every decision',
+                'Follow each application’s status from your dashboard as universities respond.',
+              ],
             ].map(([title, body]) => (
               <Box key={title}>
-                <Typography sx={{ fontWeight: 700, fontSize: 14, color: brand.navy }}>{title}</Typography>
+                <Typography sx={{ fontWeight: 700, fontSize: 14, color: brand.navy }}>
+                  {title}
+                </Typography>
                 <Typography sx={{ fontSize: 13, color: brand.secondaryText }}>{body}</Typography>
               </Box>
             ))}

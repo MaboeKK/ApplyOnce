@@ -4,7 +4,6 @@
 import { Response } from 'express';
 import { Prisma } from '@prisma/client';
 import path from 'path';
-import fs from 'fs';
 import { AuthRequest } from '../types/express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { prisma } from '../utils/prisma';
@@ -13,6 +12,7 @@ import { ApplicationDecisionInput } from '../schemas/admin';
 import { logger } from '../utils/logger';
 import { sendDecisionEmail } from '../utils/email';
 import { UPLOAD_DIR } from '../config/multer';
+import { pathExists } from '../utils/fs';
 
 /**
  * GET /v1/admin/applications
@@ -45,10 +45,7 @@ export const getApplications = asyncHandler(async (req: AuthRequest, res: Respon
         },
       },
     },
-    orderBy: [
-      { submittedAt: 'desc' },
-      { createdAt: 'desc' },
-    ],
+    orderBy: [{ submittedAt: 'desc' }, { createdAt: 'desc' }],
   });
 
   logger.info(
@@ -57,7 +54,7 @@ export const getApplications = asyncHandler(async (req: AuthRequest, res: Respon
   );
 
   res.json({
-    applications: applications.map(app => ({
+    applications: applications.map((app) => ({
       id: app.id,
       studentId: app.studentId,
       studentName: `${app.student.firstName} ${app.student.lastName}`,
@@ -108,8 +105,13 @@ export const getApplicationById = asyncHandler(async (req: AuthRequest, res: Res
   // Isolation check: admin can only view applications to their university
   if (application.universityId !== universityId) {
     logger.warn(
-      { adminId: req.admin!.adminId, universityId, applicationId: id, applicationUniversity: application.universityId },
-      'Admin attempted to access another university\'s application'
+      {
+        adminId: req.admin!.adminId,
+        universityId,
+        applicationId: id,
+        applicationUniversity: application.universityId,
+      },
+      "Admin attempted to access another university's application"
     );
     throw new ForbiddenError(
       'You do not have permission to view this application',
@@ -142,7 +144,7 @@ export const getApplicationById = asyncHandler(async (req: AuthRequest, res: Res
         matricYear: application.student.matricYear,
         school: application.student.school,
         subjectResults: application.student.subjectResults,
-        documents: application.student.documents.map(doc => ({
+        documents: application.student.documents.map((doc) => ({
           id: doc.id,
           type: doc.type,
           fileName: doc.fileName,
@@ -204,7 +206,7 @@ export const updateApplicationDecision = asyncHandler(async (req: AuthRequest, r
   if (application.universityId !== universityId) {
     logger.warn(
       { adminId, universityId, applicationId: id, applicationUniversity: application.universityId },
-      'Admin attempted to decide on another university\'s application'
+      "Admin attempted to decide on another university's application"
     );
     throw new ForbiddenError(
       'You do not have permission to decide on this application',
@@ -214,10 +216,7 @@ export const updateApplicationDecision = asyncHandler(async (req: AuthRequest, r
 
   // Validate: no duplicate decisions (check this first - more specific error)
   if (application.decision) {
-    throw new BadRequestError(
-      'This application has already been decided',
-      'ALREADY_DECIDED'
-    );
+    throw new BadRequestError('This application has already been decided', 'ALREADY_DECIDED');
   }
 
   // Validate application status (can only decide on submitted applications)
@@ -349,7 +348,7 @@ export const downloadDocument = asyncHandler(async (req: AuthRequest, res: Respo
   // Check file exists on disk
   const filePath = path.join(UPLOAD_DIR, document.storageKey);
 
-  if (!fs.existsSync(filePath)) {
+  if (!(await pathExists(filePath))) {
     throw new NotFoundError('File not found on server', 'FILE_NOT_FOUND');
   }
 

@@ -3,6 +3,8 @@
 
 import { Router } from 'express';
 import { requireStudent } from '../middleware/auth';
+import { validateBody } from '../middleware/validate';
+import { calculateAPSSchema } from '../schemas/aps';
 import { calculateAPSFromResults, getAPSMatches } from '../controllers/aps';
 
 const router = Router();
@@ -27,11 +29,20 @@ const router = Router();
  *               loHandling:
  *                 type: string
  *                 enum: [exclude, cap_at_4, full]
+ *     security:
+ *       - cookieAuth: []
  *     responses:
  *       200:
  *         description: APS calculated
+ *       401:
+ *         description: Unauthorized
  */
-router.post('/calculate', calculateAPSFromResults);
+router.post(
+  '/calculate',
+  requireStudent,
+  validateBody(calculateAPSSchema),
+  calculateAPSFromResults
+);
 
 /**
  * @openapi

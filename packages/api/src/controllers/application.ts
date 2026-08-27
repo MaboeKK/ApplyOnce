@@ -7,6 +7,7 @@ import { AuthRequest } from '../types/express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { prisma } from '../utils/prisma';
 import { BadRequestError, ConflictError, NotFoundError, ForbiddenError } from '../utils/errors';
+import { submitApplication } from '../workflows/submission';
 
 /**
  * POST /v1/applications
@@ -17,74 +18,72 @@ import { BadRequestError, ConflictError, NotFoundError, ForbiddenError } from '.
  * - Application starts as 'draft' status
  * - Student must have uploaded matric certificate + ID before they can pay
  */
-export const createApplication = asyncHandler(
-  async (req: AuthRequest, res: Response) => {
-    const studentId = req.student!.studentId;
-    const { universityId, universityName, programmeId, programmeName, facultyName } = req.body;
+export const createApplication = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const studentId = req.student!.studentId;
+  const { universityId, universityName, programmeId, programmeName, facultyName } = req.body;
 
-    // Rule: Only one programme per university
-    const existingApplication = await prisma.application.findFirst({
-      where: {
+  // Rule: Only one programme per university
+  const existingApplication = await prisma.application.findFirst({
+    where: {
+      studentId,
+      universityId,
+      status: { in: ['draft', 'submitted'] },
+    },
+  });
+
+  if (existingApplication) {
+    throw new BadRequestError(
+      `You already have an application to ${universityName}. Remove it first to choose a different programme.`
+    );
+  }
+
+  // Create draft application. The findFirst check above handles the
+  // common case; the DB-level unique constraint on [studentId, universityId]
+  // is the source of truth and closes the race between two concurrent requests.
+  let application;
+  try {
+    application = await prisma.application.create({
+      data: {
         studentId,
         universityId,
-        status: { in: ['draft', 'submitted'] },
+        universityName,
+        programmeId,
+        programmeName,
+        facultyName,
+        status: 'draft',
       },
     });
-
-    if (existingApplication) {
-      throw new BadRequestError(
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+      throw new ConflictError(
         `You already have an application to ${universityName}. Remove it first to choose a different programme.`
       );
     }
-
-    // Create draft application. The findFirst check above handles the
-    // common case; the DB-level unique constraint on [studentId, universityId]
-    // is the source of truth and closes the race between two concurrent requests.
-    let application;
-    try {
-      application = await prisma.application.create({
-        data: {
-          studentId,
-          universityId,
-          universityName,
-          programmeId,
-          programmeName,
-          facultyName,
-          status: 'draft',
-        },
-      });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
-        throw new ConflictError(
-          `You already have an application to ${universityName}. Remove it first to choose a different programme.`
-        );
-      }
-      throw err;
-    }
-
-    // Log event
-    await prisma.applicationEvent.create({
-      data: {
-        applicationId: application.id,
-        eventType: 'created',
-        toStatus: 'draft',
-      },
-    });
-
-    res.status(201).json({
-      application: {
-        id: application.id,
-        universityId: application.universityId,
-        universityName: application.universityName,
-        programmeId: application.programmeId,
-        programmeName: application.programmeName,
-        facultyName: application.facultyName,
-        status: application.status,
-        createdAt: application.createdAt.toISOString(),
-      },
-    });
+    throw err;
   }
-);
+
+  // Log event
+  await prisma.applicationEvent.create({
+    data: {
+      applicationId: application.id,
+      eventType: 'created',
+      toStatus: 'draft',
+    },
+  });
+
+  res.status(201).json({
+    application: {
+      id: application.id,
+      universityId: application.universityId,
+      universityName: application.universityName,
+      programmeId: application.programmeId,
+      programmeName: application.programmeName,
+      facultyName: application.facultyName,
+      status: application.status,
+      createdAt: application.createdAt.toISOString(),
+    },
+  });
+});
 
 /**
  * GET /v1/applications
@@ -228,6 +227,53 @@ export const getApplication = asyncHandler(async (req: AuthRequest, res: Respons
         data: e.data,
         createdAt: e.createdAt.toISOString(),
       })),
+    },
+  });
+});
+
+/**
+ * POST /v1/applications/:id/retry-submission
+ * Retry a submission that previously failed. The student already paid for
+ * this application - without this endpoint, a submission_failed status had
+ * no recovery path at all (see workflows/submission.ts's status guard).
+ */
+export const retrySubmission = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const studentId = req.student!.studentId;
+  const { id } = req.params;
+
+  const application = await prisma.application.findUnique({ where: { id } });
+
+  if (!application) {
+    throw new NotFoundError('Application not found');
+  }
+
+  if (application.studentId !== studentId) {
+    throw new ForbiddenError('You can only retry your own applications');
+  }
+
+  if (application.status !== 'submission_failed') {
+    throw new BadRequestError(
+      `Only failed submissions can be retried (current status: ${application.status})`
+    );
+  }
+
+  try {
+    await submitApplication({ applicationId: id, studentId });
+  } catch {
+    // submitApplication already recorded the failure (status + event) before
+    // re-throwing - swallow it here so the client always gets the current
+    // state back, rather than a generic 500 for what may just be "still
+    // failed, try again".
+  }
+
+  const updated = await prisma.application.findUniqueOrThrow({ where: { id } });
+
+  res.json({
+    application: {
+      id: updated.id,
+      status: updated.status,
+      universityReference: updated.universityReference,
+      notes: updated.notes,
     },
   });
 });

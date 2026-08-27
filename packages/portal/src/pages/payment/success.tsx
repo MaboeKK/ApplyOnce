@@ -25,8 +25,8 @@ export default function PaymentSuccessPage() {
             Payment Successful
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-            Your applications are being submitted to each university now. This usually takes a
-            few seconds — check your dashboard for live status.
+            Your applications are being submitted to each university now. This usually takes a few
+            seconds — check your dashboard for live status.
           </Typography>
           <Stack spacing={1.5}>
             <Button variant="contained" size="large" onClick={() => router.push('/dashboard')}>

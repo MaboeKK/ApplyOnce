@@ -25,7 +25,7 @@ echo ""
 
 # ─── Safety check: confirm we're not colliding with GoTurbo ─────────────────
 echo "▶ Checking our ports are free (5000, 5001, 5002, 5433, 6380)..."
-for port in 3600 3601 3602 3610 3611; do
+for port in 3600 3601 3602 3610; do
   if ss -tlnp 2>/dev/null | grep -q ":$port "; then
     echo "  ✗ Port $port is already in use. Stop and investigate before continuing."
     exit 1
@@ -35,10 +35,10 @@ for port in 3600 3601 3602 3610 3611; do
 done
 echo ""
 
-# ─── Start ONLY our Docker infra (postgres + redis) ─────────────────────────
-echo "▶ Starting kmaboe-applyonce Postgres + Redis (localhost-only)..."
-sudo docker compose up postgres redis -d
-echo "  ✓ Containers starting"
+# ─── Start ONLY our Docker infra (postgres) ─────────────────────────────────
+echo "▶ Starting kmaboe-applyonce Postgres (localhost-only)..."
+sudo docker compose up postgres -d
+echo "  ✓ Container starting"
 
 echo ""
 echo "▶ Waiting for PostgreSQL..."

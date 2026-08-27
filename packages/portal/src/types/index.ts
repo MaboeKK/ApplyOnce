@@ -40,7 +40,13 @@ export interface StudentProfile {
   updatedAt: string;
 }
 
-export type ApplicationStatus = 'draft' | 'submitted' | 'submission_failed' | 'accepted' | 'rejected' | 'waitlisted';
+export type ApplicationStatus =
+  | 'draft'
+  | 'submitted'
+  | 'submission_failed'
+  | 'accepted'
+  | 'rejected'
+  | 'waitlisted';
 
 export interface ApplicationEvent {
   id: string;
@@ -91,7 +97,12 @@ export interface PortalPayment {
   gateway?: string;
   gatewayReference?: string | null;
   breakdown: PaymentBreakdownItem[];
-  applications?: Array<{ id: string; universityName: string; programmeName: string; status: string }>;
+  applications?: Array<{
+    id: string;
+    universityName: string;
+    programmeName: string;
+    status: string;
+  }>;
   paidAt?: string;
   createdAt?: string;
 }

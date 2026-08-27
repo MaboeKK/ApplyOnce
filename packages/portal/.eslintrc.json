@@ -1,11 +1,28 @@
 {
   "root": true,
   "extends": "next/core-web-vitals",
-  "ignorePatterns": [
-    "node_modules",
-    ".next",
-    "out",
-    "build",
-    "coverage"
+  "plugins": ["@typescript-eslint"],
+  "ignorePatterns": ["node_modules", ".next", "out", "build", "coverage"],
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "error",
+    "max-lines": ["warn", { "max": 1000, "skipBlankLines": true, "skipComments": true }],
+    "complexity": ["warn", { "max": 15 }]
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/components/Profile/GuardianStep.tsx",
+        "src/components/Profile/ResultsStep.tsx",
+        "src/components/Profile/ReviewStep.tsx",
+        "src/pages/cart.tsx",
+        "src/pages/dashboard.tsx",
+        "src/pages/profile/setup.tsx",
+        "src/pages/universities/\\[id\\].tsx",
+        "src/pages/universities/index.tsx"
+      ],
+      "rules": {
+        "complexity": "off"
+      }
+    }
   ]
 }

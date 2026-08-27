@@ -5,6 +5,7 @@ This document outlines critical security configurations that MUST be verified be
 ## ✅ Already Implemented (Code Level)
 
 ### 1. Helmet Security Headers
+
 - **Status:** ✅ Configured
 - **File:** `packages/api/src/app.ts:32`
 - **Verification:**
@@ -19,6 +20,7 @@ This document outlines critical security configurations that MUST be verified be
   - Strict-Transport-Security (HSTS) - auto-enabled when secure cookies are on
 
 ### 2. Secure Cookies (Production)
+
 - **Status:** ✅ Configured
 - **File:** `packages/api/src/controllers/auth.ts:23-30`
 - **Settings:**
@@ -28,13 +30,15 @@ This document outlines critical security configurations that MUST be verified be
 - **Verification:**
   ```typescript
   // Cookies are only set to secure=true when NODE_ENV=production
-  secure: config.env === 'production'
+  secure: config.env === 'production';
   ```
 
 ### 3. Refresh Token Revocation on Logout
+
 - **Status:** ✅ Implemented
 - **File:** `packages/api/src/controllers/auth.ts:264-287`
 - **Implementation:**
+
   ```typescript
   // Deletes refresh tokens from database on logout
   await prisma.refreshToken.deleteMany({ where: { token: refreshToken } });
@@ -44,9 +48,11 @@ This document outlines critical security configurations that MUST be verified be
   res.clearCookie('accessToken');
   res.clearCookie('refreshToken');
   ```
+
 - **Security:** Prevents token reuse after logout
 
 ### 4. Rate Limiting
+
 - **Status:** ✅ Configured
 - **File:** `packages/api/src/app.ts:60-72`
 - **Settings:** 100 requests per 15 minutes per IP
@@ -61,6 +67,7 @@ This document outlines critical security configurations that MUST be verified be
 ## ⚠️ Pre-Deployment Requirements (Manual Configuration)
 
 ### 5. HTTPS / TLS Certificate
+
 - **Status:** ⚠️ **REQUIRED FOR PRODUCTION**
 - **Current:** Apps run on HTTP (localhost development)
 - **Production Requirement:**
@@ -70,6 +77,7 @@ This document outlines critical security configurations that MUST be verified be
   - **Enable HSTS header** (max-age=31536000; includeSubDomains)
 
 **Recommended Setup (nginx):**
+
 ```nginx
 server {
     listen 80;
@@ -123,12 +131,14 @@ server {
 ```
 
 **Verification:**
+
 ```bash
 curl -I https://applyonce.co.za
 # Should return 200 + Strict-Transport-Security header
 ```
 
 ### 6. uploads/ Directory Protection
+
 - **Status:** ✅ **SECURE BY DEFAULT** (not web-accessible)
 - **Current Implementation:**
   - Files stored in `uploads/` directory (default: project root)
@@ -139,6 +149,7 @@ curl -I https://applyonce.co.za
 - **Critical:** **NEVER add nginx location block for `/uploads`**
 
 **WRONG (DO NOT DO THIS):**
+
 ```nginx
 # ❌ NEVER add this - exposes all documents publicly
 location /uploads {
@@ -147,6 +158,7 @@ location /uploads {
 ```
 
 **Verification:**
+
 ```bash
 # Should return 404 (not accessible via web)
 curl https://applyonce.co.za/uploads/filename.pdf
@@ -156,8 +168,10 @@ curl -H "Cookie: accessToken=..." https://api.applyonce.co.za/v1/documents/:id
 ```
 
 ### 7. Environment Variables (Production)
+
 - **Status:** ⚠️ **REQUIRED FOR PRODUCTION**
 - **Critical Settings:**
+
   ```env
   NODE_ENV=production
 
@@ -186,22 +200,24 @@ curl -H "Cookie: accessToken=..." https://api.applyonce.co.za/v1/documents/:id
   ```
 
 **Generate secrets:**
+
 ```bash
 # JWT secrets (64 random bytes as hex)
 openssl rand -hex 64
 ```
 
-### 8. PostgreSQL & Redis Binding
+### 8. PostgreSQL Binding
+
 - **Status:** ✅ **CONFIGURED** (via docker-compose.yml)
-- **Requirement:** Database and Redis MUST bind to `127.0.0.1` ONLY
+- **Requirement:** Database MUST bind to `127.0.0.1` ONLY
 - **Current:** Configured in `docker-compose.yml`
 - **Verification:**
   ```bash
   ss -tlnp | grep 3610  # PostgreSQL should show 127.0.0.1:3610
-  ss -tlnp | grep 3611  # Redis should show 127.0.0.1:3611
   ```
 
 **NEVER expose:**
+
 ```yaml
 # ❌ DO NOT DO THIS
 ports:
@@ -217,6 +233,7 @@ ports:
 ## 🔐 POPIA / Data Protection
 
 ### 9. Minors' Data (Age < 18)
+
 - **Status:** ⚠️ **LEGAL REQUIREMENT PENDING**
 - **Issue:** No parental consent field in Student model
 - **Required:**
@@ -226,6 +243,7 @@ ports:
 - **Compliance:** POPIA (Protection of Personal Information Act)
 
 ### 10. ID Number Transmission
+
 - **Status:** ⚠️ **REQUIRES HTTPS**
 - **Issue:** SA ID numbers contain sensitive PII (race-coded pre-1994)
 - **Requirement:** **MUST use HTTPS** (see item 5 above)
@@ -245,7 +263,7 @@ Before deploying to production, verify ALL of the following:
 - [ ] Strong JWT secrets generated (64+ characters, random)
 - [ ] Production CORS origins configured (no wildcards)
 - [ ] Email SMTP configured and tested
-- [ ] PostgreSQL and Redis bind to `127.0.0.1` only
+- [ ] PostgreSQL binds to `127.0.0.1` only
 - [ ] uploads/ directory NOT served by nginx
 - [ ] Document download routes enforce isolation (student/admin)
 - [ ] Parental consent field added (POPIA compliance)
@@ -259,12 +277,14 @@ Before deploying to production, verify ALL of the following:
 ## Testing Security Configuration
 
 ### Test HTTPS/HSTS
+
 ```bash
 curl -I https://applyonce.co.za | grep -i strict-transport
 # Should return: Strict-Transport-Security: max-age=31536000; includeSubDomains
 ```
 
 ### Test Secure Cookies
+
 ```bash
 # Login and inspect Set-Cookie headers
 curl -X POST https://api.applyonce.co.za/v1/auth/login \
@@ -276,6 +296,7 @@ curl -X POST https://api.applyonce.co.za/v1/auth/login \
 ```
 
 ### Test uploads/ Protection
+
 ```bash
 # Direct file access should fail (404)
 curl -I https://applyonce.co.za/uploads/test-document.pdf
@@ -287,6 +308,7 @@ curl -H "Cookie: accessToken=..." https://api.applyonce.co.za/v1/documents/:id
 ```
 
 ### Test Database Isolation
+
 ```bash
 # PostgreSQL should NOT be reachable from internet
 curl -v http://45.220.228.31:3610
@@ -301,6 +323,7 @@ psql postgresql://user:pass@localhost:3610/applyonce
 ## Support & Questions
 
 For security concerns or deployment assistance:
+
 - **Founder:** MaboeKK (maboekeiketlile@gmail.com)
 - **Repository:** https://github.com/MaboeKK/ApplyOnce (private)
 - **Server:** 45.220.228.31 (kmaboe user, port range 3600-3699)

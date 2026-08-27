@@ -4,14 +4,7 @@
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import {
-  Box,
-  TextField,
-  MenuItem,
-  Button,
-  Grid,
-  Typography,
-} from '@mui/material';
+import { Box, TextField, MenuItem, Button, Grid, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { titleCase, normalizeAddressFragment, digitsOnly } from '@/utils/formatters';
@@ -92,16 +85,17 @@ export default function AddressStep({ data, onNext, onBack }: Props) {
     if (!pasted || !pasted.includes(',')) return; // Plain street line — let default paste behaviour handle it
 
     e.preventDefault();
-    const parts = pasted.split(',').map((p) => normalizeAddressFragment(p)).filter(Boolean);
+    const parts = pasted
+      .split(',')
+      .map((p) => normalizeAddressFragment(p))
+      .filter(Boolean);
 
     const postalMatch = pasted.match(/\b\d{4}\b/);
     if (postalMatch) {
       setValue('postalCode', postalMatch[0], { shouldValidate: true });
     }
 
-    const provinceKey = parts
-      .map((p) => provinceLookup[p.toLowerCase()])
-      .find((match) => !!match);
+    const provinceKey = parts.map((p) => provinceLookup[p.toLowerCase()]).find((match) => !!match);
     if (provinceKey) {
       setValue('province', provinceKey as AddressData['province'], { shouldValidate: true });
     }
@@ -244,7 +238,13 @@ export default function AddressStep({ data, onNext, onBack }: Props) {
         <Button onClick={onBack} size="large" startIcon={<ArrowBackIcon />}>
           Back
         </Button>
-        <Button type="submit" variant="contained" size="large" endIcon={<ArrowForwardIcon />} disabled={!canProceed}>
+        <Button
+          type="submit"
+          variant="contained"
+          size="large"
+          endIcon={<ArrowForwardIcon />}
+          disabled={!canProceed}
+        >
           Next
         </Button>
       </Box>

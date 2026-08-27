@@ -23,7 +23,9 @@ async function parseMatricCertificate(filePath) {
 
   // Run OCR
   console.log('Running OCR...');
-  const { data: { text } } = await Tesseract.recognize(filePath, 'eng');
+  const {
+    data: { text },
+  } = await Tesseract.recognize(filePath, 'eng');
 
   // Extract ID number
   const idMatch = text.match(/\b(\d{13})\b/);
@@ -47,7 +49,7 @@ async function parseMatricCertificate(filePath) {
   ];
 
   for (const line of lines) {
-    const matchedPattern = subjectPatterns.find(pattern => pattern.test(line));
+    const matchedPattern = subjectPatterns.find((pattern) => pattern.test(line));
     if (!matchedPattern) continue;
 
     const subjectMatch = line.match(matchedPattern);
@@ -85,9 +87,12 @@ async function parseMatricCertificate(filePath) {
       level = markToAPS(mark);
     }
 
-    const confidence = (mark !== null && level !== null && Math.abs(markToAPS(mark) - level) === 0)
-      ? 'high'
-      : (level !== null ? 'medium' : 'low');
+    const confidence =
+      mark !== null && level !== null && Math.abs(markToAPS(mark) - level) === 0
+        ? 'high'
+        : level !== null
+          ? 'medium'
+          : 'low';
 
     subjects.push({
       subject: subjectName.toLowerCase(),
@@ -100,8 +105,8 @@ async function parseMatricCertificate(filePath) {
   // Calculate APS (best 6 excluding Life Orientation)
   let aps = null;
   if (subjects.length >= 6) {
-    const nonLO = subjects.filter(s =>
-      !s.subject.toLowerCase().includes('life orientation') && s.level !== null
+    const nonLO = subjects.filter(
+      (s) => !s.subject.toLowerCase().includes('life orientation') && s.level !== null
     );
     const sorted = [...nonLO].sort((a, b) => (b.level || 0) - (a.level || 0));
     const best6 = sorted.slice(0, 6);
@@ -122,7 +127,9 @@ async function test() {
   const certPath = join(__dirname, 'test-data/real/sample-nsc-1.jpeg');
 
   console.log('Testing OCR on:', certPath);
-  console.log('Expected: English HL 71(6), Afrikaans FAL 60(5), Mathematics 70(6), LO 77(6), Accounting 72(6), Geography 73(6), Physical Sciences 70(6)');
+  console.log(
+    'Expected: English HL 71(6), Afrikaans FAL 60(5), Mathematics 70(6), LO 77(6), Accounting 72(6), Geography 73(6), Physical Sciences 70(6)'
+  );
   console.log('Expected APS (best 6 excl LO): 35\n');
 
   const result = await parseMatricCertificate(certPath);
@@ -131,7 +138,9 @@ async function test() {
   console.log('ID Number:', result.idNumber);
   console.log('\nExtracted Subjects:');
   result.subjects.forEach((s, idx) => {
-    console.log(`${idx + 1}. ${s.subject}: mark=${s.mark}, level=${s.level}, confidence=${s.confidence}`);
+    console.log(
+      `${idx + 1}. ${s.subject}: mark=${s.mark}, level=${s.level}, confidence=${s.confidence}`
+    );
   });
   console.log('\nCalculated APS:', result.aps);
 
@@ -140,7 +149,9 @@ async function test() {
   const expectedAPS = 35;
   const apsMatch = result.aps === expectedAPS;
   console.log(`APS ${apsMatch ? '✓' : '✗'} (expected ${expectedAPS}, got ${result.aps})`);
-  console.log(`Subject count ${result.subjects.length === 7 ? '✓' : '✗'} (expected 7, got ${result.subjects.length})`);
+  console.log(
+    `Subject count ${result.subjects.length === 7 ? '✓' : '✗'} (expected 7, got ${result.subjects.length})`
+  );
 }
 
 test().catch(console.error);

@@ -6,11 +6,7 @@ import bcrypt from 'bcryptjs';
 import { AuthenticatedRequest } from '../types/express';
 import { RegisterInput, VerifyEmailInput, LoginInput } from '../schemas/auth';
 import { prisma } from '../utils/prisma';
-import {
-  ConflictError,
-  UnauthorizedError,
-  BadRequestError,
-} from '../utils/errors';
+import { ConflictError, UnauthorizedError, BadRequestError } from '../utils/errors';
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt';
 import { sendVerificationEmail } from '../utils/email';
 import { config } from '../config';
@@ -29,10 +25,7 @@ function getCookieOptions(maxAge: number) {
   };
 }
 
-export async function register(
-  req: AuthenticatedRequest,
-  res: Response
-): Promise<void> {
+export async function register(req: AuthenticatedRequest, res: Response): Promise<void> {
   const input = req.body as RegisterInput;
 
   // Check if student already exists
@@ -41,14 +34,11 @@ export async function register(
   });
 
   if (existing) {
-    throw new ConflictError(
-      'Email already registered',
-      'EMAIL_EXISTS'
-    );
+    throw new ConflictError('Email already registered', 'EMAIL_EXISTS');
   }
 
   // Hash password
-  const passwordHash = await bcrypt.hash(input.password, 10);
+  const passwordHash = await bcrypt.hash(input.password, 12);
 
   // Generate verification code
   const verificationCode = generateVerificationCode();
@@ -82,10 +72,7 @@ export async function register(
   });
 }
 
-export async function verifyEmail(
-  req: AuthenticatedRequest,
-  res: Response
-): Promise<void> {
+export async function verifyEmail(req: AuthenticatedRequest, res: Response): Promise<void> {
   const input = req.body as VerifyEmailInput;
 
   const student = await prisma.student.findUnique({
@@ -129,10 +116,7 @@ export async function verifyEmail(
   });
 }
 
-export async function login(
-  req: AuthenticatedRequest,
-  res: Response
-): Promise<void> {
+export async function login(req: AuthenticatedRequest, res: Response): Promise<void> {
   const input = req.body as LoginInput;
 
   // Check for student
@@ -144,10 +128,7 @@ export async function login(
     // Verify password
     const valid = await bcrypt.compare(input.password, student.passwordHash);
     if (!valid) {
-      throw new UnauthorizedError(
-        'Invalid credentials',
-        'INVALID_CREDENTIALS'
-      );
+      throw new UnauthorizedError('Invalid credentials', 'INVALID_CREDENTIALS');
     }
 
     // Check email verification
@@ -166,9 +147,7 @@ export async function login(
     });
 
     const refreshToken = generateRefreshToken(student.id);
-    const refreshExpires = new Date(
-      Date.now() + 30 * 24 * 60 * 60 * 1000
-    ); // 30 days
+    const refreshExpires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
 
     // Store refresh token
     await prisma.refreshToken.create({
@@ -209,10 +188,7 @@ export async function login(
     // Verify password
     const valid = await bcrypt.compare(input.password, admin.passwordHash);
     if (!valid) {
-      throw new UnauthorizedError(
-        'Invalid credentials',
-        'INVALID_CREDENTIALS'
-      );
+      throw new UnauthorizedError('Invalid credentials', 'INVALID_CREDENTIALS');
     }
 
     // Generate tokens
@@ -224,9 +200,7 @@ export async function login(
     });
 
     const refreshToken = generateRefreshToken(admin.id);
-    const refreshExpires = new Date(
-      Date.now() + 30 * 24 * 60 * 60 * 1000
-    );
+    const refreshExpires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
     // Store refresh token
     await prisma.universityAdminRefreshToken.create({
@@ -241,7 +215,10 @@ export async function login(
     res.cookie('accessToken', accessToken, getCookieOptions(15 * 60 * 1000));
     res.cookie('refreshToken', refreshToken, getCookieOptions(30 * 24 * 60 * 60 * 1000));
 
-    logger.info({ adminId: admin.id, email: admin.email, universityId: admin.universityId }, 'University admin logged in');
+    logger.info(
+      { adminId: admin.id, email: admin.email, universityId: admin.universityId },
+      'University admin logged in'
+    );
 
     res.json({
       message: 'Login successful',
@@ -261,10 +238,18 @@ export async function login(
   throw new UnauthorizedError('Invalid credentials', 'INVALID_CREDENTIALS');
 }
 
-export async function logout(
-  req: AuthenticatedRequest,
-  res: Response
-): Promise<void> {
+/**
+ * GET /v1/auth/me
+ * Lightweight session check for the frontend's auth guard — returns the
+ * current user's identity if the access token is still valid (requireAuth
+ * already rejects an expired/invalid one with 401). No DB lookup needed:
+ * req.user is the already-verified JWT payload.
+ */
+export async function me(req: AuthenticatedRequest, res: Response): Promise<void> {
+  res.json({ user: req.user });
+}
+
+export async function logout(req: AuthenticatedRequest, res: Response): Promise<void> {
   const refreshToken = req.cookies?.refreshToken;
 
   if (refreshToken) {

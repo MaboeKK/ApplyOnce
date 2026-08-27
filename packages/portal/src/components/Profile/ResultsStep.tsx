@@ -75,6 +75,16 @@ interface ResultsDraft {
   lastUpdated: string | null;
 }
 
+function isResultsDraft(value: unknown): value is ResultsDraft {
+  if (typeof value !== 'object' || value === null) return false;
+  const draft = value as Partial<ResultsDraft>;
+  return (
+    (draft.step === 'upload' || draft.step === 'confirm' || draft.step === 'id-doc') &&
+    Array.isArray(draft.originalSubjects) &&
+    Array.isArray(draft.editedSubjects)
+  );
+}
+
 interface OcrSubject {
   subject: string;
   mark?: number;
@@ -90,8 +100,15 @@ interface Props {
   userId?: string;
 }
 
-const OCR_BANNER: Record<ConfidenceTier, { severity: 'success' | 'warning' | 'error'; icon: JSX.Element; text: string }> = {
-  high: { severity: 'success', icon: <CheckCircleIcon fontSize="small" />, text: 'Extraction Successful' },
+const OCR_BANNER: Record<
+  ConfidenceTier,
+  { severity: 'success' | 'warning' | 'error'; icon: JSX.Element; text: string }
+> = {
+  high: {
+    severity: 'success',
+    icon: <CheckCircleIcon fontSize="small" />,
+    text: 'Extraction Successful',
+  },
   medium: {
     severity: 'warning',
     icon: <WarningAmberIcon fontSize="small" />,
@@ -106,7 +123,10 @@ const OCR_BANNER: Record<ConfidenceTier, { severity: 'success' | 'warning' | 'er
 
 function calculateAPSFromSubjects(subjects: Subject[]): number {
   const eligible = subjects
-    .filter((s) => s.subject !== 'life_orientation' && !s.subject.toLowerCase().includes('life orientation'))
+    .filter(
+      (s) =>
+        s.subject !== 'life_orientation' && !s.subject.toLowerCase().includes('life orientation')
+    )
     .map((s) => ({ ...s, level: markToAPS(s.mark) }))
     .sort((a, b) => b.level - a.level)
     .slice(0, 6);
@@ -123,7 +143,10 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
   }, []);
 
   const draft = useMemo(
-    () => (!hasSavedResults && userId ? loadDraft<ResultsDraft>(resultsDraftKey(userId)) : null),
+    () =>
+      !hasSavedResults && userId
+        ? loadDraft<ResultsDraft>(resultsDraftKey(userId), isResultsDraft)
+        : null,
     [hasSavedResults, userId]
   );
 
@@ -132,7 +155,9 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [overallConfidence, setOverallConfidence] = useState<ConfidenceTier | null>(draft?.overallConfidence || null);
+  const [overallConfidence, setOverallConfidence] = useState<ConfidenceTier | null>(
+    draft?.overallConfidence || null
+  );
   const [originalSubjects, setOriginalSubjects] = useState<Subject[]>(
     hasSavedResults ? data.subjects : draft?.originalSubjects || []
   );
@@ -140,7 +165,9 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
     hasSavedResults ? data.subjects : draft?.editedSubjects || []
   );
   const [warnings, setWarnings] = useState<string[]>(draft?.warnings || []);
-  const [matricIdNumber, setMatricIdNumber] = useState<string | null>(draft?.matricIdNumber || null);
+  const [matricIdNumber, setMatricIdNumber] = useState<string | null>(
+    draft?.matricIdNumber || null
+  );
   const [idDocIdNumber, setIdDocIdNumber] = useState<string | null>(null);
   const [idDocUploaded, setIdDocUploaded] = useState(draft?.idDocUploaded || false);
   const [idDocUploading, setIdDocUploading] = useState(false);
@@ -148,8 +175,12 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
   const [mismatchAcknowledged, setMismatchAcknowledged] = useState(false);
   const [certFile, setCertFile] = useState<File | null>(null);
   const [certPreviewOpen, setCertPreviewOpen] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(draft?.lastUpdated ? new Date(draft.lastUpdated) : null);
-  const [pendingOverride, setPendingOverride] = useState<{ index: number; value: number } | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(
+    draft?.lastUpdated ? new Date(draft.lastUpdated) : null
+  );
+  const [pendingOverride, setPendingOverride] = useState<{ index: number; value: number } | null>(
+    null
+  );
 
   const currentYear = new Date().getFullYear();
   const aps = useMemo(() => calculateAPSFromSubjects(editedSubjects), [editedSubjects]);
@@ -175,7 +206,18 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
       idDocUploaded,
       lastUpdated,
     });
-  }, [hasSavedResults, userId, step, overallConfidence, originalSubjects, editedSubjects, warnings, matricIdNumber, idDocUploaded, lastUpdated]);
+  }, [
+    hasSavedResults,
+    userId,
+    step,
+    overallConfidence,
+    originalSubjects,
+    editedSubjects,
+    warnings,
+    matricIdNumber,
+    idDocUploaded,
+    lastUpdated,
+  ]);
 
   const handleMatricUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -267,7 +309,9 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
     return dupes;
   }, [editedSubjects]);
 
-  const allMarksValid = editedSubjects.every((s) => Number.isInteger(s.mark) && s.mark >= 0 && s.mark <= 100);
+  const allMarksValid = editedSubjects.every(
+    (s) => Number.isInteger(s.mark) && s.mark >= 0 && s.mark <= 100
+  );
   const hasMinSubjects = editedSubjects.length >= 6;
   const canConfirmResults = allMarksValid && duplicateSubjects.size === 0 && hasMinSubjects;
 
@@ -339,7 +383,8 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
           Upload Matric Results
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          Upload your National Senior Certificate (matric certificate). We&apos;ll scan it and automatically calculate your APS.
+          Upload your National Senior Certificate (matric certificate). We&apos;ll scan it and
+          automatically calculate your APS.
         </Typography>
 
         {error && (
@@ -407,7 +452,8 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
           Confirm Your Results
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          Review the extracted results. Only the mark can be edited — the level is calculated automatically.
+          Review the extracted results. Only the mark can be edited — the level is calculated
+          automatically.
         </Typography>
 
         {banner && (
@@ -426,8 +472,8 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
 
         {suggestReupload && (
           <Alert severity="info" sx={{ mb: 3 }}>
-            Some results could not be extracted accurately. For better accuracy, consider uploading a clearer copy of
-            your certificate.
+            Some results could not be extracted accurately. For better accuracy, consider uploading
+            a clearer copy of your certificate.
           </Alert>
         )}
 
@@ -437,13 +483,21 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
           </Alert>
         )}
 
-        <Paper sx={{ p: 3, mb: 3, bgcolor: 'success.50', border: '2px solid', borderColor: 'success.main' }}>
+        <Paper
+          sx={{
+            p: 3,
+            mb: 3,
+            bgcolor: 'success.50',
+            border: '2px solid',
+            borderColor: 'success.main',
+          }}
+        >
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
             <Typography variant="h5" align="center" color="success.dark">
               Your APS: <strong>{aps}</strong>
             </Typography>
             <Tooltip title="APS is the sum of your best 6 subjects' achievement levels (1–7 each), excluding Life Orientation. It's the primary score universities use to check what you qualify for.">
-              <IconButton size="small">
+              <IconButton size="small" aria-label="How APS is calculated">
                 <InfoOutlinedIcon fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -458,7 +512,11 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
 
         {certFile && (
           <Box sx={{ mb: 2 }}>
-            <Button size="small" startIcon={<VisibilityIcon />} onClick={() => setCertPreviewOpen(true)}>
+            <Button
+              size="small"
+              startIcon={<VisibilityIcon />}
+              onClick={() => setCertPreviewOpen(true)}
+            >
               Preview Certificate
             </Button>
           </Box>
@@ -468,9 +526,15 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell><strong>Subject</strong></TableCell>
-                <TableCell align="center"><strong>Mark (%)</strong></TableCell>
-                <TableCell align="center"><strong>Level (APS)</strong></TableCell>
+                <TableCell>
+                  <strong>Subject</strong>
+                </TableCell>
+                <TableCell align="center">
+                  <strong>Mark (%)</strong>
+                </TableCell>
+                <TableCell align="center">
+                  <strong>Level (APS)</strong>
+                </TableCell>
                 <TableCell align="center">Confidence</TableCell>
               </TableRow>
             </TableHead>
@@ -489,7 +553,12 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
                     <TableCell>
                       {subjectLabel(subject.subject)}
                       {subject.edited && (
-                        <Chip label="Edited" size="small" color="warning" sx={{ ml: 1, fontSize: '0.65rem', height: 18 }} />
+                        <Chip
+                          label="Edited"
+                          size="small"
+                          color="warning"
+                          sx={{ ml: 1, fontSize: '0.65rem', height: 18 }}
+                        />
                       )}
                       {isDuplicate && (
                         <Typography variant="caption" color="error.main" display="block">
@@ -509,15 +578,28 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
                         error={subject.mark < 0 || subject.mark > 100}
                       />
                       {subject.confidence === 'low' && (
-                        <Typography variant="caption" color="error.main" display="block" sx={{ maxWidth: 140 }}>
+                        <Typography
+                          variant="caption"
+                          color="error.main"
+                          display="block"
+                          sx={{ maxWidth: 140 }}
+                        >
                           Low extraction confidence — verify against your certificate.
                         </Typography>
                       )}
                     </TableCell>
                     <TableCell align="center">{subject.level}</TableCell>
                     <TableCell align="center">
-                      <Tooltip title={conf.available ? `${conf.percent}% confidence` : 'Confidence unavailable'}>
-                        <Chip label={conf.available ? `${conf.label} (${conf.percent}%)` : conf.label} size="small" color={conf.color} />
+                      <Tooltip
+                        title={
+                          conf.available ? `${conf.percent}% confidence` : 'Confidence unavailable'
+                        }
+                      >
+                        <Chip
+                          label={conf.available ? `${conf.label} (${conf.percent}%)` : conf.label}
+                          size="small"
+                          color={conf.color}
+                        />
                       </Tooltip>
                     </TableCell>
                   </TableRow>
@@ -537,7 +619,12 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
           <Button onClick={() => setStep('upload')} size="large" startIcon={<ArrowBackIcon />}>
             Re-upload
           </Button>
-          <Button onClick={handleConfirm} variant="contained" size="large" disabled={!canConfirmResults}>
+          <Button
+            onClick={handleConfirm}
+            variant="contained"
+            size="large"
+            disabled={!canConfirmResults}
+          >
             Confirm Results
           </Button>
         </Box>
@@ -546,8 +633,8 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
           <DialogTitle>Confirm your correction</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              You are overriding the automatically extracted result. Please ensure the entered mark matches your
-              official certificate.
+              You are overriding the automatically extracted result. Please ensure the entered mark
+              matches your official certificate.
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -558,7 +645,12 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
           </DialogActions>
         </Dialog>
 
-        <Dialog open={certPreviewOpen} onClose={() => setCertPreviewOpen(false)} maxWidth="md" fullWidth>
+        <Dialog
+          open={certPreviewOpen}
+          onClose={() => setCertPreviewOpen(false)}
+          maxWidth="md"
+          fullWidth
+        >
           <DialogTitle>Your Uploaded Certificate</DialogTitle>
           <DialogContent>
             {certFile && certFileUrl && certFile.type.startsWith('image/') ? (
@@ -569,7 +661,10 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
                 sx={{ width: '100%', height: 'auto' }}
               />
             ) : certFile && certFileUrl ? (
-              <Button variant="outlined" onClick={() => window.open(certFileUrl, '_blank', 'noopener,noreferrer')}>
+              <Button
+                variant="outlined"
+                onClick={() => window.open(certFileUrl, '_blank', 'noopener,noreferrer')}
+              >
                 Open PDF in new tab
               </Button>
             ) : null}
@@ -608,7 +703,10 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
         <FormControlLabel
           sx={{ mb: 2 }}
           control={
-            <Checkbox checked={mismatchAcknowledged} onChange={(e) => setMismatchAcknowledged(e.target.checked)} />
+            <Checkbox
+              checked={mismatchAcknowledged}
+              onChange={(e) => setMismatchAcknowledged(e.target.checked)}
+            />
           }
           label="I've checked and confirm my ID number is correct"
         />
@@ -624,7 +722,8 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
                   Matric Results Confirmed
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  APS: {editedSubjects.length > 0 ? aps : data.aps} • {editedSubjects.length} subjects
+                  APS: {editedSubjects.length > 0 ? aps : data.aps} • {editedSubjects.length}{' '}
+                  subjects
                 </Typography>
               </Box>
             </Box>

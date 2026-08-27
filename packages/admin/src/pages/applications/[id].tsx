@@ -43,8 +43,15 @@ import {
 import { AxiosError } from 'axios';
 import DashboardLayout from '@/components/Layout/DashboardLayout';
 import { useAuthStore } from '@/store/auth';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { getStatusColor } from '@/utils/applicationStatus';
 import api from '@/config/api';
-import { calculateAPS as calculateAPSShared, getUniversityById, type SubjectResult as SharedSubjectResult, type Address } from '@applyonce/shared';
+import {
+  calculateAPS as calculateAPSShared,
+  getUniversityById,
+  type SubjectResult as SharedSubjectResult,
+  type Address,
+} from '@applyonce/shared';
 
 type SubjectResult = SharedSubjectResult;
 
@@ -97,9 +104,17 @@ interface Application {
 }
 
 export default function ApplicationDetailPage() {
+  return (
+    <ProtectedRoute>
+      <ApplicationDetailContent />
+    </ProtectedRoute>
+  );
+}
+
+function ApplicationDetailContent() {
   const router = useRouter();
   const { id } = router.query;
-  const { isAuthenticated, user } = useAuthStore();
+  const { user } = useAuthStore();
 
   const [application, setApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
@@ -112,40 +127,41 @@ export default function ApplicationDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // Auth guard
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/login');
-    }
-  }, [isAuthenticated, router]);
-
   // Fetch application detail
   useEffect(() => {
-    if (!isAuthenticated || !id) return;
+    if (!id) return;
+    let cancelled = false;
 
     const fetchApplication = async () => {
       try {
         setLoading(true);
         setError(null);
         const response = await api.get(`/admin/applications/${id}`);
+        if (cancelled) return;
         setApplication(response.data.application);
       } catch (err) {
+        if (cancelled) return;
         console.error('Error fetching application:', err);
         const axiosErr = err as AxiosError<{ message?: string }>;
         if (axiosErr.response?.status === 403) {
-          setError('You do not have permission to view this application. It may belong to another university.');
+          setError(
+            'You do not have permission to view this application. It may belong to another university.'
+          );
         } else if (axiosErr.response?.status === 404) {
           setError('Application not found.');
         } else {
           setError(axiosErr.response?.data?.message || 'Failed to load application');
         }
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchApplication();
-  }, [isAuthenticated, id]);
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
 
   const handleDecisionSubmit = async () => {
     if (!decision || !reason.trim()) {
@@ -179,7 +195,10 @@ export default function ApplicationDetailPage() {
     } catch (err) {
       console.error('Error submitting decision:', err);
       const axiosErr = err as AxiosError<{ message?: string; code?: string }>;
-      if (axiosErr.response?.status === 400 && axiosErr.response?.data?.code === 'ALREADY_DECIDED') {
+      if (
+        axiosErr.response?.status === 400 &&
+        axiosErr.response?.data?.code === 'ALREADY_DECIDED'
+      ) {
         setSubmitError('This application has already been decided.');
       } else if (axiosErr.response?.status === 403) {
         setSubmitError('You do not have permission to decide on this application.');
@@ -211,27 +230,14 @@ export default function ApplicationDetailPage() {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'submitted':
-        return 'info';
-      case 'accepted':
-        return 'success';
-      case 'rejected':
-        return 'error';
-      default:
-        return 'default';
-    }
-  };
-
   const calculateAPS = (subjectResults: SubjectResult[], universityId: string) => {
     const university = getUniversityById(universityId);
     if (!university) return null;
     return calculateAPSShared(subjectResults, university).totalAPS;
   };
 
-  if (!isAuthenticated || !user) {
-    return null; // Will redirect via useEffect
+  if (!user) {
+    return null;
   }
 
   if (loading) {
@@ -410,7 +416,9 @@ export default function ApplicationDetailPage() {
 
           {/* Subject Results */}
           <Paper sx={{ p: 3, mb: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}
+            >
               <Typography variant="h6" sx={{ fontWeight: 600 }}>
                 Subject Results
               </Typography>
@@ -459,7 +467,13 @@ export default function ApplicationDetailPage() {
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {student.documents.map((doc) => (
                   <Card key={doc.id} variant="outlined">
-                    <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <CardContent
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
                       <Box>
                         <Typography variant="body1" sx={{ fontWeight: 500 }}>
                           {doc.fileName}
@@ -473,6 +487,7 @@ export default function ApplicationDetailPage() {
                         color="primary"
                         onClick={() => handleDownloadDocument(doc)}
                         title="Download"
+                        aria-label={`Download ${doc.fileName}`}
                       >
                         <DownloadIcon />
                       </IconButton>
@@ -498,9 +513,7 @@ export default function ApplicationDetailPage() {
                 <Typography variant="body2" color="text.secondary">
                   University Reference
                 </Typography>
-                <Typography variant="body1">
-                  {application.universityReference || 'N/A'}
-                </Typography>
+                <Typography variant="body1">{application.universityReference || 'N/A'}</Typography>
               </Box>
 
               <Box>

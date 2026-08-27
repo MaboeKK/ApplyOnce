@@ -17,7 +17,13 @@ import {
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useState, useEffect } from 'react';
 import PhoneField from './PhoneField';
-import { digitsOnly, formatIdNumber, validateIdNumber, validatePhoneNational, toE164 } from '@/utils/formatters';
+import {
+  digitsOnly,
+  formatIdNumber,
+  validateIdNumber,
+  validatePhoneNational,
+  toE164,
+} from '@/utils/formatters';
 import type { User } from '@/store/auth';
 
 // SA official languages
@@ -90,7 +96,10 @@ function parseSAIdNumber(idNumber: string): { dateOfBirth: string; gender: strin
 }
 
 export default function PersonalStep({ data, onNext, user }: Props) {
-  const [extractedInfo, setExtractedInfo] = useState<{ dateOfBirth: string; gender: string } | null>(null);
+  const [extractedInfo, setExtractedInfo] = useState<{
+    dateOfBirth: string;
+    gender: string;
+  } | null>(null);
 
   const {
     control,
@@ -200,7 +209,10 @@ export default function PersonalStep({ data, onNext, user }: Props) {
                 autoComplete="off"
                 inputProps={{ inputMode: 'numeric' }}
                 error={!!errors.idNumber}
-                helperText={errors.idNumber?.message || 'Your date of birth and gender will be extracted automatically'}
+                helperText={
+                  errors.idNumber?.message ||
+                  'Your date of birth and gender will be extracted automatically'
+                }
               />
             )}
           />
@@ -209,7 +221,8 @@ export default function PersonalStep({ data, onNext, user }: Props) {
         {extractedInfo && (
           <Grid item xs={12}>
             <Alert severity="success">
-              Date of Birth: <strong>{extractedInfo.dateOfBirth}</strong> • Gender: <strong>{extractedInfo.gender}</strong>
+              Date of Birth: <strong>{extractedInfo.dateOfBirth}</strong> • Gender:{' '}
+              <strong>{extractedInfo.gender}</strong>
             </Alert>
           </Grid>
         )}
@@ -303,7 +316,13 @@ export default function PersonalStep({ data, onNext, user }: Props) {
       </Grid>
 
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
-        <Button type="submit" variant="contained" size="large" endIcon={<ArrowForwardIcon />} disabled={!canProceed}>
+        <Button
+          type="submit"
+          variant="contained"
+          size="large"
+          endIcon={<ArrowForwardIcon />}
+          disabled={!canProceed}
+        >
           Next
         </Button>
       </Box>

@@ -6,6 +6,7 @@ import { AuthRequest } from '../types/express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { prisma } from '../utils/prisma';
 import { ValidationError } from '../utils/errors';
+import { CalculateAPSInput } from '../schemas/aps';
 import {
   calculateAPS,
   findAllMatches,
@@ -19,24 +20,26 @@ import {
 /**
  * POST /v1/aps/calculate
  * Calculate APS for a specific university from provided subject results
+ * Body is pre-validated by calculateAPSSchema (see routes/aps.ts)
  */
 export const calculateAPSFromResults = asyncHandler(async (req: AuthRequest, res: Response) => {
-  const { results, universityId } = req.body;
-
-  if (!results || !Array.isArray(results) || results.length < 6) {
-    throw new ValidationError('Minimum 6 subject results required');
-  }
-
-  if (!universityId) {
-    throw new ValidationError('universityId is required');
-  }
+  const { results, universityId } = req.body as CalculateAPSInput;
 
   const university = getUniversityById(universityId);
   if (!university) {
     throw new ValidationError(`University ${universityId} not found`);
   }
 
-  const apsResult = calculateAPS(results, university);
+  const subjectResults: SubjectResult[] = results.map((r) => ({
+    id: '',
+    studentId: req.student!.studentId,
+    subject: r.subject as NSCSubject,
+    mark: r.mark,
+    level: r.level,
+    year: r.year,
+  }));
+
+  const apsResult = calculateAPS(subjectResults, university);
 
   res.json({
     universityId: apsResult.universityId,
@@ -120,10 +123,14 @@ export const getAPSMatches = asyncHandler(async (req: AuthRequest, res: Response
   });
 
   // Filter out "requirements not available" unless explicitly requested
-  const availableMatches = matchesWithStrategy.filter(m => m.outcome !== 'requirements_not_available');
+  const availableMatches = matchesWithStrategy.filter(
+    (m) => m.outcome !== 'requirements_not_available'
+  );
 
   // Count by strategy (only for qualifying/waitlist programmes)
-  const qualifying = availableMatches.filter((m) => m.meetsRequirements || m.outcome === 'waitlist');
+  const qualifying = availableMatches.filter(
+    (m) => m.meetsRequirements || m.outcome === 'waitlist'
+  );
   const qualifyingCounts = {
     reach: qualifying.filter((m) => m.choiceStrategy === 'reach').length,
     match: qualifying.filter((m) => m.choiceStrategy === 'match').length,
@@ -134,8 +141,13 @@ export const getAPSMatches = asyncHandler(async (req: AuthRequest, res: Response
   let balanceNudge: string | null = null;
   if (qualifyingCounts.reach > 0 && qualifyingCounts.safety === 0) {
     balanceNudge = 'Consider adding a safety choice to protect yourself.';
-  } else if (qualifyingCounts.safety > 0 && qualifyingCounts.reach === 0 && qualifyingCounts.match === 0) {
-    balanceNudge = 'You have safety choices. Consider adding reach or match programmes to aim higher.';
+  } else if (
+    qualifyingCounts.safety > 0 &&
+    qualifyingCounts.reach === 0 &&
+    qualifyingCounts.match === 0
+  ) {
+    balanceNudge =
+      'You have safety choices. Consider adding reach or match programmes to aim higher.';
   }
 
   // Per-university APS breakdown

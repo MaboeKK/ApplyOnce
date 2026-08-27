@@ -1,6 +1,8 @@
 // packages/api/src/utils/saId.ts
 // South African ID number utilities
 
+import { ValidationError } from './errors';
+
 export interface SAIdInfo {
   dateOfBirth: Date;
   gender: 'male' | 'female';
@@ -9,7 +11,7 @@ export interface SAIdInfo {
 
 export function parseSAIdNumber(idNumber: string): SAIdInfo {
   if (!/^\d{13}$/.test(idNumber)) {
-    throw new Error('Invalid SA ID number format');
+    throw new ValidationError('Invalid SA ID number format');
   }
 
   // Extract date components (YYMMDD)

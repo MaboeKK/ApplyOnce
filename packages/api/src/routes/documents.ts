@@ -86,12 +86,7 @@ router.post(
  *       200:
  *         description: Certificate scanned, APS and subjects extracted
  */
-router.post(
-  '/scan-matric',
-  requireStudent,
-  upload.single('file'),
-  scanMatricCertificate
-);
+router.post('/scan-matric', requireStudent, upload.single('file'), scanMatricCertificate);
 
 /**
  * @openapi
@@ -115,12 +110,7 @@ router.post(
  *       200:
  *         description: ID document scanned, ID number extracted
  */
-router.post(
-  '/scan-id',
-  requireStudent,
-  upload.single('file'),
-  scanIdDocument
-);
+router.post('/scan-id', requireStudent, upload.single('file'), scanIdDocument);
 
 /**
  * @openapi

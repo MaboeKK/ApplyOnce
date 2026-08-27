@@ -3,14 +3,19 @@
 
 import { Response } from 'express';
 import path from 'path';
-import fs from 'fs';
 import { AuthRequest } from '../types/express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { prisma } from '../utils/prisma';
 import { ValidationError, NotFoundError } from '../utils/errors';
-import { parseMatricCertificate, parseIdDocument } from '../utils/ocr';
 import { logger } from '../utils/logger';
 import { UPLOAD_DIR } from '../config/multer';
+import { pathExists, safeUnlink } from '../utils/fs';
+import { verifyFileSignature } from '../utils/fileSignature';
+import {
+  replaceExistingDocument,
+  scanAndSaveMatricCertificate,
+  scanAndSaveIdDocument,
+} from '../services/document.service';
 
 /**
  * POST /v1/documents/upload
@@ -26,21 +31,15 @@ export const uploadDocument = asyncHandler(async (req: AuthRequest, res: Respons
 
   const file = req.file;
 
-  // Check if document of this type already exists
-  const existing = await prisma.document.findFirst({
-    where: { studentId, type },
-  });
+  try {
+    await verifyFileSignature(file.path, file.mimetype);
+  } catch (error) {
+    await safeUnlink(file.path);
+    throw error;
+  }
 
   // Delete old file if replacing
-  if (existing) {
-    const oldPath = path.join(UPLOAD_DIR, existing.storageKey);
-    if (fs.existsSync(oldPath)) {
-      fs.unlinkSync(oldPath);
-    }
-    await prisma.document.delete({
-      where: { id: existing.id },
-    });
-  }
+  await replaceExistingDocument(studentId, type);
 
   // Create document record
   const document = await prisma.document.create({
@@ -76,81 +75,26 @@ export const scanMatricCertificate = asyncHandler(async (req: AuthRequest, res: 
     throw new ValidationError('No file uploaded');
   }
 
-  const file = req.file;
-  const filePath = file.path;
+  logger.info({ studentId, fileName: req.file.originalname }, 'Scanning matric certificate');
 
-  try {
-    logger.info({ studentId, fileName: file.originalname }, 'Scanning matric certificate');
+  const { document, ocr } = await scanAndSaveMatricCertificate(studentId, req.file);
 
-    // Run OCR
-    const ocrResult = await parseMatricCertificate(filePath);
-
-    // Get student's registered ID for cross-check
-    const student = await prisma.student.findUnique({
-      where: { id: studentId },
-      select: { idNumber: true },
-    });
-
-    if (!student) {
-      throw new NotFoundError('Student not found');
-    }
-
-    // Cross-check ID number
-    if (ocrResult.idNumber && ocrResult.idNumber !== student.idNumber) {
-      ocrResult.warnings.push(
-        'ID number on certificate does not match your registered ID. Please verify.'
-      );
-    }
-
-    // Save the file as matric_certificate document
-    const existing = await prisma.document.findFirst({
-      where: { studentId, type: 'matric_certificate' },
-    });
-
-    if (existing) {
-      const oldPath = path.join(UPLOAD_DIR, existing.storageKey);
-      if (fs.existsSync(oldPath)) {
-        fs.unlinkSync(oldPath);
-      }
-      await prisma.document.delete({
-        where: { id: existing.id },
-      });
-    }
-
-    const document = await prisma.document.create({
-      data: {
-        studentId,
-        type: 'matric_certificate',
-        fileName: file.originalname,
-        mimeType: file.mimetype,
-        storageKey: file.filename,
-        sizeBytes: file.size,
-      },
-    });
-
-    res.json({
-      message: 'Matric certificate scanned successfully',
-      document: {
-        id: document.id,
-        type: document.type,
-        fileName: document.fileName,
-        uploadedAt: document.uploadedAt.toISOString(),
-      },
-      ocr: {
-        aps: ocrResult.aps,
-        subjects: ocrResult.subjects,
-        idNumber: ocrResult.idNumber,
-        confidence: ocrResult.confidence,
-        warnings: ocrResult.warnings,
-      },
-    });
-  } catch (error) {
-    // Clean up uploaded file on error
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-    throw error;
-  }
+  res.json({
+    message: 'Matric certificate scanned successfully',
+    document: {
+      id: document.id,
+      type: document.type,
+      fileName: document.fileName,
+      uploadedAt: document.uploadedAt.toISOString(),
+    },
+    ocr: {
+      aps: ocr.aps,
+      subjects: ocr.subjects,
+      idNumber: ocr.idNumber,
+      confidence: ocr.confidence,
+      warnings: ocr.warnings,
+    },
+  });
 });
 
 /**
@@ -164,83 +108,23 @@ export const scanIdDocument = asyncHandler(async (req: AuthRequest, res: Respons
     throw new ValidationError('No file uploaded');
   }
 
-  const file = req.file;
-  const filePath = file.path;
+  logger.info({ studentId, fileName: req.file.originalname }, 'Scanning ID document');
 
-  try {
-    logger.info({ studentId, fileName: file.originalname }, 'Scanning ID document');
+  const { document, idNumber, confidence, warnings } = await scanAndSaveIdDocument(
+    studentId,
+    req.file
+  );
 
-    // Run OCR
-    const ocrResult = await parseIdDocument(filePath);
-
-    // Get student's current ID for cross-check
-    const student = await prisma.student.findUnique({
-      where: { id: studentId },
-      select: { idNumber: true },
-    });
-
-    if (!student) {
-      throw new NotFoundError('Student not found');
-    }
-
-    // Cross-check ID number if student has one registered
-    let warning: string | null = null;
-    if (student.idNumber && ocrResult.idNumber && ocrResult.idNumber !== student.idNumber) {
-      warning = 'ID number on document does not match your profile. Please verify.';
-    }
-
-    // Save the file as id_document
-    const existing = await prisma.document.findFirst({
-      where: { studentId, type: 'id_document' },
-    });
-
-    if (existing) {
-      const oldPath = path.join(UPLOAD_DIR, existing.storageKey);
-      if (fs.existsSync(oldPath)) {
-        fs.unlinkSync(oldPath);
-      }
-      await prisma.document.delete({
-        where: { id: existing.id },
-      });
-    }
-
-    const document = await prisma.document.create({
-      data: {
-        studentId,
-        type: 'id_document',
-        fileName: file.originalname,
-        mimeType: file.mimetype,
-        storageKey: file.filename,
-        sizeBytes: file.size,
-      },
-    });
-
-    // Clean up temp file
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-
-    res.json({
-      message: 'ID document scanned successfully',
-      document: {
-        id: document.id,
-        type: document.type,
-        fileName: document.fileName,
-        uploadedAt: document.uploadedAt.toISOString(),
-      },
-      ocr: {
-        idNumber: ocrResult.idNumber,
-        confidence: ocrResult.confidence,
-        warnings: warning ? [warning, ...ocrResult.warnings] : ocrResult.warnings,
-      },
-    });
-  } catch (error) {
-    // Clean up uploaded file on error
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-    throw error;
-  }
+  res.json({
+    message: 'ID document scanned successfully',
+    document: {
+      id: document.id,
+      type: document.type,
+      fileName: document.fileName,
+      uploadedAt: document.uploadedAt.toISOString(),
+    },
+    ocr: { idNumber, confidence, warnings },
+  });
 });
 
 /**
@@ -283,7 +167,7 @@ export const downloadDocument = asyncHandler(async (req: AuthRequest, res: Respo
 
   const filePath = path.join(UPLOAD_DIR, document.storageKey);
 
-  if (!fs.existsSync(filePath)) {
+  if (!(await pathExists(filePath))) {
     throw new NotFoundError('File not found on server');
   }
 
@@ -308,9 +192,7 @@ export const deleteDocument = asyncHandler(async (req: AuthRequest, res: Respons
 
   // Delete file from disk
   const filePath = path.join(UPLOAD_DIR, document.storageKey);
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-  }
+  await safeUnlink(filePath);
 
   // Delete record
   await prisma.document.delete({

@@ -6,11 +6,11 @@ import { createTheme } from '@mui/material/styles';
 
 // Neutral/professional design tokens
 const colors = {
-  primary: '#1E40AF',      // Blue 800
-  secondary: '#475569',    // Slate 600
-  success: '#10B981',      // Emerald
-  error: '#DC2626',        // Red 600
-  warning: '#F59E0B',      // Amber
+  primary: '#1E40AF', // Blue 800
+  secondary: '#475569', // Slate 600
+  success: '#10B981', // Emerald
+  error: '#DC2626', // Red 600
+  warning: '#F59E0B', // Amber
   neutral: {
     50: '#F8FAFC',
     100: '#F1F5F9',

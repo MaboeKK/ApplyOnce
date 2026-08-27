@@ -1,7 +1,7 @@
 // packages/portal/src/pages/cart.tsx
 // Application cart: itemised draft applications, balance nudge, proceed to payment
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import {
   Container,
@@ -18,10 +18,11 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { SERVICE_FEE_ZAR } from '@applyonce/shared';
-import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
 import PortalNav from '@/components/Layout/PortalNav';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { getErrorMessage } from '@/utils/error-message';
+import { formatZAR } from '@/utils/formatters';
 import type { PortalApplication, ProgrammeMatch } from '@/types';
 
 const strategyColor: Record<string, 'error' | 'success' | 'primary' | 'warning'> = {
@@ -37,8 +38,15 @@ const strategyLabel: Record<string, string> = {
 };
 
 export default function CartPage() {
+  return (
+    <ProtectedRoute>
+      <CartContent />
+    </ProtectedRoute>
+  );
+}
+
+function CartContent() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
 
   const [applications, setApplications] = useState<PortalApplication[]>([]);
   const [feeByUni, setFeeByUni] = useState<Record<string, number>>({});
@@ -49,15 +57,15 @@ export default function CartPage() {
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const mountedRef = useRef(true);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/login');
-      return;
-    }
     load();
+    return () => {
+      mountedRef.current = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated]);
+  }, []);
 
   const load = async () => {
     setLoading(true);
@@ -67,8 +75,11 @@ export default function CartPage() {
         api.get('/universities'),
         api.get('/students/me'),
       ]);
+      if (!mountedRef.current) return;
 
-      const drafts = (appsRes.data.applications || []).filter((a: PortalApplication) => a.status === 'draft');
+      const drafts = (appsRes.data.applications || []).filter(
+        (a: PortalApplication) => a.status === 'draft'
+      );
       setApplications(drafts);
 
       const fees: Record<string, number> = {};
@@ -78,11 +89,14 @@ export default function CartPage() {
       setFeeByUni(fees);
 
       const student = studentRes.data.student;
-      setHasMatricCert(!!student?.documents?.some((d: { type: string }) => d.type === 'matric_certificate'));
+      setHasMatricCert(
+        !!student?.documents?.some((d: { type: string }) => d.type === 'matric_certificate')
+      );
       setHasIdDoc(!!student?.documents?.some((d: { type: string }) => d.type === 'id_document'));
 
       try {
         const matchesRes = await api.get('/aps/matches');
+        if (!mountedRef.current) return;
         const map: Record<string, string> = {};
         for (const m of (matchesRes.data.matches || []) as ProgrammeMatch[]) {
           map[`${m.universityId}:${m.programmeCode}`] = m.choiceStrategy;
@@ -92,9 +106,9 @@ export default function CartPage() {
         // Student hasn't uploaded results yet — skip strategy tagging
       }
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to load your cart'));
+      if (mountedRef.current) setError(getErrorMessage(err, 'Failed to load your cart'));
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
   };
 
@@ -127,7 +141,7 @@ export default function CartPage() {
     }
   };
 
-  if (!isAuthenticated || loading) {
+  if (loading) {
     return (
       <>
         <PortalNav />
@@ -194,7 +208,15 @@ export default function CartPage() {
               {applications.map((app) => {
                 const tier = strategyByCode[`${app.universityId}:${app.programmeId}`];
                 return (
-                  <Paper key={app.id} sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Paper
+                    key={app.id}
+                    sx={{
+                      p: 3,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
                     <Box>
                       <Typography variant="subtitle1" fontWeight={600}>
                         {app.programmeName}
@@ -204,10 +226,18 @@ export default function CartPage() {
                       </Typography>
                       <Stack direction="row" spacing={1} sx={{ mt: 1 }} alignItems="center">
                         <Typography variant="caption" color="text.secondary">
-                          Fee: R{feeByUni[app.universityId] ?? '—'} + R{SERVICE_FEE_ZAR} service
+                          Fee:{' '}
+                          {feeByUni[app.universityId] !== undefined
+                            ? formatZAR(feeByUni[app.universityId])
+                            : '—'}{' '}
+                          + {formatZAR(SERVICE_FEE_ZAR)} service
                         </Typography>
                         {tier && strategyLabel[tier] && (
-                          <Chip label={strategyLabel[tier]} size="small" color={strategyColor[tier]} />
+                          <Chip
+                            label={strategyLabel[tier]}
+                            size="small"
+                            color={strategyColor[tier]}
+                          />
                         )}
                       </Stack>
                     </Box>
@@ -215,6 +245,7 @@ export default function CartPage() {
                       onClick={() => handleRemove(app.id)}
                       disabled={removingId === app.id}
                       color="error"
+                      aria-label={`Remove ${app.programmeName} at ${app.universityName} from cart`}
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -226,16 +257,18 @@ export default function CartPage() {
             <Paper sx={{ p: 3 }}>
               <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
                 <Typography variant="body2">University fees</Typography>
-                <Typography variant="body2">R{universityFees}</Typography>
+                <Typography variant="body2">{formatZAR(universityFees)}</Typography>
               </Stack>
               <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
-                <Typography variant="body2">ApplyOnce service fees ({applications.length} × R{SERVICE_FEE_ZAR})</Typography>
-                <Typography variant="body2">R{serviceFees}</Typography>
+                <Typography variant="body2">
+                  ApplyOnce service fees ({applications.length} × {formatZAR(SERVICE_FEE_ZAR)})
+                </Typography>
+                <Typography variant="body2">{formatZAR(serviceFees)}</Typography>
               </Stack>
               <Divider sx={{ my: 2 }} />
               <Stack direction="row" justifyContent="space-between" sx={{ mb: 3 }}>
                 <Typography variant="h6">Total</Typography>
-                <Typography variant="h6">R{total}</Typography>
+                <Typography variant="h6">{formatZAR(total)}</Typography>
               </Stack>
 
               {missingDocs && (
@@ -256,7 +289,7 @@ export default function CartPage() {
                 disabled={missingDocs || submitting}
                 onClick={handleCheckout}
               >
-                {submitting ? 'Starting payment…' : `Pay R${total} and Submit All`}
+                {submitting ? 'Starting payment…' : `Pay ${formatZAR(total)} and Submit All`}
               </Button>
             </Paper>
           </>

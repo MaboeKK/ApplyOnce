@@ -4,17 +4,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { AxiosError } from 'axios';
-import {
-  Box,
-  Typography,
-  Paper,
-  Chip,
-  CircularProgress,
-  Alert,
-} from '@mui/material';
+import { Box, Typography, Paper, Chip, CircularProgress, Alert } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import DashboardLayout from '@/components/Layout/DashboardLayout';
 import { useAuthStore } from '@/store/auth';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { getStatusColor } from '@/utils/applicationStatus';
 import api from '@/config/api';
 
 interface Application {
@@ -34,53 +29,46 @@ interface Application {
 }
 
 export default function ApplicationsPage() {
+  return (
+    <ProtectedRoute>
+      <ApplicationsContent />
+    </ProtectedRoute>
+  );
+}
+
+function ApplicationsContent() {
   const router = useRouter();
-  const { isAuthenticated, user } = useAuthStore();
+  const { user } = useAuthStore();
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Auth guard - redirect to login if not authenticated
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/login');
-    }
-  }, [isAuthenticated, router]);
-
   // Fetch applications
   useEffect(() => {
-    if (!isAuthenticated) return;
+    let cancelled = false;
 
     const fetchApplications = async () => {
       try {
         setLoading(true);
         setError(null);
         const response = await api.get('/admin/applications');
+        if (cancelled) return;
         setApplications(response.data.applications);
       } catch (err) {
+        if (cancelled) return;
         console.error('Error fetching applications:', err);
         const axiosErr = err as AxiosError<{ message?: string }>;
         setError(axiosErr.response?.data?.message || 'Failed to load applications');
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchApplications();
-  }, [isAuthenticated]);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'submitted':
-        return 'info';
-      case 'accepted':
-        return 'success';
-      case 'rejected':
-        return 'error';
-      default:
-        return 'default';
-    }
-  };
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const columns: GridColDef[] = [
     {
@@ -137,8 +125,8 @@ export default function ApplicationsPage() {
     },
   ];
 
-  if (!isAuthenticated || !user) {
-    return null; // Will redirect via useEffect
+  if (!user) {
+    return null;
   }
 
   return (

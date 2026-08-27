@@ -10,6 +10,7 @@ import {
   getMyApplications,
   getApplication,
   deleteApplication,
+  retrySubmission,
 } from '../controllers/application';
 
 const router = Router();
@@ -124,5 +125,33 @@ router.get('/:id', requireStudent, getApplication);
  *         description: Application not found
  */
 router.delete('/:id', requireStudent, deleteApplication);
+
+/**
+ * @openapi
+ * /applications/{id}/retry-submission:
+ *   post:
+ *     summary: Retry a failed submission
+ *     tags: [Applications]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Retry attempted - check application.status for the outcome
+ *       400:
+ *         description: Application is not in a retryable state
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Not your application
+ *       404:
+ *         description: Application not found
+ */
+router.post('/:id/retry-submission', requireStudent, retrySubmission);
 
 export default router;

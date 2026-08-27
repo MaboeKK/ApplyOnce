@@ -4,6 +4,7 @@
 import Tesseract from 'tesseract.js';
 import { markToAPS, normalizeSubjectName } from '@applyonce/shared';
 import { logger } from './logger';
+import { InternalError } from './errors';
 
 export interface ExtractedSubject {
   subject: string;
@@ -31,7 +32,9 @@ export async function parseMatricCertificate(filePath: string): Promise<OCRResul
   try {
     // Run OCR
     logger.info({ filePath }, 'Starting OCR on matric certificate');
-    const { data: { text } } = await Tesseract.recognize(filePath, 'eng', {
+    const {
+      data: { text },
+    } = await Tesseract.recognize(filePath, 'eng', {
       logger: (m) => {
         if (m.status === 'recognizing text') {
           logger.debug({ progress: m.progress }, 'OCR progress');
@@ -55,9 +58,7 @@ export async function parseMatricCertificate(filePath: string): Promise<OCRResul
     let aps: number | null = null;
     if (subjects.length >= 6) {
       // Filter out Life Orientation and take best 6 subjects based on level
-      const nonLO = subjects.filter(
-        (s) => s.subject !== 'life_orientation' && s.level !== null
-      );
+      const nonLO = subjects.filter((s) => s.subject !== 'life_orientation' && s.level !== null);
       const sorted = [...nonLO].sort((a, b) => (b.level || 0) - (a.level || 0));
       const best6 = sorted.slice(0, 6);
       aps = best6.reduce((sum, s) => sum + (s.level || 0), 0);
@@ -66,9 +67,10 @@ export async function parseMatricCertificate(filePath: string): Promise<OCRResul
     }
 
     // Determine overall confidence
-    const avgConfidence = subjects.length > 0
-      ? subjects.filter((s) => s.confidence === 'high').length / subjects.length
-      : 0;
+    const avgConfidence =
+      subjects.length > 0
+        ? subjects.filter((s) => s.confidence === 'high').length / subjects.length
+        : 0;
     const confidence: 'high' | 'medium' | 'low' =
       avgConfidence > 0.7 ? 'high' : avgConfidence > 0.4 ? 'medium' : 'low';
 
@@ -82,7 +84,7 @@ export async function parseMatricCertificate(filePath: string): Promise<OCRResul
     };
   } catch (error) {
     logger.error({ error, filePath }, 'OCR failed');
-    throw new Error('OCR processing failed');
+    throw new InternalError('OCR processing failed');
   }
 }
 
@@ -90,7 +92,7 @@ export async function parseMatricCertificate(filePath: string): Promise<OCRResul
  * Parse subjects from OCR text
  * NSC format: Subject name | Percentage | Achievement Level (1-7)
  */
-function parseSubjects(text: string, warnings: string[]): ExtractedSubject[] {
+export function parseSubjects(text: string, warnings: string[]): ExtractedSubject[] {
   const subjects: ExtractedSubject[] = [];
   const lines = text.split('\n');
 
@@ -141,46 +143,20 @@ function parseSubjects(text: string, warnings: string[]): ExtractedSubject[] {
     // Extract all digit sequences from the numbers section
     const digitSequences = numbersSection.match(/\b\d+\b/g) || [];
 
-    let mark: number | null = null;
-    let level: number | null = null;
-
-    // Find the LAST single digit 1-7 in the line — this is the achievement level
-    for (let j = digitSequences.length - 1; j >= 0; j--) {
-      const num = parseInt(digitSequences[j], 10);
-
-      if (digitSequences[j].length === 1 && num >= 1 && num <= 7) {
-        level = num;
-
-        // Now look backward from the level for the percentage
-        for (let k = j - 1; k >= 0; k--) {
-          const markNum = parseInt(digitSequences[k], 10);
-          if (markNum >= 0 && markNum <= 100) {
-            mark = markNum;
-            break;
-          }
-        }
-        break; // Found the level, stop searching
-      }
-    }
+    const { level: foundLevel, levelIndex } = findAchievementLevel(digitSequences);
+    let level = foundLevel;
+    const mark = level !== null ? findPercentageMark(digitSequences, levelIndex) : null;
 
     // Fallback: if no level extracted, try to derive from percentage
     if (level === null && mark !== null) {
       level = markToAPS(mark);
     }
 
-    // Determine confidence
-    let confidence: 'high' | 'medium' | 'low' = 'low';
-    if (mark !== null && level !== null && Math.abs(markToAPS(mark) - level) === 0) {
-      confidence = 'high'; // Mark and level match
-    } else if (level !== null) {
-      confidence = 'medium'; // Have level but no mark or mismatch
-    }
-
     subjects.push({
       subject: normalizeSubjectName(subjectName),
       mark: mark !== null && mark >= 0 && mark <= 100 ? mark : null,
       level,
-      confidence,
+      confidence: classifyExtractionConfidence(mark, level),
     });
   }
 
@@ -192,14 +168,67 @@ function parseSubjects(text: string, warnings: string[]): ExtractedSubject[] {
 }
 
 /**
+ * Find the achievement level (1-7) in a line's digit sequences.
+ * Scans backward — the level is always the last standalone single digit 1-7.
+ * Returns the digit-sequence index it was found at, so findPercentageMark
+ * knows where to start scanning backward from.
+ */
+function findAchievementLevel(digitSequences: string[]): {
+  level: number | null;
+  levelIndex: number;
+} {
+  for (let j = digitSequences.length - 1; j >= 0; j--) {
+    const num = parseInt(digitSequences[j], 10);
+    if (digitSequences[j].length === 1 && num >= 1 && num <= 7) {
+      return { level: num, levelIndex: j };
+    }
+  }
+  return { level: null, levelIndex: -1 };
+}
+
+/**
+ * Find the percentage mark (0-100) preceding the achievement level.
+ */
+function findPercentageMark(digitSequences: string[], levelIndex: number): number | null {
+  for (let k = levelIndex - 1; k >= 0; k--) {
+    const markNum = parseInt(digitSequences[k], 10);
+    if (markNum >= 0 && markNum <= 100) {
+      return markNum;
+    }
+  }
+  return null;
+}
+
+/**
+ * Confidence is high when the mark and level agree with markToAPS(),
+ * medium when we only have a level, low otherwise.
+ */
+function classifyExtractionConfidence(
+  mark: number | null,
+  level: number | null
+): 'high' | 'medium' | 'low' {
+  if (mark !== null && level !== null && Math.abs(markToAPS(mark) - level) === 0) {
+    return 'high';
+  }
+  if (level !== null) {
+    return 'medium';
+  }
+  return 'low';
+}
+
+/**
  * Parse SA ID document to extract ID number
  */
-export async function parseIdDocument(filePath: string): Promise<{ idNumber: string | null; confidence: 'high' | 'medium' | 'low'; warnings: string[] }> {
+export async function parseIdDocument(
+  filePath: string
+): Promise<{ idNumber: string | null; confidence: 'high' | 'medium' | 'low'; warnings: string[] }> {
   const warnings: string[] = [];
 
   try {
     logger.info({ filePath }, 'Starting OCR on ID document');
-    const { data: { text } } = await Tesseract.recognize(filePath, 'eng', {
+    const {
+      data: { text },
+    } = await Tesseract.recognize(filePath, 'eng', {
       logger: (m) => {
         if (m.status === 'recognizing text') {
           logger.debug({ progress: m.progress }, 'OCR progress');
@@ -228,6 +257,6 @@ export async function parseIdDocument(filePath: string): Promise<{ idNumber: str
     return { idNumber, confidence, warnings };
   } catch (error) {
     logger.error({ error, filePath }, 'ID document OCR failed');
-    throw new Error('ID document OCR processing failed');
+    throw new InternalError('ID document OCR processing failed');
   }
 }

@@ -2,7 +2,7 @@
 // Faculty + programme selection for a single university
 // Shows qualifies (green/red) indicator and reach/match/safety chip per programme
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import {
   Box,
@@ -20,9 +20,9 @@ import {
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
 import PortalNav from '@/components/Layout/PortalNav';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { getErrorMessage } from '@/utils/error-message';
 import type { PortalApplication, ProgrammeMatch } from '@/types';
 import type { University, Programme, ChoiceStrategy } from '@applyonce/shared';
@@ -42,9 +42,16 @@ const strategyLabel: Record<ChoiceStrategy, string> = {
 };
 
 export default function UniversityDetailPage() {
+  return (
+    <ProtectedRoute>
+      <UniversityDetailContent />
+    </ProtectedRoute>
+  );
+}
+
+function UniversityDetailContent() {
   const router = useRouter();
   const { id } = router.query;
-  const { isAuthenticated } = useAuthStore();
 
   const [university, setUniversity] = useState<University | null>(null);
   const [matchByCode, setMatchByCode] = useState<Record<string, ProgrammeMatch>>({});
@@ -54,16 +61,16 @@ export default function UniversityDetailPage() {
   const [addingCode, setAddingCode] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [toast, setToast] = useState('');
+  const mountedRef = useRef(true);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/login');
-      return;
-    }
     if (!id) return;
     load();
+    return () => {
+      mountedRef.current = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, id]);
+  }, [id]);
 
   const load = async () => {
     setLoading(true);
@@ -73,15 +80,18 @@ export default function UniversityDetailPage() {
         api.get(`/universities/${universityId}`),
         api.get('/applications'),
       ]);
+      if (!mountedRef.current) return;
       setUniversity(uniRes.data.university);
 
       const existing = (appsRes.data.applications || []).find(
-        (a: PortalApplication) => a.universityId === universityId && ['draft', 'submitted'].includes(a.status)
+        (a: PortalApplication) =>
+          a.universityId === universityId && ['draft', 'submitted'].includes(a.status)
       );
       setExistingApp(existing || null);
 
       try {
         const matchesRes = await api.get('/aps/matches');
+        if (!mountedRef.current) return;
         const map: Record<string, ProgrammeMatch> = {};
         for (const m of (matchesRes.data.matches || []) as ProgrammeMatch[]) {
           if (m.universityId === universityId) {
@@ -91,12 +101,12 @@ export default function UniversityDetailPage() {
         setMatchByCode(map);
         setHasAPS(true);
       } catch {
-        setHasAPS(false);
+        if (mountedRef.current) setHasAPS(false);
       }
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to load university'));
+      if (mountedRef.current) setError(getErrorMessage(err, 'Failed to load university'));
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
   };
 
@@ -131,7 +141,7 @@ export default function UniversityDetailPage() {
     }
   };
 
-  if (!isAuthenticated || loading) {
+  if (loading) {
     return (
       <>
         <PortalNav />
@@ -177,9 +187,12 @@ export default function UniversityDetailPage() {
         )}
 
         {existingApp && (
-          <Alert severity={existingApp.status === 'submitted' ? 'success' : 'warning'} sx={{ mb: 3 }}>
-            You already have {existingApp.status === 'submitted' ? 'a submitted' : 'a draft'} application
-            to {university.name} for <strong>{existingApp.programmeName}</strong>.
+          <Alert
+            severity={existingApp.status === 'submitted' ? 'success' : 'warning'}
+            sx={{ mb: 3 }}
+          >
+            You already have {existingApp.status === 'submitted' ? 'a submitted' : 'a draft'}{' '}
+            application to {university.name} for <strong>{existingApp.programmeName}</strong>.
             {existingApp.status === 'draft' &&
               ' Remove it from your cart first if you want to choose a different programme here.'}
           </Alert>
@@ -200,8 +213,10 @@ export default function UniversityDetailPage() {
             <Stack spacing={2}>
               {programmes.map((programme: Programme) => {
                 const match = matchByCode[programme.qualificationCode];
-                const qualifies = match && (match.meetsRequirements || match.outcome === 'waitlist');
-                const disqualified = match && !match.meetsRequirements && match.outcome !== 'waitlist';
+                const qualifies =
+                  match && (match.meetsRequirements || match.outcome === 'waitlist');
+                const disqualified =
+                  match && !match.meetsRequirements && match.outcome !== 'waitlist';
                 const canAdd = !existingApp && (!match || qualifies || hasAPS === false);
 
                 return (
@@ -221,15 +236,14 @@ export default function UniversityDetailPage() {
                   >
                     <Box sx={{ flex: 1 }}>
                       <Stack direction="row" spacing={1} alignItems="center">
-                        {hasAPS && (
-                          qualifies ? (
+                        {hasAPS &&
+                          (qualifies ? (
                             <CheckCircleIcon color="success" fontSize="small" />
                           ) : disqualified ? (
                             <CancelIcon color="error" fontSize="small" />
                           ) : (
                             <HelpOutlineIcon color="disabled" fontSize="small" />
-                          )
-                        )}
+                          ))}
                         <Typography variant="subtitle1" fontWeight={600}>
                           {programme.name}
                         </Typography>
@@ -237,7 +251,8 @@ export default function UniversityDetailPage() {
                       <Typography variant="caption" color="text.secondary" display="block">
                         {programme.qualificationType} · {programme.durationYears} year
                         {programme.durationYears > 1 ? 's' : ''}
-                        {match && ` · Requires APS ${match.requiredAPS}, you have ${match.studentAPS}`}
+                        {match &&
+                          ` · Requires APS ${match.requiredAPS}, you have ${match.studentAPS}`}
                       </Typography>
                       {programme.note && (
                         <Typography variant="caption" color="text.secondary" display="block">
@@ -253,7 +268,12 @@ export default function UniversityDetailPage() {
                         />
                       )}
                       {disqualified && (match?.missingRequirements?.length ?? 0) > 0 && (
-                        <Typography variant="caption" color="error" display="block" sx={{ mt: 0.5 }}>
+                        <Typography
+                          variant="caption"
+                          color="error"
+                          display="block"
+                          sx={{ mt: 0.5 }}
+                        >
                           Missing: {match?.missingRequirements?.join(', ')}
                         </Typography>
                       )}

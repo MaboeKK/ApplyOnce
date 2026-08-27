@@ -1,17 +1,9 @@
 // packages/portal/src/components/Profile/ReviewStep.tsx
 // Final review before submission
 
-import {
-  Box,
-  Button,
-  Typography,
-  Paper,
-  Grid,
-  Divider,
-  Alert,
-  Chip,
-} from '@mui/material';
+import { Box, Button, Typography, Paper, Grid, Divider, Alert, Chip } from '@mui/material';
 import { subjectLabel } from '@/utils/subject-labels';
+import { formatZAR } from '@/utils/formatters';
 import type { User } from '@/store/auth';
 import type { ProfileWizardData } from '@/pages/profile/setup';
 import type { Subject } from '@/components/Profile/ResultsStep';
@@ -48,7 +40,8 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
 
       {data.results.aps && (
         <Alert severity="success" sx={{ mb: 3 }}>
-          Your APS is <strong>{data.results.aps}</strong>. This will be used to check which programmes you qualify for.
+          Your APS is <strong>{data.results.aps}</strong>. This will be used to check which
+          programmes you qualify for.
         </Alert>
       )}
 
@@ -69,9 +62,7 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
             <Typography variant="body2" color="text.secondary">
               Phone
             </Typography>
-            <Typography variant="body1">
-              {data.personal.phone || '-'}
-            </Typography>
+            <Typography variant="body1">{data.personal.phone || '-'}</Typography>
           </Grid>
           <Grid item xs={6}>
             <Typography variant="body2" color="text.secondary">
@@ -85,25 +76,19 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
             <Typography variant="body2" color="text.secondary">
               Nationality
             </Typography>
-            <Typography variant="body1">
-              {data.personal.nationality || '-'}
-            </Typography>
+            <Typography variant="body1">{data.personal.nationality || '-'}</Typography>
           </Grid>
           <Grid item xs={6}>
             <Typography variant="body2" color="text.secondary">
               Home Language
             </Typography>
-            <Typography variant="body1">
-              {data.personal.homeLanguage || '-'}
-            </Typography>
+            <Typography variant="body1">{data.personal.homeLanguage || '-'}</Typography>
           </Grid>
           <Grid item xs={12}>
             <Typography variant="body2" color="text.secondary">
               Disability
             </Typography>
-            <Typography variant="body1">
-              {data.personal.disability || 'None'}
-            </Typography>
+            <Typography variant="body1">{data.personal.disability || 'None'}</Typography>
           </Grid>
         </Grid>
       </Paper>
@@ -116,7 +101,8 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
           {data.address.street}
           {data.address.suburb && `, ${data.address.suburb}`}
           <br />
-          {data.address.city}, {(data.address.province && provinceNames[data.address.province]) || data.address.province}
+          {data.address.city},{' '}
+          {(data.address.province && provinceNames[data.address.province]) || data.address.province}
           <br />
           {data.address.postalCode}
         </Typography>
@@ -149,26 +135,20 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
             <Typography variant="body2" color="text.secondary">
               Phone
             </Typography>
-            <Typography variant="body1">
-              {data.guardian.phone}
-            </Typography>
+            <Typography variant="body1">{data.guardian.phone}</Typography>
           </Grid>
           <Grid item xs={6}>
             <Typography variant="body2" color="text.secondary">
               Email
             </Typography>
-            <Typography variant="body1">
-              {data.guardian.email || '-'}
-            </Typography>
+            <Typography variant="body1">{data.guardian.email || '-'}</Typography>
           </Grid>
           {typeof data.guardian.annualIncome === 'number' && (
             <Grid item xs={6}>
               <Typography variant="body2" color="text.secondary">
                 Annual Income
               </Typography>
-              <Typography variant="body1">
-                R{data.guardian.annualIncome.toLocaleString()}
-              </Typography>
+              <Typography variant="body1">{formatZAR(data.guardian.annualIncome)}</Typography>
             </Grid>
           )}
         </Grid>
@@ -184,7 +164,8 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
                   Name
                 </Typography>
                 <Typography variant="body1">
-                  {data.guardian.emergencyContact.firstName} {data.guardian.emergencyContact.lastName}
+                  {data.guardian.emergencyContact.firstName}{' '}
+                  {data.guardian.emergencyContact.lastName}
                 </Typography>
               </Grid>
               <Grid item xs={6}>
@@ -209,17 +190,13 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
             <Typography variant="body2" color="text.secondary">
               School
             </Typography>
-            <Typography variant="body1">
-              {data.school.school}
-            </Typography>
+            <Typography variant="body1">{data.school.school}</Typography>
           </Grid>
           <Grid item xs={6}>
             <Typography variant="body2" color="text.secondary">
               Year
             </Typography>
-            <Typography variant="body1">
-              {data.school.matricYear}
-            </Typography>
+            <Typography variant="body1">{data.school.matricYear}</Typography>
           </Grid>
         </Grid>
       </Paper>
@@ -234,15 +211,23 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
           </Typography>
           <Grid container spacing={1}>
             {data.results.subjects.map((subject: Subject, index: number) => {
-              const isLifeOrientation = subject.subject.toLowerCase().includes('life orientation') ||
-                                       subject.subject.toLowerCase().includes('life_orientation');
+              const isLifeOrientation =
+                subject.subject.toLowerCase().includes('life orientation') ||
+                subject.subject.toLowerCase().includes('life_orientation');
               return (
                 <Grid item xs={12} key={index}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Box
+                    sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                  >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Typography variant="body2">{subjectLabel(subject.subject)}</Typography>
                       {isLifeOrientation && (
-                        <Chip label="Not Considered" size="small" color="default" sx={{ fontSize: '0.7rem', height: 20 }} />
+                        <Chip
+                          label="Not Considered"
+                          size="small"
+                          color="default"
+                          sx={{ fontSize: '0.7rem', height: 20 }}
+                        />
                       )}
                     </Box>
                     <Typography variant="body2" fontWeight={600}>
@@ -260,12 +245,7 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
         <Button onClick={onBack} size="large" disabled={loading}>
           Back
         </Button>
-        <Button
-          onClick={onSubmit}
-          variant="contained"
-          size="large"
-          disabled={loading}
-        >
+        <Button onClick={onSubmit} variant="contained" size="large" disabled={loading}>
           {loading ? 'Submitting...' : 'Complete Profile'}
         </Button>
       </Box>

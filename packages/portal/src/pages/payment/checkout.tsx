@@ -15,15 +15,23 @@ import {
   Box,
 } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
-import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { getErrorMessage } from '@/utils/error-message';
+import { formatZAR } from '@/utils/formatters';
 import type { PortalPayment } from '@/types';
 
 export default function PaymentCheckoutPage() {
+  return (
+    <ProtectedRoute>
+      <PaymentCheckoutContent />
+    </ProtectedRoute>
+  );
+}
+
+function PaymentCheckoutContent() {
   const router = useRouter();
   const { paymentId } = router.query;
-  const { isAuthenticated } = useAuthStore();
 
   const [payment, setPayment] = useState<PortalPayment | null>(null);
   const [loading, setLoading] = useState(true);
@@ -31,18 +39,25 @@ export default function PaymentCheckoutPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/login');
-      return;
-    }
     if (!paymentId) return;
+    let cancelled = false;
 
     api
       .get(`/payments/${paymentId}`)
-      .then((res) => setPayment(res.data.payment))
-      .catch((err) => setError(err.response?.data?.error?.message || 'Payment not found'))
-      .finally(() => setLoading(false));
-  }, [isAuthenticated, paymentId, router]);
+      .then((res) => {
+        if (!cancelled) setPayment(res.data.payment);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.response?.data?.error?.message || 'Payment not found');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [paymentId]);
 
   const handlePay = async () => {
     setProcessing(true);
@@ -64,12 +79,19 @@ export default function PaymentCheckoutPage() {
     setProcessing(true);
     try {
       await api.post('/payments/notify', { paymentId, status: 'CANCELLED' });
+    } catch (err) {
+      // Not surfaced to the user — they're being redirected to the failed
+      // page regardless, but this must not become an unhandled rejection.
+      console.error(
+        'Failed to notify payment cancellation:',
+        getErrorMessage(err, 'Unknown error')
+      );
     } finally {
       router.push('/payment/failed');
     }
   };
 
-  if (!isAuthenticated || loading) {
+  if (loading) {
     return (
       <Container sx={{ py: 8, textAlign: 'center' }}>
         <CircularProgress />
@@ -113,7 +135,7 @@ export default function PaymentCheckoutPage() {
                 <Typography variant="body2">
                   {item.programmeName} ({item.universityName})
                 </Typography>
-                <Typography variant="body2">R{item.totalZAR}</Typography>
+                <Typography variant="body2">{formatZAR(item.totalZAR)}</Typography>
               </Stack>
             ))}
           </Stack>
@@ -121,7 +143,7 @@ export default function PaymentCheckoutPage() {
           <Divider sx={{ mb: 2 }} />
           <Stack direction="row" justifyContent="space-between" sx={{ mb: 3 }}>
             <Typography variant="h6">Total</Typography>
-            <Typography variant="h6">R{payment.totalAmountZAR}</Typography>
+            <Typography variant="h6">{formatZAR(payment.totalAmountZAR)}</Typography>
           </Stack>
 
           {error && (
@@ -132,7 +154,7 @@ export default function PaymentCheckoutPage() {
 
           <Stack spacing={1.5}>
             <Button variant="contained" size="large" onClick={handlePay} disabled={processing}>
-              {processing ? 'Processing…' : `Pay R${payment.totalAmountZAR} Now`}
+              {processing ? 'Processing…' : `Pay ${formatZAR(payment.totalAmountZAR)} Now`}
             </Button>
             <Button variant="text" onClick={handleCancel} disabled={processing}>
               Cancel

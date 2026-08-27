@@ -48,7 +48,7 @@ export interface ApplicationPayload {
   // Application
   programmeId: string;
   programmeName: string;
-  applyOnceReference: string;     // Our internal reference
+  applyOnceReference: string; // Our internal reference
 
   // Documents (base64 or storage URLs)
   documents: {
@@ -61,7 +61,7 @@ export interface ApplicationPayload {
 
 export interface SubmissionResult {
   success: boolean;
-  universityReference?: string;   // Their reference number if successful
+  universityReference?: string; // Their reference number if successful
   message: string;
   errors?: string[];
   submittedAt: string;

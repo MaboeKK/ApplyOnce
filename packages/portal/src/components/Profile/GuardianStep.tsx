@@ -74,7 +74,13 @@ interface Props {
   applicantEmail?: string;
 }
 
-export default function GuardianStep({ data, onNext, onBack, applicantPhone, applicantEmail }: Props) {
+export default function GuardianStep({
+  data,
+  onNext,
+  onBack,
+  applicantPhone,
+  applicantEmail,
+}: Props) {
   const applicantPhoneNational = (applicantPhone || '').replace(/^\+27/, '');
 
   const guardianSchema = useMemo(
@@ -94,7 +100,8 @@ export default function GuardianStep({ data, onNext, onBack, applicantPhone, app
             if (applicantPhoneNational && val === applicantPhoneNational) {
               ctx.addIssue({
                 code: z.ZodIssueCode.custom,
-                message: "Guardian phone number must be different from the applicant's phone number.",
+                message:
+                  "Guardian phone number must be different from the applicant's phone number.",
               });
             }
           }),
@@ -129,7 +136,11 @@ export default function GuardianStep({ data, onNext, onBack, applicantPhone, app
               if (val?.phone) {
                 const result = validatePhoneNational(val.phone);
                 if (!result.valid) {
-                  ctx.addIssue({ code: z.ZodIssueCode.custom, message: result.message, path: ['phone'] });
+                  ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: result.message,
+                    path: ['phone'],
+                  });
                 }
               }
             }),
@@ -190,21 +201,33 @@ export default function GuardianStep({ data, onNext, onBack, applicantPhone, app
     setValue('emergencyContact.phone', values.phone);
     setValue(
       'emergencyContact.relationship',
-      values.relationship === 'other' ? values.otherRelationship || '' : RELATIONSHIPS[values.relationship] || ''
+      values.relationship === 'other'
+        ? values.otherRelationship || ''
+        : RELATIONSHIPS[values.relationship] || ''
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sameAsGuardian, values.firstName, values.lastName, values.phone, values.relationship, values.otherRelationship]);
+  }, [
+    sameAsGuardian,
+    values.firstName,
+    values.lastName,
+    values.phone,
+    values.relationship,
+    values.otherRelationship,
+  ]);
 
   const onSubmit = (formData: GuardianData) => {
     onNext({
       ...formData,
       phone: toE164(formData.phone),
-      emergencyContact: formData.emergencyContactSameAsGuardian || formData.emergencyContact?.firstName
-        ? {
-            ...formData.emergencyContact,
-            phone: formData.emergencyContact?.phone ? toE164(formData.emergencyContact.phone) : undefined,
-          }
-        : undefined,
+      emergencyContact:
+        formData.emergencyContactSameAsGuardian || formData.emergencyContact?.firstName
+          ? {
+              ...formData.emergencyContact,
+              phone: formData.emergencyContact?.phone
+                ? toE164(formData.emergencyContact.phone)
+                : undefined,
+            }
+          : undefined,
     });
   };
 
@@ -448,7 +471,12 @@ export default function GuardianStep({ data, onNext, onBack, applicantPhone, app
             name="emergencyContact.relationship"
             control={control}
             render={({ field }) => (
-              <TextField {...field} label="Emergency Contact Relationship" fullWidth helperText="Optional" />
+              <TextField
+                {...field}
+                label="Emergency Contact Relationship"
+                fullWidth
+                helperText="Optional"
+              />
             )}
           />
         </Grid>
@@ -458,7 +486,13 @@ export default function GuardianStep({ data, onNext, onBack, applicantPhone, app
         <Button onClick={onBack} size="large" startIcon={<ArrowBackIcon />}>
           Back
         </Button>
-        <Button type="submit" variant="contained" size="large" endIcon={<ArrowForwardIcon />} disabled={!canProceed}>
+        <Button
+          type="submit"
+          variant="contained"
+          size="large"
+          endIcon={<ArrowForwardIcon />}
+          disabled={!canProceed}
+        >
           Next
         </Button>
       </Box>

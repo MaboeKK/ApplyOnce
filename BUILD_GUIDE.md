@@ -12,6 +12,7 @@
 You have the project zip. Get it to the server first.
 
 **Option A — scp from your laptop (PowerShell), one command:**
+
 ```powershell
 scp -i C:\Users\KK\.ssh\server\id_ed25519 applyonce_final.zip kmaboe@45.220.228.31:/home/kmaboe/
 ```
@@ -19,6 +20,7 @@ scp -i C:\Users\KK\.ssh\server\id_ed25519 applyonce_final.zip kmaboe@45.220.228.
 **Option B — your SSH client's file upload (SFTP):** drag `applyonce_final.zip` into `/home/kmaboe/`.
 
 Then SSH in and unzip:
+
 ```bash
 cd /home/kmaboe
 unzip applyonce_final.zip
@@ -27,6 +29,7 @@ ls applyonce                            # confirm CLAUDE.md, packages/, scripts/
 ```
 
 Put the server rules in place and start Claude CLI:
+
 ```bash
 cp applyonce/SERVER_CLAUDE.md ~/CLAUDE.md
 cd applyonce
@@ -40,12 +43,12 @@ claude
 ```
 Read CLAUDE.md fully before doing anything. Then:
 1. Confirm we are in /home/kmaboe/applyonce and summarise back to me the sandbox safety rules (ports, kmaboe- prefixes, what you must not touch).
-2. Run scripts/setup.sh — it verifies tools, checks our ports (3600/3601/3602/3610/3611) are free, starts ONLY the kmaboe-applyonce Postgres + Redis containers, installs npm deps, runs Prisma migrations, and seeds the 26 universities + admin accounts + demo student.
+2. Run scripts/setup.sh — it verifies tools, checks our ports (3600/3601/3602/3610) are free, starts ONLY the kmaboe-applyonce Postgres container, installs npm deps, runs Prisma migrations, and seeds the 26 universities + admin accounts + demo student.
 3. Initialise a LOCAL git repo (no remote, no GitHub) and make the first commit.
 4. STOP and report: what ran, what's now running (docker ps for kmaboe- containers only), and the seeded credentials. Do NOT write any application code yet.
 ```
 
-**QUICK CHECK (you):** `docker ps` shows `kmaboe-applyonce-postgres` and `kmaboe-applyonce-redis` running. Setup printed the seeded credentials. No errors.
+**QUICK CHECK (you):** `docker ps` shows `kmaboe-applyonce-postgres` running. Setup printed the seeded credentials. No errors.
 
 ---
 
@@ -105,39 +108,49 @@ Commit when done. STOP and report.
 > checking each, so Claude CLI never tries to do too much in one go.
 
 ### Prompt 6a — Shell, theme, auth screens
+
 ```
 Follow CLAUDE.md Build Order Phase B. Use the frontend-design skill and the design tokens in CLAUDE.md (indigo/violet/cyan, youthful, app-like, desktop-first but fully phone-responsive).
 Build ONLY: the Next.js app shell + MUI theme + layout, the Zustand auth store, and the register/login pages INCLUDING the email-verification step (in dev the code is shown on screen).
 Connect to the API base URL. Commit. STOP and report.
 ```
+
 **CHECK:** open `http://45.220.228.31:3601`, register the demo student, complete email verification, land logged-in.
 
 ### Prompt 6b — Profile wizard + document vault
+
 ```
 Build ONLY: the profile builder wizard (personal → address → guardian → school → results-upload → review) and the document vault. The results step is UPLOAD-FIRST: upload the matric certificate, the API OCR returns the marks + auto-APS, show a confirmation screen where any misread value can be corrected. Require matric certificate + ID document uploads.
 Commit. STOP and report.
 ```
+
 **CHECK:** upload a sample matric certificate from test-data/, see your APS appear, confirm it; upload an ID document.
 
 ### Prompt 6c — University browser + programme selection
+
 ```
 Build ONLY: the university browser (grid, filters by province/type, and a "only show where I qualify" toggle), the university detail page, faculty list, programme list, and programme detail. Each programme shows the green/red qualification indicator AND the choice-strategy chip (reach/match/safety). "Add to my applications" enforces one programme per university.
 Commit. STOP and report.
 ```
+
 **CHECK:** browse, open a BCom programme, see green tick + a reach/match/safety chip, add it; confirm you can't add a second programme at the same university.
 
 ### Prompt 6d — Cart + mock PayGate checkout
+
 ```
 Build ONLY: the application cart (per-line cost breakdown: university fee + R5, running total; block submit unless matric + ID uploaded; choice-balance nudge e.g. "2 reach, 0 safety — consider a safety choice"), and the payment flow. The mock PayGate must render a SIMPLE, PLAUSIBLE checkout screen ("Pay R465 — Confirm / Cancel") — not an instant jump — then on confirm, mark payment complete, trigger submission, and show a success page.
 Commit. STOP and report.
 ```
+
 **CHECK:** add 2–3 programmes, see the itemised total, go through the mock checkout screen, land on a success page; applications now show as submitted.
 
 ### Prompt 6e — Dashboard + status tracker
+
 ```
 Build ONLY: the student dashboard (APS badge, applications list with status badges, the choice-balance summary) and the application detail page (status timeline, university reference, and the decision + reason once a university responds).
 Commit. STOP and report.
 ```
+
 **CHECK:** dashboard shows your APS and your submitted applications with statuses.
 
 ---
@@ -145,17 +158,21 @@ Commit. STOP and report.
 ## PROMPT 7 — University admin portal (split into 7a–7b)
 
 ### Prompt 7a — Admin shell, login, inbox
+
 ```
 Follow CLAUDE.md Build Order Phase C. Build ONLY: the admin app (packages/admin) with a separate, neutral/professional MUI theme, the university admin login page, and the applications inbox (a table of applications for THIS university only — enforce the isolation rules).
 Commit. STOP and report.
 ```
+
 **CHECK:** open `http://45.220.228.31:3602`, log in as `admin@uj.applyonce.co.za`, see the seeded UJ sample application in the inbox.
 
 ### Prompt 7b — Application detail + decision
+
 ```
 Build ONLY: the application detail page (full student profile, APS, subjects, AND view/download of the student's uploaded ID + matric certificate) and the decision panel (Accept or Decline — no waitlist — required reason + confirm) that calls the admin decision endpoint and notifies the student in-app + email.
 Commit. STOP and report.
 ```
+
 **CHECK:** open the UJ application, view the student's documents, Accept it with a reason; confirm the demo student's dashboard then shows the acceptance.
 
 ---
@@ -178,7 +195,8 @@ Commit. STOP and report.
 Tell Claude CLI exactly what you saw (the error, or "the health check didn't load"). Let it fix and re-report BEFORE you give the next prompt. Never paste the next prompt on top of a broken phase.
 
 ## Reminder of the safety rules (already in CLAUDE.md and ~/CLAUDE.md)
-- Only kmaboe- Docker containers; never touch goturbo-*
-- Ports 3600/3601/3602 (apps), 3610/3611 (DB/Redis, localhost only)
+
+- Only kmaboe- Docker containers; never touch goturbo-\*
+- Ports 3600/3601/3602 (apps), 3610 (DB, localhost only)
 - Work only inside /home/kmaboe/applyonce
 - Local git only — backups go to your Google Drive

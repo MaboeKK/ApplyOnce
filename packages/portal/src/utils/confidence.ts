@@ -20,7 +20,9 @@ const TIER_DISPLAY: Record<ConfidenceTier, ConfidenceDisplay> = {
 };
 
 /** Returns a safe display object for a confidence tier, or `Unavailable` if none was provided. */
-export function confidenceDisplay(tier: ConfidenceTier | null | undefined): ConfidenceDisplay & { available: boolean } {
+export function confidenceDisplay(
+  tier: ConfidenceTier | null | undefined
+): ConfidenceDisplay & { available: boolean } {
   if (!tier || !TIER_DISPLAY[tier]) {
     return { label: 'Unavailable', percent: 0, color: 'error', available: false };
   }

@@ -12,7 +12,7 @@ import {
   SubjectKey,
   matchesSubjectKey,
   getStudentMathsType,
-  ApsMinimum
+  ApsMinimum,
 } from '../types/university';
 
 // ─── APS POINT CONVERSION ───────────────────────────────────────────────────
@@ -53,17 +53,14 @@ export interface SubjectAPSBreakdown {
  * UJ: 6 subjects, LO excluded
  * Wits: 7 subjects, LO included
  */
-export function calculateAPS(
-  results: SubjectResult[],
-  university: University
-): APSResult {
+export function calculateAPS(results: SubjectResult[], university: University): APSResult {
   const errors: string[] = [];
 
   if (results.length < 6) {
     errors.push(`Only ${results.length} subjects provided. Minimum 6 required.`);
   }
 
-  const breakdown: SubjectAPSBreakdown[] = results.map(r => ({
+  const breakdown: SubjectAPSBreakdown[] = results.map((r) => ({
     subject: r.subject,
     mark: r.mark,
     rating: markToAPS(r.mark),
@@ -74,8 +71,8 @@ export function calculateAPS(
   const { subjectsCounted, includesLifeOrientation } = university.apsRule;
 
   // Separate LO from other subjects
-  const loEntry = breakdown.find(b => b.isLO);
-  const otherSubjects = breakdown.filter(b => !b.isLO);
+  const loEntry = breakdown.find((b) => b.isLO);
+  const otherSubjects = breakdown.filter((b) => !b.isLO);
 
   // Sort by rating descending
   const sortedOthers = [...otherSubjects].sort((a, b) => b.rating - a.rating);
@@ -88,7 +85,9 @@ export function calculateAPS(
     const countWithoutLO = subjectsCounted - 1;
     topSubjects = sortedOthers.slice(0, countWithoutLO);
 
-    topSubjects.forEach(s => { s.included = true; });
+    topSubjects.forEach((s) => {
+      s.included = true;
+    });
 
     const baseAPS = topSubjects.reduce((sum, s) => sum + s.rating, 0);
     const loPoints = loEntry ? loEntry.rating : 0;
@@ -101,7 +100,9 @@ export function calculateAPS(
   } else {
     // Take best subjectsCounted non-LO subjects, LO excluded
     topSubjects = sortedOthers.slice(0, subjectsCounted);
-    topSubjects.forEach(s => { s.included = true; });
+    topSubjects.forEach((s) => {
+      s.included = true;
+    });
     totalAPS = topSubjects.reduce((sum, s) => sum + s.rating, 0);
   }
 
@@ -127,8 +128,10 @@ export function matchStudentToProgramme(
   university: University
 ): UniversityMatch {
   // Check if this is a placeholder programme
-  if (programme.admission.note?.includes('requirements not yet available') ||
-      programme.admission.note?.includes('Placeholder')) {
+  if (
+    programme.admission.note?.includes('requirements not yet available') ||
+    programme.admission.note?.includes('Placeholder')
+  ) {
     return {
       university,
       programme,
@@ -247,7 +250,14 @@ function getApplicableApsMinimum(
  */
 function evaluateSubjectRequirements(
   studentResults: SubjectResult[],
-  requirements: { subject: SubjectKey; status: string; minRating?: Rating; homeLanguageRating?: Rating; additionalLanguageRating?: Rating; altGroup?: string }[]
+  requirements: {
+    subject: SubjectKey;
+    status: string;
+    minRating?: Rating;
+    homeLanguageRating?: Rating;
+    additionalLanguageRating?: Rating;
+    altGroup?: string;
+  }[]
 ): { missing: string[] } {
   const missing: string[] = [];
 
@@ -265,12 +275,13 @@ function evaluateSubjectRequirements(
       altGroups.get(req.altGroup)!.push(req);
     } else if (req.status === 'not_accepted') {
       // Check if student has this subject — if yes, fail
-      const hasSubject = studentResults.some(r => matchesSubjectKey(r.subject, req.subject));
+      const hasSubject = studentResults.some((r) => matchesSubjectKey(r.subject, req.subject));
       if (hasSubject) {
         // Check if there's an acceptable alternative
-        const hasAcceptableAlternative = requirements.some(alt =>
-          (alt.status === 'required' || alt.status === 'alternative') &&
-          studentResults.some(r => matchesSubjectKey(r.subject, alt.subject))
+        const hasAcceptableAlternative = requirements.some(
+          (alt) =>
+            (alt.status === 'required' || alt.status === 'alternative') &&
+            studentResults.some((r) => matchesSubjectKey(r.subject, alt.subject))
         );
         if (!hasAcceptableAlternative) {
           missing.push(`${req.subject} is not accepted for this programme`);
@@ -281,7 +292,7 @@ function evaluateSubjectRequirements(
 
   // Check required subjects
   for (const req of requiredReqs) {
-    const studentSubj = studentResults.find(r => matchesSubjectKey(r.subject, req.subject));
+    const studentSubj = studentResults.find((r) => matchesSubjectKey(r.subject, req.subject));
 
     if (!studentSubj) {
       missing.push(`Missing required subject: ${req.subject}`);
@@ -306,16 +317,19 @@ function evaluateSubjectRequirements(
   // Check alternative groups (at least ONE must be satisfied)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   for (const [_, alts] of altGroups) {
-    const satisfied = alts.some(req => {
-      const studentSubj = studentResults.find(r => matchesSubjectKey(r.subject, req.subject));
+    const satisfied = alts.some((req) => {
+      const studentSubj = studentResults.find((r) => matchesSubjectKey(r.subject, req.subject));
       if (!studentSubj) return false;
       const rating = markToAPS(studentSubj.mark);
       return req.minRating ? rating >= req.minRating : true;
     });
 
     if (!satisfied) {
-      const altNames = alts.map(a => a.subject).join(' OR ');
-      const minRatings = alts.map(a => a.minRating ? `Level ${a.minRating}` : '').filter(Boolean).join(' or ');
+      const altNames = alts.map((a) => a.subject).join(' OR ');
+      const minRatings = alts
+        .map((a) => (a.minRating ? `Level ${a.minRating}` : ''))
+        .filter(Boolean)
+        .join(' or ');
       missing.push(`Need one of: ${altNames} ${minRatings ? `at ${minRatings}` : ''}`);
     }
   }
@@ -342,7 +356,7 @@ export function findAllMatches(
   return matches.sort((a, b) => {
     if (a.meetsRequirements && !b.meetsRequirements) return -1;
     if (!a.meetsRequirements && b.meetsRequirements) return 1;
-    return (a.requiredAPS - a.studentAPS) - (b.requiredAPS - b.studentAPS);
+    return a.requiredAPS - a.studentAPS - (b.requiredAPS - b.studentAPS);
   });
 }
 
@@ -358,7 +372,8 @@ export function classifyChoice(
   // Does not meet minimum
   if (gap < 0) {
     // ECPs might still be reachable with lower entry
-    const isECP = programme.qualificationType.includes('extended') || programme.firstTimeEntrantsOnly;
+    const isECP =
+      programme.qualificationType.includes('extended') || programme.firstTimeEntrantsOnly;
     return isECP ? 'reach' : 'not_qualified';
   }
 

@@ -1,8 +1,13 @@
 // packages/api/src/config/index.ts
 // Central configuration from environment variables
 
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import path from 'path';
+
+// Tests must never load the same .env as `npm run dev` — that file points at
+// a developer's real local database, and the test suite does bulk deletes.
+// See packages/api/.env.test.example and src/__tests__/jest.setup.ts.
+dotenv.config({ path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env' });
 
 function required(key: string): string {
   const value = process.env[key];
@@ -27,7 +32,6 @@ export const config = {
 
   // Database
   databaseUrl: required('DATABASE_URL'),
-  redisUrl: optional('REDIS_URL', 'redis://localhost:3611'),
 
   // CORS
   corsOrigins: optional('CORS_ORIGINS', 'http://localhost:3601,http://localhost:3602')
@@ -70,8 +74,8 @@ export const config = {
 
   // PayGate
   paygate: {
-    id: optional('PAYGATE_ID', '10011072130'),
-    secret: optional('PAYGATE_SECRET', 'secret'),
+    id: required('PAYGATE_ID'),
+    secret: required('PAYGATE_SECRET'),
     sandbox: optional('PAYGATE_SANDBOX', 'true') === 'true',
   },
 } as const;

@@ -15,32 +15,12 @@ import {
   Box,
   Button,
 } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
-import ErrorIcon from '@mui/icons-material/Error';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import { useAuthStore } from '@/store/auth';
 import api from '@/config/api';
 import PortalNav from '@/components/Layout/PortalNav';
-import type { PortalApplication, ApplicationStatus, ApplicationEvent } from '@/types';
-
-function getStatusConfig(status: ApplicationStatus) {
-  switch (status) {
-    case 'draft':
-      return { color: 'default' as const, label: 'Draft', icon: <HourglassEmptyIcon fontSize="small" /> };
-    case 'submitted':
-      return { color: 'info' as const, label: 'Submitted', icon: <HourglassEmptyIcon fontSize="small" /> };
-    case 'accepted':
-      return { color: 'success' as const, label: 'Accepted', icon: <CheckCircleIcon fontSize="small" /> };
-    case 'rejected':
-      return { color: 'error' as const, label: 'Rejected', icon: <CancelIcon fontSize="small" /> };
-    case 'submission_failed':
-      return { color: 'error' as const, label: 'Submission Failed', icon: <ErrorIcon fontSize="small" /> };
-    default:
-      return { color: 'default' as const, label: status, icon: <HourglassEmptyIcon fontSize="small" /> };
-  }
-}
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { getStatusConfig } from '@/utils/applicationStatus';
+import type { PortalApplication, ApplicationEvent } from '@/types';
 
 const eventLabels: Record<string, string> = {
   created: 'Added to cart',
@@ -50,29 +30,43 @@ const eventLabels: Record<string, string> = {
 };
 
 export default function ApplicationDetailPage() {
+  return (
+    <ProtectedRoute>
+      <ApplicationDetailContent />
+    </ProtectedRoute>
+  );
+}
+
+function ApplicationDetailContent() {
   const router = useRouter();
   const { id } = router.query;
-  const { isAuthenticated } = useAuthStore();
 
   const [application, setApplication] = useState<PortalApplication | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/login');
-      return;
-    }
     if (!id) return;
+    let cancelled = false;
 
     api
       .get(`/applications/${id}`)
-      .then((res) => setApplication(res.data.application))
-      .catch((err) => setError(err.response?.data?.error?.message || 'Application not found'))
-      .finally(() => setLoading(false));
-  }, [isAuthenticated, id, router]);
+      .then((res) => {
+        if (!cancelled) setApplication(res.data.application);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.response?.data?.error?.message || 'Application not found');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
 
-  if (!isAuthenticated || loading) {
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  if (loading) {
     return (
       <>
         <PortalNav />
@@ -125,7 +119,10 @@ export default function ApplicationDetailPage() {
           )}
 
           {application.decision && (
-            <Alert severity={application.decision === 'accepted' ? 'success' : 'error'} sx={{ mt: 3 }}>
+            <Alert
+              severity={application.decision === 'accepted' ? 'success' : 'error'}
+              sx={{ mt: 3 }}
+            >
               <Typography variant="body2" fontWeight={600}>
                 {application.decision === 'accepted' ? 'Accepted' : 'Rejected'}
               </Typography>

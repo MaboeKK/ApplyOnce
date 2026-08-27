@@ -3,14 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import {
-  Box,
-  Button,
-  TextField,
-  Alert,
-  InputAdornment,
-  IconButton,
-} from '@mui/material';
+import { Box, Button, TextField, Alert, InputAdornment, IconButton } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import AuthLayout from '@/components/Layout/AuthLayout';
 import { useAuthStore } from '@/store/auth';
@@ -76,7 +69,11 @@ export default function LoginPage() {
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                <IconButton
+                  onClick={() => setShowPassword(!showPassword)}
+                  edge="end"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
                   {showPassword ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
               </InputAdornment>

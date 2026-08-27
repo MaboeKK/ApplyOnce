@@ -11,11 +11,19 @@ export function saveDraft<T>(key: string, value: T): void {
   }
 }
 
-export function loadDraft<T>(key: string): T | null {
+/**
+ * Loads a draft, optionally checked against `isValid` before being trusted
+ * as `T` — without it, a stale draft from a previous app version (different
+ * shape) or a hand-edited localStorage value would be cast blindly.
+ */
+export function loadDraft<T>(key: string, isValid?: (value: unknown) => value is T): T | null {
   if (typeof window === 'undefined') return null;
   try {
     const raw = window.localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : null;
+    if (!raw) return null;
+    const parsed: unknown = JSON.parse(raw);
+    if (isValid && !isValid(parsed)) return null;
+    return parsed as T;
   } catch {
     return null;
   }

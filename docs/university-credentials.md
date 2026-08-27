@@ -12,44 +12,44 @@ Admin@ApplyOnce1
 
 ## Demo Student Account
 
-| Field | Value |
-|---|---|
-| Email | demo@applyonce.co.za |
-| Password | Student@ApplyOnce1 |
-| ID Number | 0001015009087 |
+| Field     | Value                |
+| --------- | -------------------- |
+| Email     | demo@applyonce.co.za |
+| Password  | Student@ApplyOnce1   |
+| ID Number | 0001015009087        |
 
 ---
 
 ## All 26 University Admin Accounts
 
-| University | Abbreviation | Login Email |
-|---|---|---|
-| University of Cape Town | UCT | admin@uct.applyonce.co.za |
-| University of the Witwatersrand | Wits | admin@wits.applyonce.co.za |
-| University of Pretoria | UP | admin@up.applyonce.co.za |
-| Stellenbosch University | SU | admin@su.applyonce.co.za |
-| University of Johannesburg | UJ | admin@uj.applyonce.co.za |
-| University of KwaZulu-Natal | UKZN | admin@ukzn.applyonce.co.za |
-| University of the Free State | UFS | admin@ufs.applyonce.co.za |
-| North-West University | NWU | admin@nwu.applyonce.co.za |
-| Nelson Mandela University | NMU | admin@nmu.applyonce.co.za |
-| University of the Western Cape | UWC | admin@uwc.applyonce.co.za |
-| Rhodes University | Rhodes | admin@rhodes.applyonce.co.za |
-| University of South Africa | UNISA | admin@unisa.applyonce.co.za |
-| Tshwane University of Technology | TUT | admin@tut.applyonce.co.za |
-| Durban University of Technology | DUT | admin@dut.applyonce.co.za |
-| Cape Peninsula University of Technology | CPUT | admin@cput.applyonce.co.za |
-| Vaal University of Technology | VUT | admin@vut.applyonce.co.za |
-| Central University of Technology | CUT | admin@cut.applyonce.co.za |
-| Mangosuthu University of Technology | MUT | admin@mut.applyonce.co.za |
-| University of Zululand | UniZulu | admin@unizulu.applyonce.co.za |
-| University of Fort Hare | UFH | admin@ufh.applyonce.co.za |
-| Walter Sisulu University | WSU | admin@wsu.applyonce.co.za |
-| Sefako Makgatho Health Sciences University | SMU | admin@smu.applyonce.co.za |
-| Sol Plaatje University | SPU | admin@spu.applyonce.co.za |
-| University of Mpumalanga | UMP | admin@ump.applyonce.co.za |
-| University of Limpopo | UL | admin@ul.applyonce.co.za |
-| University of Venda | UNIVEN | admin@univen.applyonce.co.za |
+| University                                 | Abbreviation | Login Email                   |
+| ------------------------------------------ | ------------ | ----------------------------- |
+| University of Cape Town                    | UCT          | admin@uct.applyonce.co.za     |
+| University of the Witwatersrand            | Wits         | admin@wits.applyonce.co.za    |
+| University of Pretoria                     | UP           | admin@up.applyonce.co.za      |
+| Stellenbosch University                    | SU           | admin@su.applyonce.co.za      |
+| University of Johannesburg                 | UJ           | admin@uj.applyonce.co.za      |
+| University of KwaZulu-Natal                | UKZN         | admin@ukzn.applyonce.co.za    |
+| University of the Free State               | UFS          | admin@ufs.applyonce.co.za     |
+| North-West University                      | NWU          | admin@nwu.applyonce.co.za     |
+| Nelson Mandela University                  | NMU          | admin@nmu.applyonce.co.za     |
+| University of the Western Cape             | UWC          | admin@uwc.applyonce.co.za     |
+| Rhodes University                          | Rhodes       | admin@rhodes.applyonce.co.za  |
+| University of South Africa                 | UNISA        | admin@unisa.applyonce.co.za   |
+| Tshwane University of Technology           | TUT          | admin@tut.applyonce.co.za     |
+| Durban University of Technology            | DUT          | admin@dut.applyonce.co.za     |
+| Cape Peninsula University of Technology    | CPUT         | admin@cput.applyonce.co.za    |
+| Vaal University of Technology              | VUT          | admin@vut.applyonce.co.za     |
+| Central University of Technology           | CUT          | admin@cut.applyonce.co.za     |
+| Mangosuthu University of Technology        | MUT          | admin@mut.applyonce.co.za     |
+| University of Zululand                     | UniZulu      | admin@unizulu.applyonce.co.za |
+| University of Fort Hare                    | UFH          | admin@ufh.applyonce.co.za     |
+| Walter Sisulu University                   | WSU          | admin@wsu.applyonce.co.za     |
+| Sefako Makgatho Health Sciences University | SMU          | admin@smu.applyonce.co.za     |
+| Sol Plaatje University                     | SPU          | admin@spu.applyonce.co.za     |
+| University of Mpumalanga                   | UMP          | admin@ump.applyonce.co.za     |
+| University of Limpopo                      | UL           | admin@ul.applyonce.co.za      |
+| University of Venda                        | UNIVEN       | admin@univen.applyonce.co.za  |
 
 ---
 

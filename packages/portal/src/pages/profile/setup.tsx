@@ -15,6 +15,7 @@ import {
   Alert,
 } from '@mui/material';
 import { useAuthStore } from '@/store/auth';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import PersonalStep from '@/components/Profile/PersonalStep';
 import AddressStep from '@/components/Profile/AddressStep';
 import GuardianStep from '@/components/Profile/GuardianStep';
@@ -55,9 +56,27 @@ interface WizardDraft {
   profileData: ProfileWizardData;
 }
 
+function isWizardDraft(value: unknown): value is WizardDraft {
+  if (typeof value !== 'object' || value === null) return false;
+  const draft = value as Partial<WizardDraft>;
+  return (
+    typeof draft.activeStep === 'number' &&
+    typeof draft.profileData === 'object' &&
+    draft.profileData !== null
+  );
+}
+
 export default function ProfileSetup() {
+  return (
+    <ProtectedRoute>
+      <ProfileSetupContent />
+    </ProtectedRoute>
+  );
+}
+
+function ProfileSetupContent() {
   const router = useRouter();
-  const { isAuthenticated, user } = useAuthStore();
+  const { user } = useAuthStore();
   const [activeStep, setActiveStep] = useState(0);
   const [profileData, setProfileData] = useState<ProfileWizardData>({
     personal: {},
@@ -72,15 +91,13 @@ export default function ProfileSetup() {
   const [resumedFromDraft, setResumedFromDraft] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/login');
-      return;
-    }
+    let cancelled = false;
 
     // Fetch existing profile data to allow resuming
     const fetchExistingProfile = async () => {
       try {
         const response = await api.get('/students/me');
+        if (cancelled) return;
         const student: StudentProfile = response.data.student;
 
         // Pre-fill profile data if it exists
@@ -126,30 +143,35 @@ export default function ProfileSetup() {
           // Otherwise start at step 0 (Personal)
         }
       } catch (err) {
-        console.error('Failed to fetch existing profile:', err);
+        if (!cancelled) console.error('Failed to fetch existing profile:', err);
       } finally {
-        // A stray pre-fix draft was saved under an unscoped key and could belong to
-        // *any* student who used this browser — purge it so it can never be read again.
-        clearDraft(LEGACY_UNSCOPED_DRAFT_KEY);
+        if (!cancelled) {
+          // A stray pre-fix draft was saved under an unscoped key and could belong to
+          // *any* student who used this browser — purge it so it can never be read again.
+          clearDraft(LEGACY_UNSCOPED_DRAFT_KEY);
 
-        // A local draft always reflects more recent in-browser progress than the server
-        // (intermediate wizard steps aren't persisted server-side until final submit),
-        // so it takes priority — this is what lets a refresh mid-wizard resume correctly.
-        // Scoped to this student's id so it can never resume with another student's data.
-        if (user?.id) {
-          const draft = loadDraft<WizardDraft>(wizardDraftKey(user.id));
-          if (draft) {
-            setProfileData(draft.profileData);
-            setActiveStep(draft.activeStep);
-            setResumedFromDraft(true);
+          // A local draft always reflects more recent in-browser progress than the server
+          // (intermediate wizard steps aren't persisted server-side until final submit),
+          // so it takes priority — this is what lets a refresh mid-wizard resume correctly.
+          // Scoped to this student's id so it can never resume with another student's data.
+          if (user?.id) {
+            const draft = loadDraft<WizardDraft>(wizardDraftKey(user.id), isWizardDraft);
+            if (draft) {
+              setProfileData(draft.profileData);
+              setActiveStep(draft.activeStep);
+              setResumedFromDraft(true);
+            }
           }
+          setHydrated(true);
         }
-        setHydrated(true);
       }
     };
 
     fetchExistingProfile();
-  }, [isAuthenticated, router, user?.id]);
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
 
   // Auto-save wizard progress so a refresh or interrupted session resumes where the user left off.
   useEffect(() => {
@@ -161,10 +183,13 @@ export default function ProfileSetup() {
     const stepKeys = ['personal', 'address', 'guardian', 'school', 'results', 'review'];
     const currentKey = stepKeys[activeStep];
 
-    setProfileData((prev) => ({
-      ...prev,
-      [currentKey]: stepData,
-    } as ProfileWizardData));
+    setProfileData(
+      (prev) =>
+        ({
+          ...prev,
+          [currentKey]: stepData,
+        }) as ProfileWizardData
+    );
 
     setActiveStep((prev) => prev + 1);
     setError('');
@@ -229,15 +254,15 @@ export default function ProfileSetup() {
       router.push('/dashboard');
     } catch (err) {
       // Extract validation details if available
-      const axiosErr = err as AxiosError<{ error?: { message?: string; details?: Array<{ path: string; message: string }> } }>;
+      const axiosErr = err as AxiosError<{
+        error?: { message?: string; details?: Array<{ path: string; message: string }> };
+      }>;
       const errorData = axiosErr.response?.data?.error;
       let message = errorData?.message || 'Failed to save profile';
 
       // Append validation details if present
       if (errorData?.details && Array.isArray(errorData.details)) {
-        const fieldErrors = errorData.details
-          .map((d) => `${d.path}: ${d.message}`)
-          .join(', ');
+        const fieldErrors = errorData.details.map((d) => `${d.path}: ${d.message}`).join(', ');
         message = `${message} — ${fieldErrors}`;
       }
 
@@ -251,21 +276,9 @@ export default function ProfileSetup() {
   const renderStepContent = () => {
     switch (activeStep) {
       case 0:
-        return (
-          <PersonalStep
-            data={profileData.personal}
-            onNext={handleNext}
-            user={user}
-          />
-        );
+        return <PersonalStep data={profileData.personal} onNext={handleNext} user={user} />;
       case 1:
-        return (
-          <AddressStep
-            data={profileData.address}
-            onNext={handleNext}
-            onBack={handleBack}
-          />
-        );
+        return <AddressStep data={profileData.address} onNext={handleNext} onBack={handleBack} />;
       case 2:
         return (
           <GuardianStep
@@ -277,13 +290,7 @@ export default function ProfileSetup() {
           />
         );
       case 3:
-        return (
-          <SchoolStep
-            data={profileData.school}
-            onNext={handleNext}
-            onBack={handleBack}
-          />
-        );
+        return <SchoolStep data={profileData.school} onNext={handleNext} onBack={handleBack} />;
       case 4:
         return (
           <ResultsStep
@@ -308,10 +315,6 @@ export default function ProfileSetup() {
         return null;
     }
   };
-
-  if (!isAuthenticated) {
-    return null;
-  }
 
   return (
     <Container maxWidth="md" sx={{ py: 6 }}>

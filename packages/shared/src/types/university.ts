@@ -9,9 +9,11 @@ export type Rating = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 // Generic keys allow matching across similar subjects
 export type SubjectKey =
   | 'english'
-  | 'homeLanguage'          // matches any *_home language
-  | 'additionalLanguage'    // matches any *_fal language
-  | 'afrikaans' | 'isiZulu' | 'sepedi'
+  | 'homeLanguage' // matches any *_home language
+  | 'additionalLanguage' // matches any *_fal language
+  | 'afrikaans'
+  | 'isiZulu'
+  | 'sepedi'
   | 'mathematics'
   | 'mathematicalLiteracy'
   | 'technicalMathematics'
@@ -25,8 +27,8 @@ export type SubjectKey =
 // ── How a university computes APS ───────────────────────────────────
 export interface ApsRule {
   method: 'standard_aps' | 'composite_index' | 'custom';
-  subjectsCounted: number;            // UJ = 6, Wits = 7
-  includesLifeOrientation: boolean;   // UJ = false, Wits = true
+  subjectsCounted: number; // UJ = 6, Wits = 7
+  includesLifeOrientation: boolean; // UJ = false, Wits = true
   scale: 'nsc_7point' | 'percentage_600' | 'percentage_average' | 'nsc_8point';
   bonusPoints?: string;
   note?: string;
@@ -39,12 +41,12 @@ export interface ApsRule {
 // ── Per-faculty score transform (e.g. UCT APS → FPS → WPS) ──────────
 export interface FacultyScoringRule {
   faculty: string;
-  scoreName: string;                  // e.g. 'FPS', 'WPS'
-  scoreMax: number;                   // e.g. 600, 800, 900
-  transform: string;                  // human-readable formula/description
+  scoreName: string; // e.g. 'FPS', 'WPS'
+  scoreMax: number; // e.g. 600, 800, 900
+  transform: string; // human-readable formula/description
   disadvantageFactor?: {
-    maxPercent: number;               // e.g. 20 for Health Sciences (0-20%)
-    formula: string;                  // e.g. 'WPS = FPS + (factor% x FPS)'
+    maxPercent: number; // e.g. 20 for Health Sciences (0-20%)
+    formula: string; // e.g. 'WPS = FPS + (factor% x FPS)'
     note?: string;
   };
   usesNBT?: boolean;
@@ -53,19 +55,19 @@ export interface FacultyScoringRule {
 
 // ── University ──────────────────────────────────────────────────────
 export interface University {
-  id: string;                         // slug, e.g. 'uj', 'wits'
+  id: string; // slug, e.g. 'uj', 'wits'
   name: string;
   shortName: string;
-  applicationSystem: string;          // 'Custom portal' | 'CAO' | 'PeopleSoft'
-  applicationFee: number;             // ZAR. 0 = free
+  applicationSystem: string; // 'Custom portal' | 'CAO' | 'PeopleSoft'
+  applicationFee: number; // ZAR. 0 = free
   feeNote?: string;
-  maxChoices: number;                 // UJ = 2, Wits = 3
+  maxChoices: number; // UJ = 2, Wits = 3
   choicesRanked: boolean;
   choicesIndependent: boolean;
   choicesFinal: boolean;
   apsRule: ApsRule;
-  applicationsOpen?: string;          // ISO date
-  defaultClosingDate: string;         // ISO datetime
+  applicationsOpen?: string; // ISO date
+  defaultClosingDate: string; // ISO datetime
   applyUrl: string;
   notes?: string[];
   programmes: Programme[];
@@ -75,19 +77,24 @@ export interface University {
   province?: string;
   website?: string;
   applicationPortal?: string;
-  logoUrl?: string;                   // path to a real logo asset, when we have one
+  logoUrl?: string; // path to a real logo asset, when we have one
 }
 
 // ── Programme ───────────────────────────────────────────────────────
 export type QualificationType =
-  | 'degree' | 'extended_degree'
-  | 'diploma' | 'extended_diploma'
+  | 'degree'
+  | 'extended_degree'
+  | 'diploma'
+  | 'extended_diploma'
   | 'online'
   // Legacy types for backward compatibility
-  | 'bachelor' | 'btech' | 'higher_certificate' | 'advanced_diploma';
+  | 'bachelor'
+  | 'btech'
+  | 'higher_certificate'
+  | 'advanced_diploma';
 
 export interface Programme {
-  qualificationCode: string;          // PRIMARY KEY, e.g. 'B8BA3Q'
+  qualificationCode: string; // PRIMARY KEY, e.g. 'B8BA3Q'
   universityId: string;
   name: string;
   qualificationType: QualificationType;
@@ -95,14 +102,14 @@ export interface Programme {
   faculty: string;
   campus: string[];
   admission: AdmissionRule;
-  closingDateOverride?: string;       // ISO datetime
-  additionalRequirements?: string[];  // ['NBT', 'portfolio', 'audition']
+  closingDateOverride?: string; // ISO datetime
+  additionalRequirements?: string[]; // ['NBT', 'portfolio', 'audition']
   firstTimeEntrantsOnly?: boolean;
   careers?: string[];
   note?: string;
   // Legacy fields for backward compatibility
   id?: string;
-  isECP?: boolean;                    // derived from qualificationType
+  isECP?: boolean; // derived from qualificationType
 }
 
 // ── Admission Rule (the core) ───────────────────────────────────────
@@ -121,39 +128,43 @@ export interface ApsMinimum {
   // Which score this minimum is expressed in, when the university uses a
   // faculty-specific transform (see ApsRule.facultyScoring). Omit for
   // universities/programmes that use the plain APS.
-  scoreType?: string;                 // e.g. 'FPS', 'WPS'
+  scoreType?: string; // e.g. 'FPS', 'WPS'
 }
 
 export type SubjectStatus =
-  | 'required'        // must be present at minRating
-  | 'alternative'     // one of an altGroup must be satisfied
-  | 'not_accepted'    // disqualifies this path
+  | 'required' // must be present at minRating
+  | 'alternative' // one of an altGroup must be satisfied
+  | 'not_accepted' // disqualifies this path
   | 'not_applicable'; // irrelevant
 
 export interface SubjectRequirement {
   subject: SubjectKey;
   status: SubjectStatus;
-  minRating?: Rating;                 // 1-7 NSC achievement level (UJ/Wits style)
-  minPercentage?: number;             // raw NSC % (e.g. UCT: 'Mathematics 60%')
+  minRating?: Rating; // 1-7 NSC achievement level (UJ/Wits style)
+  minPercentage?: number; // raw NSC % (e.g. UCT: 'Mathematics 60%')
   homeLanguageRating?: Rating;
   additionalLanguageRating?: Rating;
   altGroup?: string;
 }
 
 export interface WaitlistBand {
-  apsRange: [number, number];         // inclusive, e.g. [35, 37]
+  apsRange: [number, number]; // inclusive, e.g. [35, 37]
   conditions: string[];
 }
 
 // ── Matching Results ────────────────────────────────────────────────
-export type MatchOutcome = 'qualifies' | 'waitlist' | 'below_minimum' | 'requirements_not_available';
+export type MatchOutcome =
+  | 'qualifies'
+  | 'waitlist'
+  | 'below_minimum'
+  | 'requirements_not_available';
 
 export interface UniversityMatch {
   university: University;
   programme: Programme;
   outcome: MatchOutcome;
   studentAPS: number;
-  requiredAPS: number;                // The applicable APS minimum for this student
+  requiredAPS: number; // The applicable APS minimum for this student
   meetsRequirements: boolean;
   missingRequirements: string[];
   choiceStrategy?: ChoiceStrategy;
@@ -197,7 +208,9 @@ export function matchesSubjectKey(nscSubject: NSCSubject, key: SubjectKey): bool
 }
 
 // Detect which maths type the student has
-export function getStudentMathsType(subjects: { subject: NSCSubject }[]): 'mathematics' | 'mathematicalLiteracy' | 'technicalMathematics' | null {
+export function getStudentMathsType(
+  subjects: { subject: NSCSubject }[]
+): 'mathematics' | 'mathematicalLiteracy' | 'technicalMathematics' | null {
   for (const s of subjects) {
     const subj = s.subject.toLowerCase();
     if (subj === 'mathematics') return 'mathematics';

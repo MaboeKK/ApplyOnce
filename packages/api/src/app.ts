@@ -20,7 +20,9 @@ if (process.env.NODE_ENV !== 'production') {
   registerAllMockAdapters();
   logger.info('Mock university adapters registered (non-production environment)');
 } else {
-  logger.warn('No real university adapters registered - production submissions will fail until MOU signed');
+  logger.warn(
+    'No real university adapters registered - production submissions will fail until MOU signed'
+  );
 }
 
 const app = express();
@@ -91,8 +93,7 @@ const swaggerOptions = {
     info: {
       title: 'ApplyOnce API',
       version: '0.1.0',
-      description:
-        'Backend API for ApplyOnce - Apply to all SA universities in one go',
+      description: 'Backend API for ApplyOnce - Apply to all SA universities in one go',
     },
     servers: [
       {

@@ -43,6 +43,19 @@ jobs:
       - run: npm ci
       - run: npm run lint --workspaces
 
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+
   test-shared:
     name: Test @applyonce/shared
     runs-on: ubuntu-latest
@@ -66,7 +79,7 @@ jobs:
         env:
           POSTGRES_USER: applyonce
           POSTGRES_PASSWORD: applyonce
-          POSTGRES_DB: applyonce
+          POSTGRES_DB: applyonce_test
         ports:
           - 5432:5432
         options: >-
@@ -74,21 +87,13 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      redis:
-        image: redis:7
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     env:
       NODE_ENV: test
-      DATABASE_URL: postgresql://applyonce:applyonce@localhost:5432/applyonce
-      REDIS_URL: redis://localhost:6379
+      DATABASE_URL: postgresql://applyonce:applyonce@localhost:5432/applyonce_test
       JWT_ACCESS_SECRET: ci-test-jwt-access-secret-change-me
       JWT_REFRESH_SECRET: ci-test-jwt-refresh-secret-change-me
+      PAYGATE_ID: ci-test-paygate-id
+      PAYGATE_SECRET: ci-test-paygate-secret
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -116,3 +121,18 @@ jobs:
       - run: npx prisma generate --schema=packages/api/prisma/schema.prisma
       # api (tsc), portal + admin (next build); shared has no build script and is skipped
       - run: npm run build --workspaces --if-present
+
+  gate:
+    name: Gate
+    runs-on: ubuntu-latest
+    needs: [lint-typecheck, lint, format, test-shared, test-api, build]
+    if: always()
+    steps:
+      - name: Check required jobs succeeded
+        run: |
+          if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" || "${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            echo "One or more required jobs did not succeed:"
+            echo '${{ toJSON(needs) }}'
+            exit 1
+          fi
+          echo "All required jobs passed."
