@@ -238,6 +238,17 @@ export async function login(req: AuthenticatedRequest, res: Response): Promise<v
   throw new UnauthorizedError('Invalid credentials', 'INVALID_CREDENTIALS');
 }
 
+/**
+ * GET /v1/auth/me
+ * Lightweight session check for the frontend's auth guard — returns the
+ * current user's identity if the access token is still valid (requireAuth
+ * already rejects an expired/invalid one with 401). No DB lookup needed:
+ * req.user is the already-verified JWT payload.
+ */
+export async function me(req: AuthenticatedRequest, res: Response): Promise<void> {
+  res.json({ user: req.user });
+}
+
 export async function logout(req: AuthenticatedRequest, res: Response): Promise<void> {
   const refreshToken = req.cookies?.refreshToken;
 

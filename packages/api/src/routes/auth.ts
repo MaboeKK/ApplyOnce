@@ -4,6 +4,7 @@
 import { Router } from 'express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { validateBody } from '../middleware/validate';
+import { requireAuth } from '../middleware/auth';
 import { registerSchema, verifyEmailSchema, loginSchema } from '../schemas/auth';
 import * as authController from '../controllers/auth';
 
@@ -105,6 +106,22 @@ router.post('/verify', validateBody(verifyEmailSchema), asyncHandler(authControl
  *         description: Invalid credentials or email not verified
  */
 router.post('/login', validateBody(loginSchema), asyncHandler(authController.login));
+
+/**
+ * @swagger
+ * /v1/auth/me:
+ *   get:
+ *     summary: Lightweight session check (used by the frontend's auth guard)
+ *     tags: [Auth]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Session is valid
+ *       401:
+ *         description: Not authenticated / token expired
+ */
+router.get('/me', requireAuth, asyncHandler(authController.me));
 
 /**
  * @swagger
