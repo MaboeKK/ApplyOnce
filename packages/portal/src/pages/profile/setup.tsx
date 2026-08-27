@@ -56,6 +56,16 @@ interface WizardDraft {
   profileData: ProfileWizardData;
 }
 
+function isWizardDraft(value: unknown): value is WizardDraft {
+  if (typeof value !== 'object' || value === null) return false;
+  const draft = value as Partial<WizardDraft>;
+  return (
+    typeof draft.activeStep === 'number' &&
+    typeof draft.profileData === 'object' &&
+    draft.profileData !== null
+  );
+}
+
 export default function ProfileSetup() {
   return (
     <ProtectedRoute>
@@ -141,7 +151,7 @@ function ProfileSetupContent() {
         // so it takes priority — this is what lets a refresh mid-wizard resume correctly.
         // Scoped to this student's id so it can never resume with another student's data.
         if (user?.id) {
-          const draft = loadDraft<WizardDraft>(wizardDraftKey(user.id));
+          const draft = loadDraft<WizardDraft>(wizardDraftKey(user.id), isWizardDraft);
           if (draft) {
             setProfileData(draft.profileData);
             setActiveStep(draft.activeStep);

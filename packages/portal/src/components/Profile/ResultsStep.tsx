@@ -75,6 +75,16 @@ interface ResultsDraft {
   lastUpdated: string | null;
 }
 
+function isResultsDraft(value: unknown): value is ResultsDraft {
+  if (typeof value !== 'object' || value === null) return false;
+  const draft = value as Partial<ResultsDraft>;
+  return (
+    (draft.step === 'upload' || draft.step === 'confirm' || draft.step === 'id-doc') &&
+    Array.isArray(draft.originalSubjects) &&
+    Array.isArray(draft.editedSubjects)
+  );
+}
+
 interface OcrSubject {
   subject: string;
   mark?: number;
@@ -133,7 +143,10 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
   }, []);
 
   const draft = useMemo(
-    () => (!hasSavedResults && userId ? loadDraft<ResultsDraft>(resultsDraftKey(userId)) : null),
+    () =>
+      !hasSavedResults && userId
+        ? loadDraft<ResultsDraft>(resultsDraftKey(userId), isResultsDraft)
+        : null,
     [hasSavedResults, userId]
   );
 

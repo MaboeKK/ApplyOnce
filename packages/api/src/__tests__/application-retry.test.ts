@@ -37,9 +37,11 @@ describe('POST /v1/applications/:id/retry-submission', () => {
       },
     });
     studentId = student.id;
-    studentToken = jwt.sign({ role: 'student', studentId: student.id }, config.jwt.accessSecret, {
-      expiresIn: '15m',
-    });
+    studentToken = jwt.sign(
+      { role: 'student', studentId: student.id, email: student.email },
+      config.jwt.accessSecret,
+      { expiresIn: '15m' }
+    );
 
     const otherStudent = await prisma.student.create({
       data: {
@@ -51,7 +53,7 @@ describe('POST /v1/applications/:id/retry-submission', () => {
       },
     });
     otherStudentToken = jwt.sign(
-      { role: 'student', studentId: otherStudent.id },
+      { role: 'student', studentId: otherStudent.id, email: otherStudent.email },
       config.jwt.accessSecret,
       { expiresIn: '15m' }
     );
