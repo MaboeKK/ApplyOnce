@@ -44,24 +44,29 @@ function DashboardContent() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchProfile();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    let cancelled = false;
 
-  const fetchProfile = async () => {
-    try {
-      const [profileRes, appsRes] = await Promise.all([
-        api.get('/students/me'),
-        api.get('/applications'),
-      ]);
-      setProfile(profileRes.data.student);
-      setApplications(appsRes.data.applications || []);
-    } catch (err) {
-      console.error('Failed to fetch data', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const fetchProfile = async () => {
+      try {
+        const [profileRes, appsRes] = await Promise.all([
+          api.get('/students/me'),
+          api.get('/applications'),
+        ]);
+        if (cancelled) return;
+        setProfile(profileRes.data.student);
+        setApplications(appsRes.data.applications || []);
+      } catch (err) {
+        if (!cancelled) console.error('Failed to fetch data', err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    fetchProfile();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   if (loading) {
     return null;

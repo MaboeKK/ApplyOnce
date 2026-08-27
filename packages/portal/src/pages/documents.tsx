@@ -1,7 +1,7 @@
 // packages/portal/src/pages/documents.tsx
 // Document vault - view and manage uploaded documents
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import {
   Box,
@@ -47,20 +47,25 @@ function DocumentsContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
     fetchDocuments();
+    return () => {
+      mountedRef.current = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchDocuments = async () => {
     try {
       const response = await api.get('/documents');
+      if (!mountedRef.current) return;
       setDocuments(response.data.documents || []);
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to load documents'));
+      if (mountedRef.current) setError(getErrorMessage(err, 'Failed to load documents'));
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
   };
 

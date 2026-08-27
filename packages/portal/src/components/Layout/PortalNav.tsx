@@ -42,15 +42,24 @@ export default function PortalNav() {
   const [navMenuAnchor, setNavMenuAnchor] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+
     api
       .get('/applications')
       .then((res) => {
+        if (cancelled) return;
         const drafts = (res.data.applications || []).filter(
           (a: PortalApplication) => a.status === 'draft'
         );
         setCartCount(drafts.length);
       })
-      .catch(() => {});
+      .catch((err) => {
+        if (!cancelled) console.error('Failed to fetch cart count:', err);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [router.pathname]);
 
   const handleLogout = async () => {

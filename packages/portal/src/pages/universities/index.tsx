@@ -1,7 +1,7 @@
 // packages/portal/src/pages/universities/index.tsx
 // University browser: search/filter all 26 universities, optional APS-match view
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import {
   Box,
@@ -118,22 +118,32 @@ function UniversitiesContent() {
   const [draftApplications, setDraftApplications] = useState<PortalApplication[]>([]);
   const [cardMenu, setCardMenu] = useState<{ el: HTMLElement; uni: University } | null>(null);
   const [howItWorksOpen, setHowItWorksOpen] = useState(false);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
     api
       .get('/universities')
-      .then((res) => setUniversities(res.data.universities || []))
-      .finally(() => setLoading(false));
+      .then((res) => {
+        if (mountedRef.current) setUniversities(res.data.universities || []);
+      })
+      .finally(() => {
+        if (mountedRef.current) setLoading(false);
+      });
 
     api
       .get('/applications')
       .then((res) => {
+        if (!mountedRef.current) return;
         const drafts = (res.data.applications || []).filter(
           (a: PortalApplication) => a.status === 'draft'
         );
         setDraftApplications(drafts);
       })
       .catch(() => {});
+
+    return () => {
+      mountedRef.current = false;
+    };
   }, []);
 
   const fetchMatches = async () => {
@@ -141,6 +151,7 @@ function UniversitiesContent() {
     setMatchesError('');
     try {
       const res = await api.get('/aps/matches');
+      if (!mountedRef.current) return;
       const grouped: Record<string, ProgrammeMatch[]> = {};
       for (const m of (res.data.matches || []) as ProgrammeMatch[]) {
         grouped[m.universityId] = grouped[m.universityId] || [];
@@ -153,6 +164,7 @@ function UniversitiesContent() {
       setMatchesByUni(grouped);
       setApsByUni(apsMap);
     } catch (err) {
+      if (!mountedRef.current) return;
       setMatchesError(
         getErrorMessage(
           err,
@@ -161,7 +173,7 @@ function UniversitiesContent() {
       );
       setApsToggle(false);
     } finally {
-      setMatchesLoading(false);
+      if (mountedRef.current) setMatchesLoading(false);
     }
   };
 

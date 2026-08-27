@@ -91,10 +91,13 @@ function ProfileSetupContent() {
   const [resumedFromDraft, setResumedFromDraft] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+
     // Fetch existing profile data to allow resuming
     const fetchExistingProfile = async () => {
       try {
         const response = await api.get('/students/me');
+        if (cancelled) return;
         const student: StudentProfile = response.data.student;
 
         // Pre-fill profile data if it exists
@@ -140,29 +143,34 @@ function ProfileSetupContent() {
           // Otherwise start at step 0 (Personal)
         }
       } catch (err) {
-        console.error('Failed to fetch existing profile:', err);
+        if (!cancelled) console.error('Failed to fetch existing profile:', err);
       } finally {
-        // A stray pre-fix draft was saved under an unscoped key and could belong to
-        // *any* student who used this browser — purge it so it can never be read again.
-        clearDraft(LEGACY_UNSCOPED_DRAFT_KEY);
+        if (!cancelled) {
+          // A stray pre-fix draft was saved under an unscoped key and could belong to
+          // *any* student who used this browser — purge it so it can never be read again.
+          clearDraft(LEGACY_UNSCOPED_DRAFT_KEY);
 
-        // A local draft always reflects more recent in-browser progress than the server
-        // (intermediate wizard steps aren't persisted server-side until final submit),
-        // so it takes priority — this is what lets a refresh mid-wizard resume correctly.
-        // Scoped to this student's id so it can never resume with another student's data.
-        if (user?.id) {
-          const draft = loadDraft<WizardDraft>(wizardDraftKey(user.id), isWizardDraft);
-          if (draft) {
-            setProfileData(draft.profileData);
-            setActiveStep(draft.activeStep);
-            setResumedFromDraft(true);
+          // A local draft always reflects more recent in-browser progress than the server
+          // (intermediate wizard steps aren't persisted server-side until final submit),
+          // so it takes priority — this is what lets a refresh mid-wizard resume correctly.
+          // Scoped to this student's id so it can never resume with another student's data.
+          if (user?.id) {
+            const draft = loadDraft<WizardDraft>(wizardDraftKey(user.id), isWizardDraft);
+            if (draft) {
+              setProfileData(draft.profileData);
+              setActiveStep(draft.activeStep);
+              setResumedFromDraft(true);
+            }
           }
+          setHydrated(true);
         }
-        setHydrated(true);
       }
     };
 
     fetchExistingProfile();
+    return () => {
+      cancelled = true;
+    };
   }, [user?.id]);
 
   // Auto-save wizard progress so a refresh or interrupted session resumes where the user left off.

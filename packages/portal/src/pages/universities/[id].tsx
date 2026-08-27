@@ -2,7 +2,7 @@
 // Faculty + programme selection for a single university
 // Shows qualifies (green/red) indicator and reach/match/safety chip per programme
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import {
   Box,
@@ -61,10 +61,14 @@ function UniversityDetailContent() {
   const [addingCode, setAddingCode] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [toast, setToast] = useState('');
+  const mountedRef = useRef(true);
 
   useEffect(() => {
     if (!id) return;
     load();
+    return () => {
+      mountedRef.current = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -76,6 +80,7 @@ function UniversityDetailContent() {
         api.get(`/universities/${universityId}`),
         api.get('/applications'),
       ]);
+      if (!mountedRef.current) return;
       setUniversity(uniRes.data.university);
 
       const existing = (appsRes.data.applications || []).find(
@@ -86,6 +91,7 @@ function UniversityDetailContent() {
 
       try {
         const matchesRes = await api.get('/aps/matches');
+        if (!mountedRef.current) return;
         const map: Record<string, ProgrammeMatch> = {};
         for (const m of (matchesRes.data.matches || []) as ProgrammeMatch[]) {
           if (m.universityId === universityId) {
@@ -95,12 +101,12 @@ function UniversityDetailContent() {
         setMatchByCode(map);
         setHasAPS(true);
       } catch {
-        setHasAPS(false);
+        if (mountedRef.current) setHasAPS(false);
       }
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to load university'));
+      if (mountedRef.current) setError(getErrorMessage(err, 'Failed to load university'));
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
   };
 

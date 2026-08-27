@@ -130,14 +130,17 @@ function ApplicationDetailContent() {
   // Fetch application detail
   useEffect(() => {
     if (!id) return;
+    let cancelled = false;
 
     const fetchApplication = async () => {
       try {
         setLoading(true);
         setError(null);
         const response = await api.get(`/admin/applications/${id}`);
+        if (cancelled) return;
         setApplication(response.data.application);
       } catch (err) {
+        if (cancelled) return;
         console.error('Error fetching application:', err);
         const axiosErr = err as AxiosError<{ message?: string }>;
         if (axiosErr.response?.status === 403) {
@@ -150,11 +153,14 @@ function ApplicationDetailContent() {
           setError(axiosErr.response?.data?.message || 'Failed to load application');
         }
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchApplication();
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   const handleDecisionSubmit = async () => {

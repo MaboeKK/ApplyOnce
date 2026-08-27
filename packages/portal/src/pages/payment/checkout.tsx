@@ -40,12 +40,23 @@ function PaymentCheckoutContent() {
 
   useEffect(() => {
     if (!paymentId) return;
+    let cancelled = false;
 
     api
       .get(`/payments/${paymentId}`)
-      .then((res) => setPayment(res.data.payment))
-      .catch((err) => setError(err.response?.data?.error?.message || 'Payment not found'))
-      .finally(() => setLoading(false));
+      .then((res) => {
+        if (!cancelled) setPayment(res.data.payment);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.response?.data?.error?.message || 'Payment not found');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [paymentId]);
 
   const handlePay = async () => {

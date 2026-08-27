@@ -45,22 +45,29 @@ function ApplicationsContent() {
 
   // Fetch applications
   useEffect(() => {
+    let cancelled = false;
+
     const fetchApplications = async () => {
       try {
         setLoading(true);
         setError(null);
         const response = await api.get('/admin/applications');
+        if (cancelled) return;
         setApplications(response.data.applications);
       } catch (err) {
+        if (cancelled) return;
         console.error('Error fetching applications:', err);
         const axiosErr = err as AxiosError<{ message?: string }>;
         setError(axiosErr.response?.data?.message || 'Failed to load applications');
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchApplications();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const columns: GridColDef[] = [

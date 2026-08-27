@@ -1,7 +1,7 @@
 // packages/portal/src/pages/cart.tsx
 // Application cart: itemised draft applications, balance nudge, proceed to payment
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import {
   Container,
@@ -57,9 +57,13 @@ function CartContent() {
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const mountedRef = useRef(true);
 
   useEffect(() => {
     load();
+    return () => {
+      mountedRef.current = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -71,6 +75,7 @@ function CartContent() {
         api.get('/universities'),
         api.get('/students/me'),
       ]);
+      if (!mountedRef.current) return;
 
       const drafts = (appsRes.data.applications || []).filter(
         (a: PortalApplication) => a.status === 'draft'
@@ -91,6 +96,7 @@ function CartContent() {
 
       try {
         const matchesRes = await api.get('/aps/matches');
+        if (!mountedRef.current) return;
         const map: Record<string, string> = {};
         for (const m of (matchesRes.data.matches || []) as ProgrammeMatch[]) {
           map[`${m.universityId}:${m.programmeCode}`] = m.choiceStrategy;
@@ -100,9 +106,9 @@ function CartContent() {
         // Student hasn't uploaded results yet — skip strategy tagging
       }
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to load your cart'));
+      if (mountedRef.current) setError(getErrorMessage(err, 'Failed to load your cart'));
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
   };
 

@@ -47,12 +47,23 @@ function ApplicationDetailContent() {
 
   useEffect(() => {
     if (!id) return;
+    let cancelled = false;
 
     api
       .get(`/applications/${id}`)
-      .then((res) => setApplication(res.data.application))
-      .catch((err) => setError(err.response?.data?.error?.message || 'Application not found'))
-      .finally(() => setLoading(false));
+      .then((res) => {
+        if (!cancelled) setApplication(res.data.application);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.response?.data?.error?.message || 'Application not found');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   if (loading) {
