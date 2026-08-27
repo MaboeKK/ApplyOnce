@@ -7,6 +7,7 @@ import { AuthRequest } from '../types/express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { prisma } from '../utils/prisma';
 import { BadRequestError, ConflictError, NotFoundError, ForbiddenError } from '../utils/errors';
+import { submitApplication } from '../workflows/submission';
 
 /**
  * POST /v1/applications
@@ -226,6 +227,53 @@ export const getApplication = asyncHandler(async (req: AuthRequest, res: Respons
         data: e.data,
         createdAt: e.createdAt.toISOString(),
       })),
+    },
+  });
+});
+
+/**
+ * POST /v1/applications/:id/retry-submission
+ * Retry a submission that previously failed. The student already paid for
+ * this application - without this endpoint, a submission_failed status had
+ * no recovery path at all (see workflows/submission.ts's status guard).
+ */
+export const retrySubmission = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const studentId = req.student!.studentId;
+  const { id } = req.params;
+
+  const application = await prisma.application.findUnique({ where: { id } });
+
+  if (!application) {
+    throw new NotFoundError('Application not found');
+  }
+
+  if (application.studentId !== studentId) {
+    throw new ForbiddenError('You can only retry your own applications');
+  }
+
+  if (application.status !== 'submission_failed') {
+    throw new BadRequestError(
+      `Only failed submissions can be retried (current status: ${application.status})`
+    );
+  }
+
+  try {
+    await submitApplication({ applicationId: id, studentId });
+  } catch {
+    // submitApplication already recorded the failure (status + event) before
+    // re-throwing - swallow it here so the client always gets the current
+    // state back, rather than a generic 500 for what may just be "still
+    // failed, try again".
+  }
+
+  const updated = await prisma.application.findUniqueOrThrow({ where: { id } });
+
+  res.json({
+    application: {
+      id: updated.id,
+      status: updated.status,
+      universityReference: updated.universityReference,
+      notes: updated.notes,
     },
   });
 });

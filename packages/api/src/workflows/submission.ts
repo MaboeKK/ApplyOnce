@@ -35,6 +35,9 @@ function requireField<T>(value: T | null | undefined, label: string): T {
  */
 export async function submitApplication(input: SubmissionInput): Promise<void> {
   const { applicationId } = input;
+  // Only used for the event log if the catch block below fires, since
+  // `application` itself is scoped to the try block.
+  let previousStatus = 'draft';
 
   try {
     // Fetch the application with all related data
@@ -56,7 +59,12 @@ export async function submitApplication(input: SubmissionInput): Promise<void> {
       throw new NotFoundError(`Application ${applicationId} not found`);
     }
 
-    if (application.status !== 'draft') {
+    previousStatus = application.status;
+
+    // 'submission_failed' is retryable (see retrySubmission in
+    // controllers/application.ts) - any other non-draft status means this
+    // was already submitted or accepted/rejected, so it's a genuine no-op.
+    if (application.status !== 'draft' && application.status !== 'submission_failed') {
       logger.warn({ applicationId, status: application.status }, 'Application already submitted');
       return;
     }
@@ -254,7 +262,7 @@ export async function submitApplication(input: SubmissionInput): Promise<void> {
         data: {
           applicationId,
           eventType: 'submitted',
-          fromStatus: 'draft',
+          fromStatus: application.status,
           toStatus: 'submitted',
           data: {
             universityReference: result.universityReference,
@@ -310,7 +318,7 @@ export async function submitApplication(input: SubmissionInput): Promise<void> {
       data: {
         applicationId,
         eventType: 'submission_failed',
-        fromStatus: 'draft',
+        fromStatus: previousStatus,
         toStatus: 'submission_failed',
         data: {
           error: errorMessage,
