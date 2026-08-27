@@ -91,7 +91,7 @@ export async function parseMatricCertificate(filePath: string): Promise<OCRResul
  * Parse subjects from OCR text
  * NSC format: Subject name | Percentage | Achievement Level (1-7)
  */
-function parseSubjects(text: string, warnings: string[]): ExtractedSubject[] {
+export function parseSubjects(text: string, warnings: string[]): ExtractedSubject[] {
   const subjects: ExtractedSubject[] = [];
   const lines = text.split('\n');
 
@@ -142,46 +142,20 @@ function parseSubjects(text: string, warnings: string[]): ExtractedSubject[] {
     // Extract all digit sequences from the numbers section
     const digitSequences = numbersSection.match(/\b\d+\b/g) || [];
 
-    let mark: number | null = null;
-    let level: number | null = null;
-
-    // Find the LAST single digit 1-7 in the line — this is the achievement level
-    for (let j = digitSequences.length - 1; j >= 0; j--) {
-      const num = parseInt(digitSequences[j], 10);
-
-      if (digitSequences[j].length === 1 && num >= 1 && num <= 7) {
-        level = num;
-
-        // Now look backward from the level for the percentage
-        for (let k = j - 1; k >= 0; k--) {
-          const markNum = parseInt(digitSequences[k], 10);
-          if (markNum >= 0 && markNum <= 100) {
-            mark = markNum;
-            break;
-          }
-        }
-        break; // Found the level, stop searching
-      }
-    }
+    const { level: foundLevel, levelIndex } = findAchievementLevel(digitSequences);
+    let level = foundLevel;
+    const mark = level !== null ? findPercentageMark(digitSequences, levelIndex) : null;
 
     // Fallback: if no level extracted, try to derive from percentage
     if (level === null && mark !== null) {
       level = markToAPS(mark);
     }
 
-    // Determine confidence
-    let confidence: 'high' | 'medium' | 'low' = 'low';
-    if (mark !== null && level !== null && Math.abs(markToAPS(mark) - level) === 0) {
-      confidence = 'high'; // Mark and level match
-    } else if (level !== null) {
-      confidence = 'medium'; // Have level but no mark or mismatch
-    }
-
     subjects.push({
       subject: normalizeSubjectName(subjectName),
       mark: mark !== null && mark >= 0 && mark <= 100 ? mark : null,
       level,
-      confidence,
+      confidence: classifyExtractionConfidence(mark, level),
     });
   }
 
@@ -190,6 +164,55 @@ function parseSubjects(text: string, warnings: string[]): ExtractedSubject[] {
   }
 
   return subjects;
+}
+
+/**
+ * Find the achievement level (1-7) in a line's digit sequences.
+ * Scans backward — the level is always the last standalone single digit 1-7.
+ * Returns the digit-sequence index it was found at, so findPercentageMark
+ * knows where to start scanning backward from.
+ */
+function findAchievementLevel(digitSequences: string[]): {
+  level: number | null;
+  levelIndex: number;
+} {
+  for (let j = digitSequences.length - 1; j >= 0; j--) {
+    const num = parseInt(digitSequences[j], 10);
+    if (digitSequences[j].length === 1 && num >= 1 && num <= 7) {
+      return { level: num, levelIndex: j };
+    }
+  }
+  return { level: null, levelIndex: -1 };
+}
+
+/**
+ * Find the percentage mark (0-100) preceding the achievement level.
+ */
+function findPercentageMark(digitSequences: string[], levelIndex: number): number | null {
+  for (let k = levelIndex - 1; k >= 0; k--) {
+    const markNum = parseInt(digitSequences[k], 10);
+    if (markNum >= 0 && markNum <= 100) {
+      return markNum;
+    }
+  }
+  return null;
+}
+
+/**
+ * Confidence is high when the mark and level agree with markToAPS(),
+ * medium when we only have a level, low otherwise.
+ */
+function classifyExtractionConfidence(
+  mark: number | null,
+  level: number | null
+): 'high' | 'medium' | 'low' {
+  if (mark !== null && level !== null && Math.abs(markToAPS(mark) - level) === 0) {
+    return 'high';
+  }
+  if (level !== null) {
+    return 'medium';
+  }
+  return 'low';
 }
 
 /**

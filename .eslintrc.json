@@ -23,8 +23,20 @@
         "ignoreRestSiblings": true
       }
     ],
-    "max-lines": ["warn", { "max": 1000, "skipBlankLines": true, "skipComments": true }],
-    "complexity": ["warn", { "max": 15 }]
+    "max-lines": [
+      "warn",
+      {
+        "max": 1000,
+        "skipBlankLines": true,
+        "skipComments": true
+      }
+    ],
+    "complexity": [
+      "warn",
+      {
+        "max": 15
+      }
+    ]
   },
   "overrides": [
     {
@@ -36,6 +48,18 @@
       ],
       "rules": {
         "complexity": "off"
+      }
+    },
+    {
+      "files": [
+        "packages/shared/src/constants/universities/uct.ts",
+        "packages/shared/src/constants/universities/up.ts",
+        "packages/shared/src/constants/universities/su.ts",
+        "packages/shared/src/constants/universities/ufs.ts",
+        "packages/shared/src/constants/universities/ukzn.ts"
+      ],
+      "rules": {
+        "max-lines": "off"
       }
     }
   ]
