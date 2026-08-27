@@ -491,6 +491,7 @@ export default function ApplicationDetailPage() {
                         color="primary"
                         onClick={() => handleDownloadDocument(doc)}
                         title="Download"
+                        aria-label={`Download ${doc.fileName}`}
                       >
                         <DownloadIcon />
                       </IconButton>

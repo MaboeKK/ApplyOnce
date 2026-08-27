@@ -412,7 +412,11 @@ export default function UniversitiesPage() {
                   <MenuItem value="matches">Show my APS matches</MenuItem>
                 </TextField>
                 <Tooltip title="Uses your uploaded matric results to check which programmes you qualify for.">
-                  <IconButton size="small" sx={{ color: brand.mutedText }}>
+                  <IconButton
+                    size="small"
+                    sx={{ color: brand.mutedText }}
+                    aria-label="How APS matching works"
+                  >
                     <InfoOutlinedIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>

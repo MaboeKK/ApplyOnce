@@ -231,6 +231,7 @@ export default function CartPage() {
                       onClick={() => handleRemove(app.id)}
                       disabled={removingId === app.id}
                       color="error"
+                      aria-label={`Remove ${app.programmeName} at ${app.universityName} from cart`}
                     >
                       <DeleteIcon />
                     </IconButton>

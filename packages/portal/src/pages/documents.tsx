@@ -199,6 +199,7 @@ export default function DocumentsPage() {
                             size="small"
                             color="error"
                             onClick={() => handleDelete(doc.id)}
+                            aria-label={`Delete ${doc.fileName}`}
                           >
                             <DeleteIcon />
                           </IconButton>
@@ -292,7 +293,12 @@ export default function DocumentsPage() {
                         >
                           Download
                         </Button>
-                        <IconButton size="small" color="error" onClick={() => handleDelete(doc.id)}>
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={() => handleDelete(doc.id)}
+                          aria-label={`Delete ${doc.fileName}`}
+                        >
                           <DeleteIcon />
                         </IconButton>
                       </Box>
