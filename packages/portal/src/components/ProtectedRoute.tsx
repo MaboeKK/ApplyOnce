@@ -15,14 +15,19 @@ interface Props {
 export function ProtectedRoute({ children }: Props) {
   const router = useRouter();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const hasHydrated = useAuthStore((state) => state.hasHydrated);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    // Wait for the persisted store to rehydrate before deciding to redirect —
+    // isAuthenticated starts false on every hard page load/reload/direct
+    // navigation, before localStorage is read, so redirecting on that initial
+    // value would kick out an actually-logged-in user.
+    if (hasHydrated && !isAuthenticated) {
       router.replace('/login');
     }
-  }, [isAuthenticated, router]);
+  }, [hasHydrated, isAuthenticated, router]);
 
-  if (!isAuthenticated) {
+  if (!hasHydrated || !isAuthenticated) {
     return null;
   }
 

@@ -8,18 +8,20 @@ import {
   Box,
   Container,
   Typography,
-  Paper,
   Button,
   Chip,
   Stack,
   Alert,
   CircularProgress,
-  Divider,
   Snackbar,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import api from '@/config/api';
 import PortalNav from '@/components/Layout/PortalNav';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
@@ -61,6 +63,7 @@ function UniversityDetailContent() {
   const [addingCode, setAddingCode] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [toast, setToast] = useState('');
+  const [expandedFaculties, setExpandedFaculties] = useState<Set<string>>(new Set());
   const mountedRef = useRef(true);
 
   useEffect(() => {
@@ -71,6 +74,41 @@ function UniversityDetailContent() {
       mountedRef.current = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  // The "already have an application here" gate is only as good as the last
+  // fetch — if the student removes the draft from their cart in another tab
+  // (or comes back to this page after a while), a stale existingApp would
+  // wrongly keep blocking Add to Cart even though the cart is now empty.
+  // Refresh it (without the full-page loading spinner) whenever the tab
+  // regains focus, so it self-heals instead of requiring a manual reload.
+  useEffect(() => {
+    const refreshExistingApp = async () => {
+      const universityId = Array.isArray(id) ? id[0] : id;
+      if (!universityId) return;
+      try {
+        const appsRes = await api.get('/applications');
+        if (!mountedRef.current) return;
+        const existing = (appsRes.data.applications || []).find(
+          (a: PortalApplication) =>
+            a.universityId === universityId && ['draft', 'submitted'].includes(a.status)
+        );
+        setExistingApp(existing || null);
+      } catch {
+        // Best-effort background refresh — keep the last known state on failure.
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') refreshExistingApp();
+    };
+
+    window.addEventListener('focus', refreshExistingApp);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      window.removeEventListener('focus', refreshExistingApp);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [id]);
 
   const load = async () => {
@@ -206,91 +244,117 @@ function UniversityDetailContent() {
         )}
 
         {Object.entries(programmesByFaculty).map(([faculty, programmes]) => (
-          <Paper key={faculty} sx={{ p: 3, mb: 3 }}>
-            <Typography variant="h6" color="primary" gutterBottom>
-              {faculty}
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            <Stack spacing={2}>
-              {programmes.map((programme: Programme) => {
-                const match = matchByCode[programme.qualificationCode];
-                const qualifies =
-                  match && (match.meetsRequirements || match.outcome === 'waitlist');
-                const disqualified =
-                  match && !match.meetsRequirements && match.outcome !== 'waitlist';
-                const canAdd = !existingApp && (!match || qualifies || hasAPS === false);
+          <Accordion
+            key={faculty}
+            expanded={expandedFaculties.has(faculty)}
+            onChange={(_, isExpanded) => {
+              setExpandedFaculties((prev) => {
+                const next = new Set(prev);
+                if (isExpanded) next.add(faculty);
+                else next.delete(faculty);
+                return next;
+              });
+            }}
+            sx={{ mb: 2, '&:before': { display: 'none' } }}
+          >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Stack
+                direction="row"
+                spacing={1.5}
+                alignItems="center"
+                sx={{ width: '100%', pr: 2 }}
+              >
+                <Typography variant="h6" color="primary" sx={{ flex: 1 }}>
+                  {faculty}
+                </Typography>
+                <Chip
+                  label={`${programmes.length} programme${programmes.length !== 1 ? 's' : ''}`}
+                  size="small"
+                />
+              </Stack>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Stack spacing={2}>
+                {programmes.map((programme: Programme) => {
+                  const match = matchByCode[programme.qualificationCode];
+                  const qualifies =
+                    match && (match.meetsRequirements || match.outcome === 'waitlist');
+                  const disqualified =
+                    match && !match.meetsRequirements && match.outcome !== 'waitlist';
+                  const canAdd = !existingApp && (!match || qualifies || hasAPS === false);
 
-                return (
-                  <Box
-                    key={programme.qualificationCode}
-                    sx={{
-                      display: 'flex',
-                      flexDirection: { xs: 'column', sm: 'row' },
-                      justifyContent: 'space-between',
-                      alignItems: { sm: 'center' },
-                      gap: 2,
-                      p: 2,
-                      borderRadius: 2,
-                      border: '1px solid',
-                      borderColor: 'divider',
-                    }}
-                  >
-                    <Box sx={{ flex: 1 }}>
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        {hasAPS &&
-                          (qualifies ? (
-                            <CheckCircleIcon color="success" fontSize="small" />
-                          ) : disqualified ? (
-                            <CancelIcon color="error" fontSize="small" />
-                          ) : (
-                            <HelpOutlineIcon color="disabled" fontSize="small" />
-                          ))}
-                        <Typography variant="subtitle1" fontWeight={600}>
-                          {programme.name}
-                        </Typography>
-                      </Stack>
-                      <Typography variant="caption" color="text.secondary" display="block">
-                        {programme.qualificationType} · {programme.durationYears} year
-                        {programme.durationYears > 1 ? 's' : ''}
-                        {match &&
-                          ` · Requires APS ${match.requiredAPS}, you have ${match.studentAPS}`}
-                      </Typography>
-                      {programme.note && (
-                        <Typography variant="caption" color="text.secondary" display="block">
-                          {programme.note}
-                        </Typography>
-                      )}
-                      {match?.choiceStrategy && strategyLabel[match.choiceStrategy] && (
-                        <Chip
-                          label={strategyLabel[match.choiceStrategy]}
-                          size="small"
-                          color={strategyColor[match.choiceStrategy]}
-                          sx={{ mt: 1 }}
-                        />
-                      )}
-                      {disqualified && (match?.missingRequirements?.length ?? 0) > 0 && (
-                        <Typography
-                          variant="caption"
-                          color="error"
-                          display="block"
-                          sx={{ mt: 0.5 }}
-                        >
-                          Missing: {match?.missingRequirements?.join(', ')}
-                        </Typography>
-                      )}
-                    </Box>
-                    <Button
-                      variant="contained"
-                      disabled={!canAdd || addingCode === programme.qualificationCode}
-                      onClick={() => handleAddToCart(programme)}
+                  return (
+                    <Box
+                      key={programme.qualificationCode}
+                      sx={{
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        justifyContent: 'space-between',
+                        alignItems: { sm: 'center' },
+                        gap: 2,
+                        p: 2,
+                        borderRadius: 2,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                      }}
                     >
-                      {addingCode === programme.qualificationCode ? 'Adding…' : 'Add to Cart'}
-                    </Button>
-                  </Box>
-                );
-              })}
-            </Stack>
-          </Paper>
+                      <Box sx={{ flex: 1 }}>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          {hasAPS &&
+                            (qualifies ? (
+                              <CheckCircleIcon color="success" fontSize="small" />
+                            ) : disqualified ? (
+                              <CancelIcon color="error" fontSize="small" />
+                            ) : (
+                              <HelpOutlineIcon color="disabled" fontSize="small" />
+                            ))}
+                          <Typography variant="subtitle1" fontWeight={600}>
+                            {programme.name}
+                          </Typography>
+                        </Stack>
+                        <Typography variant="caption" color="text.secondary" display="block">
+                          {programme.qualificationType} · {programme.durationYears} year
+                          {programme.durationYears > 1 ? 's' : ''}
+                          {match &&
+                            ` · Requires APS ${match.requiredAPS}, you have ${match.studentAPS}`}
+                        </Typography>
+                        {programme.note && (
+                          <Typography variant="caption" color="text.secondary" display="block">
+                            {programme.note}
+                          </Typography>
+                        )}
+                        {match?.choiceStrategy && strategyLabel[match.choiceStrategy] && (
+                          <Chip
+                            label={strategyLabel[match.choiceStrategy]}
+                            size="small"
+                            color={strategyColor[match.choiceStrategy]}
+                            sx={{ mt: 1 }}
+                          />
+                        )}
+                        {disqualified && (match?.missingRequirements?.length ?? 0) > 0 && (
+                          <Typography
+                            variant="caption"
+                            color="error"
+                            display="block"
+                            sx={{ mt: 0.5 }}
+                          >
+                            Missing: {match?.missingRequirements?.join(', ')}
+                          </Typography>
+                        )}
+                      </Box>
+                      <Button
+                        variant="contained"
+                        disabled={!canAdd || addingCode === programme.qualificationCode}
+                        onClick={() => handleAddToCart(programme)}
+                      >
+                        {addingCode === programme.qualificationCode ? 'Adding…' : 'Add to Cart'}
+                      </Button>
+                    </Box>
+                  );
+                })}
+              </Stack>
+            </AccordionDetails>
+          </Accordion>
         ))}
 
         {Object.keys(programmesByFaculty).length === 0 && (
