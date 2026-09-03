@@ -18,7 +18,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
+        background: 'linear-gradient(135deg, #002E5B 0%, #004080 100%)',
         py: 4,
       }}
     >

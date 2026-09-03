@@ -80,17 +80,18 @@ const strategyLabel: Record<string, string> = {
   safety: 'Secure',
 };
 
-// Page-scoped colour tokens matching the requested restyle direction.
+// Page-scoped colour tokens — Capitec design system.
 const brand = {
-  purple: '#5B32D6',
-  purpleDark: '#4930D8',
-  navy: '#17213A',
-  secondaryText: '#526078',
-  mutedText: '#7B8497',
-  border: '#E4E7EF',
-  purpleSurface: '#F2EDFF',
-  pageBg: '#FAFBFF',
-  success: '#15966B',
+  purple: '#00A651', // Capitec Green (primary accent / CTA)
+  purpleDark: '#00863F',
+  navy: '#002E5B', // Capitec Navy (headline / strong text)
+  secondaryText: '#4B5563',
+  mutedText: '#6B7280',
+  border: '#E5E7EB',
+  purpleSurface: '#E6F7EE', // light green surface
+  pageBg: '#F8F9FA',
+  success: '#00A651',
+  error: '#D32F2F',
 };
 
 type SortOption = 'name-asc' | 'name-desc' | 'programmes-desc';
@@ -485,7 +486,7 @@ function UniversitiesContent() {
                       sx={{
                         bgcolor: brand.purpleSurface,
                         color: brand.purple,
-                        border: '1px solid #ddd2ff',
+                        border: '1px solid #9FE3BF',
                         fontWeight: 500,
                       }}
                     />
@@ -498,7 +499,7 @@ function UniversitiesContent() {
                     sx={{
                       bgcolor: brand.purpleSurface,
                       color: brand.purple,
-                      border: '1px solid #ddd2ff',
+                      border: '1px solid #9FE3BF',
                       fontWeight: 500,
                       textTransform: 'capitalize',
                     }}
@@ -573,7 +574,7 @@ function UniversitiesContent() {
                         'transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease',
                       '&:hover': {
                         transform: 'translateY(-2px)',
-                        borderColor: '#d8ccff',
+                        borderColor: '#9FE3BF',
                         boxShadow: '0 8px 24px rgba(70,45,160,0.08)',
                       },
                       '&:hover .view-programmes-arrow': { transform: 'translateX(3px)' },
@@ -685,9 +686,9 @@ function UniversitiesContent() {
                           justifyContent: 'center',
                           borderLeft: `1px solid ${brand.border}`,
                           bgcolor: qualifies
-                            ? '#f3faf7'
+                            ? brand.purpleSurface
                             : doesNotQualify
-                              ? alpha('#F43F5E', 0.05)
+                              ? alpha(brand.error, 0.05)
                               : 'transparent',
                         }}
                       >
@@ -708,12 +709,12 @@ function UniversitiesContent() {
                         ) : doesNotQualify ? (
                           <>
                             <Stack direction="row" spacing={0.5} alignItems="center">
-                              <ErrorOutlineIcon sx={{ fontSize: 15, color: '#F43F5E' }} />
+                              <ErrorOutlineIcon sx={{ fontSize: 15, color: brand.error }} />
                               <Typography sx={{ fontSize: 12, fontWeight: 600, color: brand.navy }}>
                                 APS Match
                               </Typography>
                             </Stack>
-                            <Typography sx={{ fontSize: 12, color: '#F43F5E', fontWeight: 500 }}>
+                            <Typography sx={{ fontSize: 12, color: brand.error, fontWeight: 500 }}>
                               {minRequiredAPS
                                 ? `APS ${minRequiredAPS} required`
                                 : 'Below requirements'}

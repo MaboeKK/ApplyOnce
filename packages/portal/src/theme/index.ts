@@ -1,28 +1,28 @@
 // packages/portal/src/theme/index.ts
 // MUI theme for ApplyOnce student portal
-// Design: youthful, modern, app-like, friendly, colourful
+// Design: Capitec "Live Better" style — simple, high-legibility, low visual friction
 
 import { createTheme } from '@mui/material/styles';
 
-// Design tokens from CLAUDE.md
+// Design tokens: Capitec mobile app design system
 const colors = {
-  primary: '#4F46E5', // Indigo
-  secondary: '#7C3AED', // Violet
-  accent: '#06B6D4', // Cyan
-  success: '#10B981', // Emerald (qualifies)
-  error: '#F43F5E', // Rose (doesn't qualify)
-  warning: '#F59E0B', // Amber
+  primary: '#00A651', // Capitec Green — CTAs, positive indicators, progress
+  secondary: '#002E5B', // Capitec Navy — header bar, branding, high-emphasis headers
+  accent: '#00A651',
+  success: '#00A651',
+  error: '#D32F2F', // Alert / Money Out
+  warning: '#FFA000', // Warning / Pending
   neutral: {
-    50: '#F8FAFC',
-    100: '#F1F5F9',
-    200: '#E2E8F0',
-    300: '#CBD5E1',
-    400: '#94A3B8',
-    500: '#64748B',
-    600: '#475569',
-    700: '#334155',
-    800: '#1E293B',
-    900: '#0F172A',
+    50: '#F8F9FA', // Main background
+    100: '#F1F2F4',
+    200: '#E5E7EB',
+    300: '#D1D5DB',
+    400: '#9CA3AF',
+    500: '#6B7280', // Secondary / muted text
+    600: '#666666',
+    700: '#4B5563',
+    800: '#333333',
+    900: '#1F2937', // Primary text
   },
 };
 
@@ -30,167 +30,174 @@ export const theme = createTheme({
   palette: {
     primary: {
       main: colors.primary,
-      light: '#6366F1',
-      dark: '#4338CA',
+      light: '#33B96F',
+      dark: '#00863F',
       contrastText: '#FFFFFF',
     },
     secondary: {
       main: colors.secondary,
-      light: '#8B5CF6',
-      dark: '#6D28D9',
+      light: '#1A4A7A',
+      dark: '#001E3D',
       contrastText: '#FFFFFF',
     },
     success: {
       main: colors.success,
-      light: '#34D399',
-      dark: '#059669',
+      light: '#33B96F',
+      dark: '#00863F',
       contrastText: '#FFFFFF',
     },
     error: {
       main: colors.error,
-      light: '#FB7185',
-      dark: '#E11D48',
+      light: '#E53935',
+      dark: '#B71C1C',
       contrastText: '#FFFFFF',
     },
     warning: {
       main: colors.warning,
-      light: '#FBBF24',
-      dark: '#D97706',
+      light: '#FFB833',
+      dark: '#C67100',
       contrastText: '#000000',
     },
     info: {
-      main: colors.accent,
-      light: '#22D3EE',
-      dark: '#0891B2',
+      main: colors.secondary,
+      light: '#1A4A7A',
+      dark: '#001E3D',
       contrastText: '#FFFFFF',
     },
     background: {
-      default: '#FFFFFF',
+      default: colors.neutral[50],
       paper: '#FFFFFF',
     },
     text: {
       primary: colors.neutral[900],
-      secondary: colors.neutral[600],
+      secondary: colors.neutral[500],
       disabled: colors.neutral[400],
     },
     divider: colors.neutral[200],
   },
   typography: {
     fontFamily: [
-      'Inter',
+      'Roboto',
       '-apple-system',
       'BlinkMacSystemFont',
+      '"SF Pro Display"',
+      '"SF Pro Text"',
       '"Segoe UI"',
-      'Roboto',
       'Arial',
       'sans-serif',
     ].join(','),
     h1: {
-      fontFamily: 'Poppins, sans-serif',
+      fontFamily: 'Roboto, sans-serif',
       fontWeight: 700,
-      fontSize: '3rem',
+      fontSize: '2rem', // 32px — big balance/display numbers
       lineHeight: 1.2,
-      letterSpacing: '-0.02em',
-    },
-    h2: {
-      fontFamily: 'Poppins, sans-serif',
-      fontWeight: 700,
-      fontSize: '2.25rem',
-      lineHeight: 1.3,
       letterSpacing: '-0.01em',
     },
+    h2: {
+      fontFamily: 'Roboto, sans-serif',
+      fontWeight: 700,
+      fontSize: '1.75rem',
+      lineHeight: 1.25,
+    },
     h3: {
-      fontFamily: 'Poppins, sans-serif',
-      fontWeight: 600,
-      fontSize: '1.875rem',
+      fontFamily: 'Roboto, sans-serif',
+      fontWeight: 500,
+      fontSize: '1.5rem',
       lineHeight: 1.3,
     },
     h4: {
-      fontFamily: 'Poppins, sans-serif',
-      fontWeight: 600,
-      fontSize: '1.5rem',
-      lineHeight: 1.4,
+      fontFamily: 'Roboto, sans-serif',
+      fontWeight: 500,
+      fontSize: '1.25rem',
+      lineHeight: 1.35,
     },
     h5: {
-      fontFamily: 'Poppins, sans-serif',
-      fontWeight: 600,
-      fontSize: '1.25rem',
-      lineHeight: 1.5,
+      fontFamily: 'Roboto, sans-serif',
+      fontWeight: 500,
+      fontSize: '1.125rem', // 18px — section headers
+      lineHeight: 1.4,
     },
     h6: {
-      fontFamily: 'Poppins, sans-serif',
-      fontWeight: 600,
-      fontSize: '1rem',
-      lineHeight: 1.5,
+      fontFamily: 'Roboto, sans-serif',
+      fontWeight: 500,
+      fontSize: '1rem', // 16px — section headers
+      lineHeight: 1.4,
     },
     body1: {
-      fontSize: '1rem',
+      fontSize: '0.875rem', // 14px — body text
       lineHeight: 1.6,
     },
     body2: {
-      fontSize: '0.875rem',
+      fontSize: '0.8125rem',
       lineHeight: 1.6,
     },
+    caption: {
+      fontSize: '0.6875rem', // 11px — microcopy/captions
+      fontWeight: 400,
+      lineHeight: 1.5,
+    },
     button: {
-      fontWeight: 600,
+      fontWeight: 500,
       textTransform: 'none',
-      letterSpacing: '0.02em',
+      letterSpacing: 'normal',
     },
   },
   shape: {
-    borderRadius: 12, // Rounded corners 12-16px
+    borderRadius: 8, // Cards & containers: 8–12px
   },
+  // MUI's default spacing(1)=8px already matches the 8px/4px grid
+  // (spacing(0.5)=4px xxs, 1=8px xs, 2=16px sm, 3=24px md, 4=32px lg) — no override needed.
   shadows: [
     'none',
-    '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-    '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-    '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-    '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-    '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
+    '0px 2px 8px rgba(0,0,0,0.06)',
   ],
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
+          borderRadius: 100, // pill-shaped action buttons
           padding: '10px 24px',
-          fontSize: '1rem',
-          fontWeight: 600,
+          fontSize: '0.875rem',
+          fontWeight: 500,
           boxShadow: 'none',
           '&:hover': {
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+            boxShadow: 'none',
           },
         },
         sizeLarge: {
           padding: '14px 32px',
-          fontSize: '1.125rem',
+          fontSize: '1rem',
         },
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 16,
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+          borderRadius: 12,
+          boxShadow: '0px 2px 8px rgba(0,0,0,0.06)',
         },
       },
     },
@@ -198,7 +205,7 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            borderRadius: 12,
+            borderRadius: 8,
           },
         },
       },
@@ -206,15 +213,15 @@ export const theme = createTheme({
     MuiPaper: {
       styleOverrides: {
         rounded: {
-          borderRadius: 16,
+          borderRadius: 12,
         },
       },
     },
     MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
-          fontWeight: 600,
+          borderRadius: 100,
+          fontWeight: 500,
         },
       },
     },

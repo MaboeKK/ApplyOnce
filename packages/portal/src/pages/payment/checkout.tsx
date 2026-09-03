@@ -111,7 +111,7 @@ function PaymentCheckoutContent() {
     <Box
       sx={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
+        background: 'linear-gradient(135deg, #002E5B 0%, #004080 100%)',
         display: 'flex',
         alignItems: 'center',
         py: 6,
