@@ -33,6 +33,14 @@ const documentTypeLabels: Record<string, string> = {
   proof_of_residence: 'Proof of residence',
 };
 
+function formatUploadDate(value: string): string {
+  const d = new Date(value);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}/${mm}/${dd}`;
+}
+
 export default function DocumentsPage() {
   return (
     <ProtectedRoute>
@@ -189,28 +197,10 @@ function DocumentsContent() {
                           {doc.fileName}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          Uploaded {new Date(doc.uploadedAt).toLocaleDateString()}
+                          Uploaded {formatUploadDate(doc.uploadedAt)}
                         </Typography>
 
-                        <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                          <Button
-                            size="small"
-                            startIcon={<DownloadIcon />}
-                            onClick={() => handleDownload(doc.id, doc.fileName)}
-                          >
-                            Download
-                          </Button>
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() => handleDelete(doc.id)}
-                            aria-label={`Delete ${doc.fileName}`}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Box>
-
-                        <Box sx={{ mt: 2 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
                           <input
                             type="file"
                             accept="image/*,.pdf"
@@ -229,6 +219,22 @@ function DocumentsContent() {
                               Replace
                             </Button>
                           </label>
+                          <Button
+                            size="small"
+                            startIcon={<DownloadIcon />}
+                            onClick={() => handleDownload(doc.id, doc.fileName)}
+                          >
+                            Download
+                          </Button>
+                          <Box sx={{ flexGrow: 1 }} />
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => handleDelete(doc.id)}
+                            aria-label={`Delete ${doc.fileName}`}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
                         </Box>
                       </Box>
                     ) : (
