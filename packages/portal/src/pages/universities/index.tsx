@@ -122,6 +122,8 @@ function UniversitiesContent() {
   const mountedRef = useRef(true);
 
   useEffect(() => {
+    mountedRef.current = true;
+
     api
       .get('/universities')
       .then((res) => {

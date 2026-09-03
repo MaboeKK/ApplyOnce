@@ -65,6 +65,7 @@ function UniversityDetailContent() {
 
   useEffect(() => {
     if (!id) return;
+    mountedRef.current = true;
     load();
     return () => {
       mountedRef.current = false;
