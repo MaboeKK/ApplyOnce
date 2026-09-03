@@ -116,6 +116,21 @@ export function calculateAPS(results: SubjectResult[], university: University): 
   };
 }
 
+/**
+ * "Headline" APS shown before a specific university is chosen (OCR confirmation
+ * screen, dashboard) — best 6 subjects excluding Life Orientation, the
+ * methodology most universities use. This is a preview only: per-university
+ * matching (calculateAPS) recalculates correctly for universities whose
+ * apsRule includes Life Orientation (e.g. Wits), which can yield a different,
+ * higher score for that university.
+ */
+export function calculateStandardAPS(results: SubjectResult[]): number {
+  const nonLO = results.filter((r) => r.subject !== 'life_orientation');
+  const sorted = [...nonLO].sort((a, b) => markToAPS(b.mark) - markToAPS(a.mark));
+  const best6 = sorted.slice(0, 6);
+  return best6.reduce((sum, r) => sum + markToAPS(r.mark), 0);
+}
+
 // ─── PROGRAMME MATCHING ─────────────────────────────────────────────────────
 
 /**
@@ -402,6 +417,7 @@ export function classifyChoice(
 export const APSCalculator = {
   markToAPS,
   calculateAPS,
+  calculateStandardAPS,
   matchStudentToProgramme,
   findAllMatches,
   classifyChoice,

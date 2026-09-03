@@ -50,6 +50,7 @@ function DocumentsContent() {
   const mountedRef = useRef(true);
 
   useEffect(() => {
+    mountedRef.current = true;
     fetchDocuments();
     return () => {
       mountedRef.current = false;

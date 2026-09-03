@@ -75,7 +75,7 @@ export default function PortalNav() {
       position="static"
       elevation={0}
       sx={{
-        background: 'linear-gradient(90deg, #4930D8 0%, #6638E8 55%, #7838EB 100%)',
+        background: '#002E5B',
       }}
     >
       <Toolbar sx={{ gap: { xs: 1, sm: 3 }, minHeight: '72px !important' }}>
@@ -149,7 +149,7 @@ export default function PortalNav() {
         <Button
           onClick={() => router.push('/cart')}
           startIcon={
-            <Badge badgeContent={cartCount} color="secondary">
+            <Badge badgeContent={cartCount} color="warning">
               <ShoppingCartIcon />
             </Badge>
           }

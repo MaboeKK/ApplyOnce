@@ -60,6 +60,7 @@ function CartContent() {
   const mountedRef = useRef(true);
 
   useEffect(() => {
+    mountedRef.current = true;
     load();
     return () => {
       mountedRef.current = false;
