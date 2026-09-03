@@ -73,13 +73,13 @@ function ApplicationsContent() {
   const columns: GridColDef[] = [
     {
       field: 'studentName',
-      headerName: 'Student Name',
+      headerName: 'Student name',
       width: 200,
       sortable: true,
     },
     {
       field: 'studentIdNumber',
-      headerName: 'ID Number',
+      headerName: 'ID number',
       width: 150,
       sortable: true,
     },

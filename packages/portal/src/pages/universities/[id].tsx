@@ -207,7 +207,7 @@ function UniversityDetailContent() {
       <PortalNav />
       <Container maxWidth="lg" sx={{ py: 6 }}>
         <Button onClick={() => router.push('/universities')} sx={{ mb: 2 }}>
-          ← Back to Universities
+          ← Back to universities
         </Button>
 
         <Typography variant="h4" gutterBottom>
@@ -347,7 +347,7 @@ function UniversityDetailContent() {
                         disabled={!canAdd || addingCode === programme.qualificationCode}
                         onClick={() => handleAddToCart(programme)}
                       >
-                        {addingCode === programme.qualificationCode ? 'Adding…' : 'Add to Cart'}
+                        {addingCode === programme.qualificationCode ? 'Adding…' : 'Add to cart'}
                       </Button>
                     </Box>
                   );

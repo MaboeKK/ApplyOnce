@@ -266,7 +266,7 @@ function ApplicationDetailContent() {
             onClick={() => router.push('/applications')}
             sx={{ mb: 2 }}
           >
-            Back to Applications
+            Back to applications
           </Button>
           <Alert severity="error">{error || 'Application not found'}</Alert>
         </Box>
@@ -286,7 +286,7 @@ function ApplicationDetailContent() {
           onClick={() => router.push('/applications')}
           sx={{ mb: 2 }}
         >
-          Back to Applications
+          Back to applications
         </Button>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
@@ -306,11 +306,11 @@ function ApplicationDetailContent() {
       </Box>
 
       <Grid container spacing={3}>
-        {/* Student Profile */}
+        {/* Student profile */}
         <Grid item xs={12} md={8}>
           <Paper sx={{ p: 3, mb: 3 }}>
             <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-              Student Profile
+              Student profile
             </Typography>
             <Divider sx={{ mb: 2 }} />
 
@@ -375,7 +375,7 @@ function ApplicationDetailContent() {
               {student.homeLanguage && (
                 <Grid item xs={12} sm={6}>
                   <Typography variant="body2" color="text.secondary">
-                    Home Language
+                    Home language
                   </Typography>
                   <Typography variant="body1">{student.homeLanguage}</Typography>
                 </Grid>
@@ -383,7 +383,7 @@ function ApplicationDetailContent() {
 
               <Grid item xs={12} sm={6}>
                 <Typography variant="body2" color="text.secondary">
-                  Matric Year
+                  Matric year
                 </Typography>
                 <Typography variant="body1">{student.matricYear}</Typography>
               </Grid>
@@ -414,13 +414,13 @@ function ApplicationDetailContent() {
             </Grid>
           </Paper>
 
-          {/* Subject Results */}
+          {/* Subject results */}
           <Paper sx={{ p: 3, mb: 3 }}>
             <Box
               sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}
             >
               <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                Subject Results
+                Subject results
               </Typography>
               <Chip
                 label={`APS: ${aps ?? 'N/A'}`}
@@ -436,7 +436,7 @@ function ApplicationDetailContent() {
                   <TableRow>
                     <TableCell>Subject</TableCell>
                     <TableCell align="center">Mark (%)</TableCell>
-                    <TableCell align="center">Achievement Level</TableCell>
+                    <TableCell align="center">Achievement level</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -452,10 +452,10 @@ function ApplicationDetailContent() {
             </TableContainer>
           </Paper>
 
-          {/* Uploaded Documents */}
+          {/* Uploaded documents */}
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-              Uploaded Documents
+              Uploaded documents
             </Typography>
             <Divider sx={{ mb: 2 }} />
 
@@ -501,24 +501,24 @@ function ApplicationDetailContent() {
 
         {/* Application Info & Decision Panel */}
         <Grid item xs={12} md={4}>
-          {/* Application Information */}
+          {/* Application information */}
           <Paper sx={{ p: 3, mb: 3 }}>
             <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-              Application Information
+              Application information
             </Typography>
             <Divider sx={{ mb: 2 }} />
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Box>
                 <Typography variant="body2" color="text.secondary">
-                  University Reference
+                  University reference
                 </Typography>
                 <Typography variant="body1">{application.universityReference || 'N/A'}</Typography>
               </Box>
 
               <Box>
                 <Typography variant="body2" color="text.secondary">
-                  Submitted Date
+                  Submitted date
                 </Typography>
                 <Typography variant="body1">
                   {application.submittedAt
@@ -590,7 +590,7 @@ function ApplicationDetailContent() {
               <Box>
                 <FormControl component="fieldset" fullWidth sx={{ mb: 2 }}>
                   <FormLabel component="legend" sx={{ mb: 1 }}>
-                    Select Decision
+                    Select decision
                   </FormLabel>
                   <RadioGroup
                     value={decision}
@@ -645,7 +645,7 @@ function ApplicationDetailContent() {
                   disabled={!decision || !reason.trim() || submitting}
                   onClick={() => setConfirmDialogOpen(true)}
                 >
-                  {submitting ? 'Submitting...' : 'Submit Decision'}
+                  {submitting ? 'Submitting...' : 'Submit decision'}
                 </Button>
               </Box>
             )}
@@ -655,7 +655,7 @@ function ApplicationDetailContent() {
 
       {/* Confirmation Dialog */}
       <Dialog open={confirmDialogOpen} onClose={() => !submitting && setConfirmDialogOpen(false)}>
-        <DialogTitle>Confirm Decision</DialogTitle>
+        <DialogTitle>Confirm decision</DialogTitle>
         <DialogContent>
           <DialogContentText>
             Are you sure you want to <strong>{decision}</strong> this application?
