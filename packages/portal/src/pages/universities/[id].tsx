@@ -226,14 +226,21 @@ function UniversityDetailContent() {
         )}
 
         {existingApp && (
-          <Alert
-            severity={existingApp.status === 'submitted' ? 'success' : 'warning'}
-            sx={{ mb: 3 }}
-          >
-            You already have {existingApp.status === 'submitted' ? 'a submitted' : 'a draft'}{' '}
-            application to {university.name} for <strong>{existingApp.programmeName}</strong>.
-            {existingApp.status === 'draft' &&
-              ' Remove it from your cart first if you want to choose a different programme here.'}
+          <Alert severity="success" sx={{ mb: 3 }}>
+            {existingApp.status === 'submitted' ? (
+              <>
+                You&apos;ve submitted your application to {university.name}:{' '}
+                <strong>{existingApp.programmeName}</strong>. Applications are final, so you
+                can&apos;t choose a different programme here.
+              </>
+            ) : (
+              <>
+                Your application to {university.name} is in your cart:{' '}
+                <strong>{existingApp.programmeName}</strong>. You can only choose one programme per
+                university, so remove this from your cart first if you&apos;d like a different one
+                here.
+              </>
+            )}
           </Alert>
         )}
 
