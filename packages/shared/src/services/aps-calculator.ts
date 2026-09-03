@@ -28,6 +28,22 @@ export function markToAPS(mark: number): Rating {
   return 1;
 }
 
+/**
+ * 8-point conversion table used by UFS and UKZN — distinguishes the top NSC
+ * achievement level (80-100%) into two point values instead of the standard
+ * scale's single "7". No points below 30%.
+ */
+export function markToAPS8(mark: number): number {
+  if (mark >= 90) return 8;
+  if (mark >= 80) return 7;
+  if (mark >= 70) return 6;
+  if (mark >= 60) return 5;
+  if (mark >= 50) return 4;
+  if (mark >= 40) return 3;
+  if (mark >= 30) return 2;
+  return 0;
+}
+
 // ─── CORE APS CALCULATION (PER-UNIVERSITY) ──────────────────────────────────
 
 export interface APSResult {
@@ -42,68 +58,65 @@ export interface APSResult {
 export interface SubjectAPSBreakdown {
   subject: NSCSubject;
   mark: number;
-  rating: Rating;
+  rating: Rating; // canonical 1-7 NSC achievement level — always this scale
+  points: number; // this university's own scale-converted contribution to totalAPS
   included: boolean;
   isLO: boolean;
 }
 
-/**
- * Calculate APS for a specific university using that university's apsRule.
- *
- * UJ: 6 subjects, LO excluded
- * Wits: 7 subjects, LO included
- */
-export function calculateAPS(results: SubjectResult[], university: University): APSResult {
-  const errors: string[] = [];
+function baseBreakdown(results: SubjectResult[]): SubjectAPSBreakdown[] {
+  return results.map((r) => ({
+    subject: r.subject,
+    mark: r.mark,
+    rating: markToAPS(r.mark),
+    points: 0,
+    included: false,
+    isLO: r.subject === 'life_orientation',
+  }));
+}
 
+/**
+ * Standard NSC 1-7 point scale (UJ, Wits, UP, ...).
+ * UJ: 6 subjects, LO excluded. Wits: 7 subjects, LO included.
+ */
+function calculateNsc7PointAPS(results: SubjectResult[], university: University): APSResult {
+  const errors: string[] = [];
   if (results.length < 6) {
     errors.push(`Only ${results.length} subjects provided. Minimum 6 required.`);
   }
 
-  const breakdown: SubjectAPSBreakdown[] = results.map((r) => ({
-    subject: r.subject,
-    mark: r.mark,
-    rating: markToAPS(r.mark),
-    included: false,
-    isLO: r.subject === 'life_orientation',
-  }));
+  const breakdown = baseBreakdown(results);
+  breakdown.forEach((b) => {
+    b.points = b.rating;
+  });
 
   const { subjectsCounted, includesLifeOrientation } = university.apsRule;
 
-  // Separate LO from other subjects
   const loEntry = breakdown.find((b) => b.isLO);
   const otherSubjects = breakdown.filter((b) => !b.isLO);
-
-  // Sort by rating descending
-  const sortedOthers = [...otherSubjects].sort((a, b) => b.rating - a.rating);
+  const sortedOthers = [...otherSubjects].sort((a, b) => b.points - a.points);
 
   let topSubjects: SubjectAPSBreakdown[];
   let totalAPS: number;
 
   if (includesLifeOrientation) {
-    // Take best (subjectsCounted - 1) non-LO subjects + LO
     const countWithoutLO = subjectsCounted - 1;
     topSubjects = sortedOthers.slice(0, countWithoutLO);
-
     topSubjects.forEach((s) => {
       s.included = true;
     });
 
-    const baseAPS = topSubjects.reduce((sum, s) => sum + s.rating, 0);
-    const loPoints = loEntry ? loEntry.rating : 0;
-
-    if (loEntry) {
-      loEntry.included = true;
-    }
+    const baseAPS = topSubjects.reduce((sum, s) => sum + s.points, 0);
+    const loPoints = loEntry ? loEntry.points : 0;
+    if (loEntry) loEntry.included = true;
 
     totalAPS = baseAPS + loPoints;
   } else {
-    // Take best subjectsCounted non-LO subjects, LO excluded
     topSubjects = sortedOthers.slice(0, subjectsCounted);
     topSubjects.forEach((s) => {
       s.included = true;
     });
-    totalAPS = topSubjects.reduce((sum, s) => sum + s.rating, 0);
+    totalAPS = topSubjects.reduce((sum, s) => sum + s.points, 0);
   }
 
   return {
@@ -114,6 +127,167 @@ export function calculateAPS(results: SubjectResult[], university: University): 
     isValid: errors.length === 0,
     validationErrors: errors,
   };
+}
+
+/**
+ * 8-point scale (UFS, UKZN). Life Orientation is never part of the ranked
+ * "best N" pool: UKZN excludes it entirely (includesLifeOrientation: false);
+ * UFS awards it a flat 1-point bonus if the mark is 60%+ (0 otherwise) on top
+ * of the best 6 academic subjects, signalled by apsRule.bonusPoints being set
+ * — it is NOT run through the 8-point table like the other six subjects.
+ */
+function calculateNsc8PointAPS(results: SubjectResult[], university: University): APSResult {
+  const errors: string[] = [];
+  if (results.length < 6) {
+    errors.push(`Only ${results.length} subjects provided. Minimum 6 required.`);
+  }
+
+  const breakdown = baseBreakdown(results);
+  breakdown.forEach((b) => {
+    b.points = markToAPS8(b.mark);
+  });
+
+  const { subjectsCounted, includesLifeOrientation, bonusPoints } = university.apsRule;
+
+  const loEntry = breakdown.find((b) => b.isLO);
+  const otherSubjects = breakdown.filter((b) => !b.isLO);
+  const sortedOthers = [...otherSubjects].sort((a, b) => b.points - a.points);
+
+  const topSubjects = sortedOthers.slice(0, subjectsCounted);
+  topSubjects.forEach((s) => {
+    s.included = true;
+  });
+
+  let totalAPS = topSubjects.reduce((sum, s) => sum + s.points, 0);
+  let subjectCount = topSubjects.length;
+
+  if (includesLifeOrientation && loEntry) {
+    loEntry.included = true;
+    subjectCount += 1;
+    if (bonusPoints) {
+      loEntry.points = loEntry.mark >= 60 ? 1 : 0;
+    }
+    totalAPS += loEntry.points;
+  }
+
+  return {
+    universityId: university.id,
+    totalAPS,
+    subjects: breakdown,
+    subjectCount,
+    isValid: errors.length === 0,
+    validationErrors: errors,
+  };
+}
+
+/**
+ * Percentage-average scale (SU): the average raw NSC percentage across ALL
+ * subjects excluding Life Orientation (not a best-N sum like the other
+ * scales). Thresholds like "60" are a target average %, not APS points.
+ */
+function calculatePercentageAverageAPS(
+  results: SubjectResult[],
+  university: University
+): APSResult {
+  const errors: string[] = [];
+  if (results.length < 6) {
+    errors.push(`Only ${results.length} subjects provided. Minimum 6 required.`);
+  }
+
+  const breakdown = baseBreakdown(results);
+  breakdown.forEach((b) => {
+    b.points = b.mark;
+  });
+
+  const nonLO = breakdown.filter((b) => !b.isLO);
+  nonLO.forEach((b) => {
+    b.included = true;
+  });
+
+  const totalAPS =
+    nonLO.length > 0
+      ? Math.round((nonLO.reduce((sum, b) => sum + b.points, 0) / nonLO.length) * 10) / 10
+      : 0;
+
+  return {
+    universityId: university.id,
+    totalAPS,
+    subjects: breakdown,
+    subjectCount: nonLO.length,
+    isValid: errors.length === 0,
+    validationErrors: errors,
+  };
+}
+
+/**
+ * Base percentage-out-of-600 scale (UCT): English (home or FAL) + best 5
+ * other subjects, raw percentages, Life Orientation excluded, any subject
+ * below 40% scores 0. This is UCT's BASE APS before any faculty-specific
+ * Faculty Points Score (FPS) transform — see applyFacultyScoring, applied
+ * per-programme in matchStudentToProgramme since the transform depends on
+ * the programme's faculty.
+ */
+function calculatePercentage600APS(results: SubjectResult[], university: University): APSResult {
+  const errors: string[] = [];
+  if (results.length < 6) {
+    errors.push(`Only ${results.length} subjects provided. Minimum 6 required.`);
+  }
+
+  const breakdown = baseBreakdown(results);
+  breakdown.forEach((b) => {
+    b.points = b.mark < 40 ? 0 : b.mark;
+  });
+
+  const nonLO = breakdown.filter((b) => !b.isLO);
+  const englishEntry = [...nonLO]
+    .filter((b) => b.subject === 'english_home' || b.subject === 'english_fal')
+    .sort((a, b) => b.points - a.points)[0];
+
+  if (!englishEntry) {
+    errors.push('English subject not found — UCT APS requires English.');
+  }
+
+  const others = nonLO
+    .filter((b) => b !== englishEntry)
+    .sort((a, b) => b.points - a.points)
+    .slice(0, 5);
+
+  [englishEntry, ...others].forEach((b) => {
+    if (b) b.included = true;
+  });
+
+  const totalAPS =
+    (englishEntry ? englishEntry.points : 0) + others.reduce((sum, b) => sum + b.points, 0);
+
+  return {
+    universityId: university.id,
+    totalAPS,
+    subjects: breakdown,
+    subjectCount: (englishEntry ? 1 : 0) + others.length,
+    isValid: errors.length === 0,
+    validationErrors: errors,
+  };
+}
+
+/**
+ * Calculate APS for a specific university using that university's apsRule.
+ * Dispatches on apsRule.scale since universities score NSC results in
+ * genuinely different units (1-7 points, 1-8 points, a raw percentage
+ * average, or a percentage sum out of 600) — see the per-scale functions
+ * above for each university's documented methodology.
+ */
+export function calculateAPS(results: SubjectResult[], university: University): APSResult {
+  switch (university.apsRule.scale) {
+    case 'nsc_8point':
+      return calculateNsc8PointAPS(results, university);
+    case 'percentage_average':
+      return calculatePercentageAverageAPS(results, university);
+    case 'percentage_600':
+      return calculatePercentage600APS(results, university);
+    case 'nsc_7point':
+    default:
+      return calculateNsc7PointAPS(results, university);
+  }
 }
 
 /**
@@ -129,6 +303,47 @@ export function calculateStandardAPS(results: SubjectResult[]): number {
   const sorted = [...nonLO].sort((a, b) => markToAPS(b.mark) - markToAPS(a.mark));
   const best6 = sorted.slice(0, 6);
   return best6.reduce((sum, r) => sum + markToAPS(r.mark), 0);
+}
+
+/**
+ * Apply a university's faculty-specific score transform (e.g. UCT's base APS
+ * -> Faculty Points Score) on top of a base APSResult, for a given
+ * programme's faculty. Returns the base score unchanged if the university
+ * has no facultyScoring or the programme's faculty isn't listed. Returns
+ * `cannotCompute` when the real transform requires data ApplyOnce doesn't
+ * collect (e.g. NBT scores) — callers must not silently compare the base
+ * score against that faculty's threshold in that case.
+ */
+function applyFacultyScoring(
+  apsResult: APSResult,
+  programme: Programme,
+  university: University
+): { score: number; cannotCompute?: string } {
+  const rule = university.apsRule.facultyScoring?.find((f) => f.faculty === programme.faculty);
+  if (!rule) return { score: apsResult.totalAPS };
+
+  // UCT Health Sciences bakes NBT scores directly into the formula — genuinely
+  // not computable without NBT data, which is explicitly out of scope.
+  if (rule.faculty === 'Health Sciences' && rule.usesNBT) {
+    return {
+      score: apsResult.totalAPS,
+      cannotCompute: `${rule.scoreName} for this faculty requires NBT results, which ApplyOnce does not collect — check directly with the university.`,
+    };
+  }
+
+  // UCT Science: FPS = base APS + Mathematics% + Physical Sciences% (Life
+  // Sciences substitutes when Physical Sciences wasn't taken).
+  if (rule.faculty === 'Science' && rule.scoreName === 'FPS') {
+    const mathEntry = apsResult.subjects.find((s) => s.subject === 'mathematics');
+    const sciEntry =
+      apsResult.subjects.find((s) => s.subject === 'physical_sciences') ||
+      apsResult.subjects.find((s) => s.subject === 'life_sciences');
+    const bonus = (mathEntry?.points ?? 0) + (sciEntry?.points ?? 0);
+    return { score: apsResult.totalAPS + bonus };
+  }
+
+  // Commerce / Engineering / Humanities / Law: "FPS = APS (no adjustment)".
+  return { score: apsResult.totalAPS };
 }
 
 // ─── PROGRAMME MATCHING ─────────────────────────────────────────────────────
@@ -161,7 +376,27 @@ export function matchStudentToProgramme(
 
   // Calculate student's APS for THIS university
   const apsResult = calculateAPS(studentResults, university);
-  const studentAPS = apsResult.totalAPS;
+  let studentAPS = apsResult.totalAPS;
+
+  // Universities with a faculty-specific score transform (e.g. UCT's base
+  // APS -> Faculty Points Score) need it applied before comparing against
+  // that programme's threshold, which is expressed in the transformed score.
+  if (university.apsRule.facultyScoring) {
+    const adjusted = applyFacultyScoring(apsResult, programme, university);
+    if (adjusted.cannotCompute) {
+      return {
+        university,
+        programme,
+        outcome: 'requirements_not_available',
+        studentAPS: apsResult.totalAPS,
+        requiredAPS: 0,
+        meetsRequirements: false,
+        missingRequirements: [adjusted.cannotCompute],
+        choiceStrategy: 'not_qualified',
+      };
+    }
+    studentAPS = adjusted.score;
+  }
 
   // Detect student's maths type
   const mathsType = getStudentMathsType(studentResults);
@@ -269,6 +504,7 @@ function evaluateSubjectRequirements(
     subject: SubjectKey;
     status: string;
     minRating?: Rating;
+    minPercentage?: number;
     homeLanguageRating?: Rating;
     additionalLanguageRating?: Rating;
     altGroup?: string;
@@ -326,6 +562,10 @@ function evaluateSubjectRequirements(
       if (requiredRating && rating < requiredRating) {
         missing.push(`${req.subject}: need Level ${requiredRating}, you have Level ${rating}`);
       }
+
+      if (req.minPercentage && studentSubj.mark < req.minPercentage) {
+        missing.push(`${req.subject}: need ${req.minPercentage}%, you have ${studentSubj.mark}%`);
+      }
     }
   }
 
@@ -335,17 +575,20 @@ function evaluateSubjectRequirements(
     const satisfied = alts.some((req) => {
       const studentSubj = studentResults.find((r) => matchesSubjectKey(r.subject, req.subject));
       if (!studentSubj) return false;
+      if (req.minPercentage) return studentSubj.mark >= req.minPercentage;
       const rating = markToAPS(studentSubj.mark);
       return req.minRating ? rating >= req.minRating : true;
     });
 
     if (!satisfied) {
       const altNames = alts.map((a) => a.subject).join(' OR ');
-      const minRatings = alts
-        .map((a) => (a.minRating ? `Level ${a.minRating}` : ''))
+      const thresholds = alts
+        .map((a) =>
+          a.minPercentage ? `${a.minPercentage}%` : a.minRating ? `Level ${a.minRating}` : ''
+        )
         .filter(Boolean)
         .join(' or ');
-      missing.push(`Need one of: ${altNames} ${minRatings ? `at ${minRatings}` : ''}`);
+      missing.push(`Need one of: ${altNames} ${thresholds ? `at ${thresholds}` : ''}`);
     }
   }
 
