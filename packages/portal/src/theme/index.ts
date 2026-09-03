@@ -10,12 +10,20 @@ const colors = {
   secondary: '#002E5B', // Capitec Navy — header bar, branding, high-emphasis headers
   accent: '#00A651',
   success: '#00A651',
+  successSurface: '#00A6511F', // 12% alpha — positive pill/success banner backgrounds
   error: '#D32F2F', // Alert / Money Out
+  errorSurface: '#D32F2F1A', // 10% alpha — negative cashflow pill backgrounds
   warning: '#FFA000', // Warning / Pending
+  warningSurface: '#FFA0001F', // 12% alpha, matching the success/error surface convention
+  // Brand accents distinct from the functional palette above: reserved for
+  // logo accents / critical alert badges (red) and promotional banners /
+  // onboarding illustrations (cyan) — never used for routine CTAs or errors.
+  brandRed: '#DA1A23',
+  brandCyan: '#0091D2',
   neutral: {
     50: '#F8F9FA', // Main background
     100: '#F1F2F4',
-    200: '#E5E7EB',
+    200: '#E2E8F0', // Card border / divider
     300: '#D1D5DB',
     400: '#9CA3AF',
     500: '#6B7280', // Secondary / muted text
@@ -24,6 +32,18 @@ const colors = {
     800: '#333333',
     900: '#1F2937', // Primary text
   },
+  disabledBackground: '#EFEFEF',
+};
+
+const STANDARD_CARD_SHADOW = '0px 2px 8px rgba(0,0,0,0.06)';
+const ELEVATED_SHADOW = '0px 8px 24px rgba(0,0,0,0.12)';
+
+export const capitecTokens = {
+  brandRed: colors.brandRed,
+  brandCyan: colors.brandCyan,
+  successSurface: colors.successSurface,
+  errorSurface: colors.errorSurface,
+  warningSurface: colors.warningSurface,
 };
 
 export const theme = createTheme({
@@ -74,6 +94,10 @@ export const theme = createTheme({
       disabled: colors.neutral[400],
     },
     divider: colors.neutral[200],
+    action: {
+      disabledBackground: colors.disabledBackground,
+      disabled: 'rgba(0, 0, 0, 0.38)',
+    },
   },
   typography: {
     fontFamily: [
@@ -107,7 +131,7 @@ export const theme = createTheme({
     },
     h4: {
       fontFamily: 'Roboto, sans-serif',
-      fontWeight: 500,
+      fontWeight: 700, // Page Title / Header
       fontSize: '1.25rem',
       lineHeight: 1.35,
     },
@@ -147,32 +171,37 @@ export const theme = createTheme({
   },
   // MUI's default spacing(1)=8px already matches the 8px/4px grid
   // (spacing(0.5)=4px xxs, 1=8px xs, 2=16px sm, 3=24px md, 4=32px lg) — no override needed.
+  //
+  // Two-tier shadow system: elevations 1-4 (Card, Paper, AppBar) get the flat
+  // "standard card" shadow; elevations 5+ (Snackbar=6, Menu/Popover=8,
+  // Drawer=16, Dialog=24) get the "elevated surface / floating modal" shadow
+  // — otherwise every floating surface looked exactly as flat as a plain card.
   shadows: [
     'none',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
-    '0px 2px 8px rgba(0,0,0,0.06)',
+    STANDARD_CARD_SHADOW,
+    STANDARD_CARD_SHADOW,
+    STANDARD_CARD_SHADOW,
+    STANDARD_CARD_SHADOW,
+    ELEVATED_SHADOW,
+    ELEVATED_SHADOW,
+    ELEVATED_SHADOW,
+    ELEVATED_SHADOW,
+    ELEVATED_SHADOW,
+    ELEVATED_SHADOW,
+    ELEVATED_SHADOW,
+    ELEVATED_SHADOW,
+    ELEVATED_SHADOW,
+    ELEVATED_SHADOW,
+    ELEVATED_SHADOW,
+    ELEVATED_SHADOW,
+    ELEVATED_SHADOW,
+    ELEVATED_SHADOW,
+    ELEVATED_SHADOW,
+    ELEVATED_SHADOW,
+    ELEVATED_SHADOW,
+    ELEVATED_SHADOW,
+    ELEVATED_SHADOW,
+    ELEVATED_SHADOW,
   ],
   components: {
     MuiButton: {
@@ -197,7 +226,7 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 12,
-          boxShadow: '0px 2px 8px rgba(0,0,0,0.06)',
+          boxShadow: STANDARD_CARD_SHADOW,
         },
       },
     },

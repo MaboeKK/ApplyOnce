@@ -87,11 +87,14 @@ const brand = {
   navy: '#002E5B', // Capitec Navy (headline / strong text)
   secondaryText: '#4B5563',
   mutedText: '#6B7280',
-  border: '#E5E7EB',
+  border: '#E2E8F0',
   purpleSurface: '#E6F7EE', // light green surface
   pageBg: '#F8F9FA',
   success: '#00A651',
   error: '#D32F2F',
+  cyan: '#0091D2', // Capitec Cyan — promotional banners only, not routine CTAs
+  cyanDark: '#00729F',
+  cyanSurface: '#E0F3FA',
 };
 
 type SortOption = 'name-asc' | 'name-desc' | 'programmes-desc';
@@ -781,14 +784,14 @@ function UniversitiesContent() {
                   width: 44,
                   height: 44,
                   borderRadius: '10px',
-                  bgcolor: brand.purpleSurface,
+                  bgcolor: brand.cyanSurface,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
                 }}
               >
-                <SchoolIcon sx={{ color: brand.purple }} />
+                <SchoolIcon sx={{ color: brand.cyan }} />
               </Box>
               <Box>
                 <Typography sx={{ fontSize: 15, fontWeight: 700, color: brand.navy }}>
@@ -804,11 +807,11 @@ function UniversitiesContent() {
               onClick={() => setHowItWorksOpen(true)}
               endIcon={<ArrowForwardIcon />}
               sx={{
-                bgcolor: brand.purple,
+                bgcolor: brand.cyan,
                 color: '#fff',
                 flexShrink: 0,
                 whiteSpace: 'nowrap',
-                '&:hover': { bgcolor: brand.purpleDark },
+                '&:hover': { bgcolor: brand.cyanDark },
               }}
             >
               How it works

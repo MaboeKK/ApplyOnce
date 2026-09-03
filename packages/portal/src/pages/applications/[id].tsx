@@ -109,7 +109,12 @@ function ApplicationDetailContent() {
                 {application.facultyName}
               </Typography>
             </Box>
-            <Chip label={statusConfig.label} color={statusConfig.color} icon={statusConfig.icon} />
+            <Chip
+              label={statusConfig.label}
+              color={statusConfig.color}
+              icon={statusConfig.icon}
+              sx={statusConfig.sx}
+            />
           </Stack>
 
           {application.universityReference && (

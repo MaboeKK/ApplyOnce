@@ -37,6 +37,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import api from '@/config/api';
+import { capitecTokens } from '@/theme';
 import { markToAPS } from '@applyonce/shared';
 import { subjectLabel } from '@/utils/subject-labels';
 import { confidenceDisplay, ConfidenceTier } from '@/utils/confidence';
@@ -399,7 +400,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
             textAlign: 'center',
             border: '2px dashed',
             borderColor: 'primary.main',
-            bgcolor: 'primary.50',
+            bgcolor: capitecTokens.successSurface,
             cursor: loading ? 'wait' : 'pointer',
           }}
         >
@@ -487,7 +488,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
           sx={{
             p: 3,
             mb: 3,
-            bgcolor: 'success.50',
+            bgcolor: capitecTokens.successSurface,
             border: '2px solid',
             borderColor: 'success.main',
           }}
@@ -546,7 +547,11 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
                   <TableRow
                     key={index}
                     sx={{
-                      bgcolor: subject.edited ? 'warning.50' : isDuplicate ? 'error.50' : undefined,
+                      bgcolor: subject.edited
+                        ? capitecTokens.warningSurface
+                        : isDuplicate
+                          ? capitecTokens.errorSurface
+                          : undefined,
                       transition: 'background-color 0.3s',
                     }}
                   >
@@ -714,7 +719,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
 
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Paper sx={{ p: 3, bgcolor: 'success.50' }}>
+          <Paper sx={{ p: 3, bgcolor: capitecTokens.successSurface }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <CheckCircleIcon color="success" />
               <Box>
@@ -732,7 +737,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
 
         <Grid item xs={12}>
           {idDocUploaded ? (
-            <Paper sx={{ p: 3, bgcolor: 'success.50' }}>
+            <Paper sx={{ p: 3, bgcolor: capitecTokens.successSurface }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <CheckCircleIcon color="success" />
                 <Typography variant="body1" fontWeight={600}>
@@ -747,7 +752,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
                 textAlign: 'center',
                 border: '2px dashed',
                 borderColor: 'primary.main',
-                bgcolor: 'primary.50',
+                bgcolor: capitecTokens.successSurface,
                 cursor: idDocUploading ? 'wait' : 'pointer',
               }}
             >
