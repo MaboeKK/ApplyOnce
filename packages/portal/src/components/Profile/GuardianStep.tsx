@@ -30,12 +30,12 @@ import {
 
 const RELATIONSHIPS: Record<string, string> = {
   parent: 'Parent',
-  legal_guardian: 'Legal Guardian',
+  legal_guardian: 'Legal guardian',
   grandparent: 'Grandparent',
   aunt: 'Aunt',
   uncle: 'Uncle',
   sibling: 'Sibling',
-  foster_parent: 'Foster Parent',
+  foster_parent: 'Foster parent',
   other: 'Other',
 };
 
@@ -234,7 +234,7 @@ export default function GuardianStep({
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)}>
       <Typography variant="h6" gutterBottom>
-        Guardian / Parent Information
+        Guardian / parent information
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
         Details for your parent or legal guardian.
@@ -248,7 +248,7 @@ export default function GuardianStep({
             render={({ field }) => (
               <TextField
                 {...field}
-                label="Guardian First Name"
+                label="Guardian first name"
                 required
                 fullWidth
                 onBlur={() => {
@@ -269,7 +269,7 @@ export default function GuardianStep({
             render={({ field }) => (
               <TextField
                 {...field}
-                label="Guardian Last Name"
+                label="Guardian last name"
                 required
                 fullWidth
                 onBlur={() => {
@@ -315,7 +315,7 @@ export default function GuardianStep({
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Specify Relationship"
+                  label="Specify relationship"
                   required
                   fullWidth
                   error={!!errors.otherRelationship}
@@ -335,7 +335,7 @@ export default function GuardianStep({
                 value={field.value}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
-                label="Guardian Phone"
+                label="Guardian phone"
                 required
                 error={!!errors.phone}
                 helperText={errors.phone?.message}
@@ -351,7 +351,7 @@ export default function GuardianStep({
             render={({ field }) => (
               <TextField
                 {...field}
-                label="Guardian Email"
+                label="Guardian email"
                 fullWidth
                 type="email"
                 autoComplete="email"
@@ -371,7 +371,7 @@ export default function GuardianStep({
                 value={formatZAR(field.value)}
                 onChange={(e) => field.onChange(parseZARInput(e.target.value))}
                 onBlur={field.onBlur}
-                label="Annual Income"
+                label="Annual income"
                 fullWidth
                 placeholder="R 250,000"
                 inputProps={{ inputMode: 'numeric' }}
@@ -404,7 +404,7 @@ export default function GuardianStep({
       </Box>
 
       <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>
-        Emergency Contact
+        Emergency contact
         <Typography component="span" variant="body2" color="text.secondary" sx={{ ml: 1 }}>
           Optional
         </Typography>
@@ -418,7 +418,7 @@ export default function GuardianStep({
             render={({ field }) => (
               <TextField
                 {...field}
-                label="Emergency Contact First Name"
+                label="Emergency contact first name"
                 fullWidth
                 onBlur={() => {
                   field.onBlur();
@@ -437,7 +437,7 @@ export default function GuardianStep({
             render={({ field }) => (
               <TextField
                 {...field}
-                label="Emergency Contact Last Name"
+                label="Emergency contact last name"
                 fullWidth
                 onBlur={() => {
                   field.onBlur();
@@ -458,7 +458,7 @@ export default function GuardianStep({
                 value={field.value || ''}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
-                label="Emergency Contact Phone"
+                label="Emergency contact phone"
                 error={!!errors.emergencyContact?.phone}
                 helperText={errors.emergencyContact?.phone?.message || 'Optional'}
               />
@@ -473,7 +473,7 @@ export default function GuardianStep({
             render={({ field }) => (
               <TextField
                 {...field}
-                label="Emergency Contact Relationship"
+                label="Emergency contact relationship"
                 fullWidth
                 helperText="Optional"
               />

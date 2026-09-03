@@ -147,7 +147,7 @@ export default function PersonalStep({ data, onNext, user }: Props) {
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)}>
       <Typography variant="h6" gutterBottom>
-        Personal Information
+        Personal information
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
         Your name is set from registration. Add your ID number and contact details below.
@@ -161,7 +161,7 @@ export default function PersonalStep({ data, onNext, user }: Props) {
             render={({ field }) => (
               <TextField
                 {...field}
-                label="First Name"
+                label="First name"
                 fullWidth
                 disabled
                 helperText="Set during registration"
@@ -177,7 +177,7 @@ export default function PersonalStep({ data, onNext, user }: Props) {
             render={({ field }) => (
               <TextField
                 {...field}
-                label="Last Name"
+                label="Last name"
                 fullWidth
                 disabled
                 helperText="Set during registration"
@@ -202,7 +202,7 @@ export default function PersonalStep({ data, onNext, user }: Props) {
                     field.onChange(digitsOnly(pasted).slice(0, 13));
                   }
                 }}
-                label="SA ID Number"
+                label="SA ID number"
                 required
                 fullWidth
                 placeholder="888888 8888 888"
@@ -236,7 +236,7 @@ export default function PersonalStep({ data, onNext, user }: Props) {
                 value={field.value}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
-                label="Phone Number"
+                label="Phone number"
                 required
                 error={!!errors.phone}
                 helperText={errors.phone?.message}
@@ -283,7 +283,7 @@ export default function PersonalStep({ data, onNext, user }: Props) {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="Home Language"
+                    label="Home language"
                     required
                     onBlur={field.onBlur}
                     error={!!errors.homeLanguage}

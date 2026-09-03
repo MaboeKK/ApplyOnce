@@ -108,17 +108,17 @@ const OCR_BANNER: Record<
   high: {
     severity: 'success',
     icon: <CheckCircleIcon fontSize="small" />,
-    text: 'Extraction Successful',
+    text: 'Extraction successful',
   },
   medium: {
     severity: 'warning',
     icon: <WarningAmberIcon fontSize="small" />,
-    text: 'Extraction Completed – Manual Review Recommended',
+    text: 'Extraction completed, manual review recommended',
   },
   low: {
     severity: 'error',
     icon: <ErrorOutlineIcon fontSize="small" />,
-    text: 'Extraction Failed – Please Re-upload Your Certificate',
+    text: 'Extraction failed, please re-upload your certificate',
   },
 };
 
@@ -381,7 +381,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
     return (
       <Box>
         <Typography variant="h6" gutterBottom>
-          Upload Matric Results
+          Upload matric results
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           Upload your National Senior Certificate (matric certificate). We&apos;ll scan it and
@@ -450,7 +450,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
     return (
       <Box>
         <Typography variant="h6" gutterBottom>
-          Confirm Your Results
+          Confirm your results
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           Review the extracted results. Only the mark can be edited — the level is calculated
@@ -518,7 +518,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
               startIcon={<VisibilityIcon />}
               onClick={() => setCertPreviewOpen(true)}
             >
-              Preview Certificate
+              Preview certificate
             </Button>
           </Box>
         )}
@@ -630,7 +630,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
             size="large"
             disabled={!canConfirmResults}
           >
-            Confirm Results
+            Confirm results
           </Button>
         </Box>
 
@@ -656,7 +656,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
           maxWidth="md"
           fullWidth
         >
-          <DialogTitle>Your Uploaded Certificate</DialogTitle>
+          <DialogTitle>Your uploaded certificate</DialogTitle>
           <DialogContent>
             {certFile && certFileUrl && certFile.type.startsWith('image/') ? (
               <Box
@@ -686,7 +686,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
   return (
     <Box>
       <Typography variant="h6" gutterBottom>
-        Upload ID Document
+        Upload ID document
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
         Upload your South African ID document to complete your profile.
@@ -724,7 +724,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
               <CheckCircleIcon color="success" />
               <Box>
                 <Typography variant="body1" fontWeight={600}>
-                  Matric Results Confirmed
+                  Matric results confirmed
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   APS: {editedSubjects.length > 0 ? aps : data.aps} • {editedSubjects.length}{' '}
@@ -776,7 +776,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
                   <>
                     <CloudUploadIcon sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
                     <Typography variant="h6" gutterBottom>
-                      Upload ID Document
+                      Upload ID document
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Image or PDF of your SA ID
@@ -791,7 +791,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
         <Button onClick={() => setStep('confirm')} size="large" startIcon={<ArrowBackIcon />}>
-          Back to Results
+          Back to results
         </Button>
         <Button
           onClick={handleNext}

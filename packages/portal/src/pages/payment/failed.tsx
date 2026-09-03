@@ -22,7 +22,7 @@ export default function PaymentFailedPage() {
         <Paper sx={{ p: 5, textAlign: 'center' }}>
           <CancelIcon color="error" sx={{ fontSize: 64, mb: 2 }} />
           <Typography variant="h4" gutterBottom>
-            Payment Not Completed
+            Payment not completed
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
             Your payment was cancelled or did not go through. Your programmes are still saved in
@@ -30,7 +30,7 @@ export default function PaymentFailedPage() {
           </Typography>
           <Stack spacing={1.5}>
             <Button variant="contained" size="large" onClick={() => router.push('/cart')}>
-              Back to Cart
+              Back to cart
             </Button>
           </Stack>
         </Paper>

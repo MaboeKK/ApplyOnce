@@ -104,7 +104,7 @@ export default function RegisterPage() {
   if (step === 'verify') {
     return (
       <AuthLayout
-        title="Verify Your Email"
+        title="Verify your email"
         subtitle={`We sent a verification code to ${registeredEmail}`}
       >
         {devVerificationCode && (
@@ -124,7 +124,7 @@ export default function RegisterPage() {
         <Box component="form" onSubmit={handleVerifySubmit(onVerifySubmit)}>
           <TextField
             fullWidth
-            label="Verification Code"
+            label="Verification code"
             {...registerVerify('code')}
             error={!!verifyErrors.code}
             helperText={verifyErrors.code?.message}
@@ -133,7 +133,7 @@ export default function RegisterPage() {
           />
 
           <Button type="submit" fullWidth variant="contained" size="large" disabled={isVerifying}>
-            {isVerifying ? 'Verifying...' : 'Verify Email'}
+            {isVerifying ? 'Verifying...' : 'Verify email'}
           </Button>
 
           <Box sx={{ mt: 2, textAlign: 'center' }}>
@@ -150,7 +150,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <AuthLayout title="Create Your Account" subtitle="Start applying to universities today">
+    <AuthLayout title="Create your account" subtitle="Start applying to universities today">
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
@@ -161,7 +161,7 @@ export default function RegisterPage() {
         <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
           <TextField
             fullWidth
-            label="First Name"
+            label="First name"
             {...register('firstName')}
             error={!!errors.firstName}
             helperText={errors.firstName?.message}
@@ -169,7 +169,7 @@ export default function RegisterPage() {
           />
           <TextField
             fullWidth
-            label="Last Name"
+            label="Last name"
             {...register('lastName')}
             error={!!errors.lastName}
             helperText={errors.lastName?.message}
@@ -211,7 +211,7 @@ export default function RegisterPage() {
 
         <TextField
           fullWidth
-          label="Confirm Password"
+          label="Confirm password"
           type={showPassword ? 'text' : 'password'}
           {...register('confirmPassword')}
           error={!!errors.confirmPassword}
@@ -233,7 +233,7 @@ export default function RegisterPage() {
         />
 
         <Button type="submit" fullWidth variant="contained" size="large" disabled={isSubmitting}>
-          {isSubmitting ? 'Creating Account...' : 'Create Account'}
+          {isSubmitting ? 'Creating account...' : 'Create account'}
         </Button>
 
         <Divider sx={{ my: 3 }} />
@@ -243,7 +243,7 @@ export default function RegisterPage() {
             Already have an account?{' '}
             <Link href="/login" passHref legacyBehavior>
               <MuiLink underline="hover" sx={{ fontWeight: 600 }}>
-                Log In
+                Log in
               </MuiLink>
             </Link>
           </Typography>

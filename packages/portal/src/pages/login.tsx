@@ -61,7 +61,7 @@ export default function LoginPage() {
   };
 
   return (
-    <AuthLayout title="Welcome Back" subtitle="Log in to continue your application journey">
+    <AuthLayout title="Welcome back" subtitle="Log in to continue your application journey">
       {successMessage && (
         <Alert severity="success" sx={{ mb: 2 }}>
           {successMessage}
@@ -116,7 +116,7 @@ export default function LoginPage() {
         </Box>
 
         <Button type="submit" fullWidth variant="contained" size="large" disabled={isSubmitting}>
-          {isSubmitting ? 'Logging In...' : 'Log In'}
+          {isSubmitting ? 'Logging in...' : 'Log in'}
         </Button>
 
         <Divider sx={{ my: 3 }} />
@@ -126,7 +126,7 @@ export default function LoginPage() {
             Don&apos;t have an account?{' '}
             <Link href="/register" passHref legacyBehavior>
               <MuiLink underline="hover" sx={{ fontWeight: 600 }}>
-                Sign Up
+                Sign up
               </MuiLink>
             </Link>
           </Typography>
