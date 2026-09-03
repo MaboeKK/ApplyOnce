@@ -19,6 +19,11 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  // True once the persisted store has finished rehydrating from localStorage
+  // on this page load. A hard navigation/reload resets isAuthenticated to its
+  // initial `false` before rehydration runs, so guards must wait for this
+  // before treating `false` as "actually logged out" (see ProtectedRoute).
+  hasHydrated: boolean;
 
   // Actions
   login: (email: string, password: string) => Promise<void>;
@@ -26,6 +31,7 @@ interface AuthState {
   verifyEmail: (email: string, code: string) => Promise<void>;
   logout: () => Promise<void>;
   clearError: () => void;
+  setHasHydrated: (value: boolean) => void;
 }
 
 interface RegisterData {
@@ -42,6 +48,7 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
       error: null,
+      hasHydrated: false,
 
       login: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
@@ -94,6 +101,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       clearError: () => set({ error: null }),
+      setHasHydrated: (value: boolean) => set({ hasHydrated: value }),
     }),
     {
       name: 'auth-storage',
@@ -101,6 +109,9 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

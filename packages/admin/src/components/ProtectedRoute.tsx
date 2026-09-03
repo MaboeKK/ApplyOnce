@@ -23,9 +23,16 @@ interface Props {
 export function ProtectedRoute({ children }: Props) {
   const router = useRouter();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const [sessionValid, setSessionValid] = useState(false);
 
   useEffect(() => {
+    // Wait for the persisted store to rehydrate before deciding to redirect —
+    // isAuthenticated starts false on every hard page load/reload/direct
+    // navigation, before localStorage is read, so redirecting on that initial
+    // value would kick out an actually-logged-in admin.
+    if (!hasHydrated) return;
+
     if (!isAuthenticated) {
       router.replace('/login');
       return;
@@ -44,9 +51,9 @@ export function ProtectedRoute({ children }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [isAuthenticated, router]);
+  }, [hasHydrated, isAuthenticated, router]);
 
-  if (!isAuthenticated || !sessionValid) {
+  if (!hasHydrated || !isAuthenticated || !sessionValid) {
     return null;
   }
 
