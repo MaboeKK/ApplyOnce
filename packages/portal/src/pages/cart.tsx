@@ -190,7 +190,7 @@ function CartContent() {
       <PortalNav />
       <Container maxWidth="md" sx={{ py: 6 }}>
         <Typography variant="h4" gutterBottom>
-          Your Application Cart
+          Your application cart
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
           Review your programmes, then pay once to submit them all.
@@ -304,7 +304,7 @@ function CartContent() {
                 disabled={missingDocs || submitting}
                 onClick={handleCheckout}
               >
-                {submitting ? 'Starting payment…' : `Pay ${formatZAR(total)} and Submit All`}
+                {submitting ? 'Starting payment…' : `Pay ${formatZAR(total)} and submit all`}
               </Button>
             </Paper>
           </>

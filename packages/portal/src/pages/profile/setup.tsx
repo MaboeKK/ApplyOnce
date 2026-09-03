@@ -320,7 +320,7 @@ function ProfileSetupContent() {
     <Container maxWidth="md" sx={{ py: 6 }}>
       <Paper sx={{ p: 4 }}>
         <Typography variant="h4" gutterBottom align="center" sx={{ mb: 4 }}>
-          Complete Your Profile
+          Complete your profile
         </Typography>
 
         <Stepper activeStep={activeStep} sx={{ mb: 4 }}>

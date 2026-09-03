@@ -37,6 +37,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import api from '@/config/api';
+import { themeTokens } from '@/theme';
 import { markToAPS } from '@applyonce/shared';
 import { subjectLabel } from '@/utils/subject-labels';
 import { confidenceDisplay, ConfidenceTier } from '@/utils/confidence';
@@ -107,17 +108,17 @@ const OCR_BANNER: Record<
   high: {
     severity: 'success',
     icon: <CheckCircleIcon fontSize="small" />,
-    text: 'Extraction Successful',
+    text: 'Extraction successful',
   },
   medium: {
     severity: 'warning',
     icon: <WarningAmberIcon fontSize="small" />,
-    text: 'Extraction Completed – Manual Review Recommended',
+    text: 'Extraction completed, manual review recommended',
   },
   low: {
     severity: 'error',
     icon: <ErrorOutlineIcon fontSize="small" />,
-    text: 'Extraction Failed – Please Re-upload Your Certificate',
+    text: 'Extraction failed, please re-upload your certificate',
   },
 };
 
@@ -380,7 +381,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
     return (
       <Box>
         <Typography variant="h6" gutterBottom>
-          Upload Matric Results
+          Upload matric results
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           Upload your National Senior Certificate (matric certificate). We&apos;ll scan it and
@@ -399,7 +400,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
             textAlign: 'center',
             border: '2px dashed',
             borderColor: 'primary.main',
-            bgcolor: 'primary.50',
+            bgcolor: themeTokens.successSurface,
             cursor: loading ? 'wait' : 'pointer',
           }}
         >
@@ -449,7 +450,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
     return (
       <Box>
         <Typography variant="h6" gutterBottom>
-          Confirm Your Results
+          Confirm your results
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           Review the extracted results. Only the mark can be edited — the level is calculated
@@ -487,7 +488,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
           sx={{
             p: 3,
             mb: 3,
-            bgcolor: 'success.50',
+            bgcolor: themeTokens.successSurface,
             border: '2px solid',
             borderColor: 'success.main',
           }}
@@ -517,7 +518,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
               startIcon={<VisibilityIcon />}
               onClick={() => setCertPreviewOpen(true)}
             >
-              Preview Certificate
+              Preview certificate
             </Button>
           </Box>
         )}
@@ -546,7 +547,11 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
                   <TableRow
                     key={index}
                     sx={{
-                      bgcolor: subject.edited ? 'warning.50' : isDuplicate ? 'error.50' : undefined,
+                      bgcolor: subject.edited
+                        ? themeTokens.warningSurface
+                        : isDuplicate
+                          ? themeTokens.errorSurface
+                          : undefined,
                       transition: 'background-color 0.3s',
                     }}
                   >
@@ -625,7 +630,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
             size="large"
             disabled={!canConfirmResults}
           >
-            Confirm Results
+            Confirm results
           </Button>
         </Box>
 
@@ -651,7 +656,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
           maxWidth="md"
           fullWidth
         >
-          <DialogTitle>Your Uploaded Certificate</DialogTitle>
+          <DialogTitle>Your uploaded certificate</DialogTitle>
           <DialogContent>
             {certFile && certFileUrl && certFile.type.startsWith('image/') ? (
               <Box
@@ -681,7 +686,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
   return (
     <Box>
       <Typography variant="h6" gutterBottom>
-        Upload ID Document
+        Upload ID document
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
         Upload your South African ID document to complete your profile.
@@ -714,12 +719,12 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
 
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Paper sx={{ p: 3, bgcolor: 'success.50' }}>
+          <Paper sx={{ p: 3, bgcolor: themeTokens.successSurface }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <CheckCircleIcon color="success" />
               <Box>
                 <Typography variant="body1" fontWeight={600}>
-                  Matric Results Confirmed
+                  Matric results confirmed
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   APS: {editedSubjects.length > 0 ? aps : data.aps} • {editedSubjects.length}{' '}
@@ -732,7 +737,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
 
         <Grid item xs={12}>
           {idDocUploaded ? (
-            <Paper sx={{ p: 3, bgcolor: 'success.50' }}>
+            <Paper sx={{ p: 3, bgcolor: themeTokens.successSurface }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <CheckCircleIcon color="success" />
                 <Typography variant="body1" fontWeight={600}>
@@ -747,7 +752,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
                 textAlign: 'center',
                 border: '2px dashed',
                 borderColor: 'primary.main',
-                bgcolor: 'primary.50',
+                bgcolor: themeTokens.successSurface,
                 cursor: idDocUploading ? 'wait' : 'pointer',
               }}
             >
@@ -771,7 +776,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
                   <>
                     <CloudUploadIcon sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
                     <Typography variant="h6" gutterBottom>
-                      Upload ID Document
+                      Upload ID document
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Image or PDF of your SA ID
@@ -786,7 +791,7 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
         <Button onClick={() => setStep('confirm')} size="large" startIcon={<ArrowBackIcon />}>
-          Back to Results
+          Back to results
         </Button>
         <Button
           onClick={handleNext}

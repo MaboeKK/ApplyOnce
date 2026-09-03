@@ -81,42 +81,38 @@ function DashboardContent() {
   return (
     <>
       <PortalNav />
-      <Container maxWidth="lg" sx={{ py: 6 }}>
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" gutterBottom>
+      <Box sx={{ bgcolor: 'secondary.main', color: '#FFFFFF', pt: 4, pb: hasAPS ? 5 : 4 }}>
+        <Container maxWidth="lg">
+          <Typography variant="h4" sx={{ color: '#FFFFFF' }} gutterBottom>
             Welcome, {user?.firstName}!
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.75)' }}>
             Your ApplyOnce dashboard
           </Typography>
-        </Box>
 
+          {hasAPS && profile && (
+            <Box sx={{ mt: 3 }}>
+              <Typography
+                sx={{ fontSize: { xs: '1.75rem', sm: '2rem' }, fontWeight: 700, lineHeight: 1.15 }}
+              >
+                {profile.aps ?? 'Calculating...'}
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.75)', mt: 0.5 }}>
+                Admission Point Score (best 6 subjects)
+              </Typography>
+            </Box>
+          )}
+        </Container>
+      </Box>
+
+      <Container maxWidth="lg" sx={{ py: 4 }}>
         {!hasCompletedProfile && (
           <Alert severity="info" sx={{ mb: 4 }}>
             Complete your profile and upload your documents to start applying to universities.
           </Alert>
         )}
 
-        {hasAPS && profile && (
-          <Paper
-            sx={{
-              p: 3,
-              mb: 4,
-              bgcolor: 'success.50',
-              border: '2px solid',
-              borderColor: 'success.main',
-            }}
-          >
-            <Typography variant="h5" color="success.dark">
-              Your APS: <strong>{profile.aps || 'Calculating...'}</strong>
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Admission Point Score (best 6 subjects)
-            </Typography>
-          </Paper>
-        )}
-
-        <Grid container spacing={3}>
+        <Grid container spacing={2}>
           <Grid item xs={12} md={4}>
             <Card>
               <CardContent>
@@ -139,7 +135,7 @@ function DashboardContent() {
               </CardContent>
               <CardActions>
                 <Button size="small" onClick={() => router.push('/profile/setup')}>
-                  {hasCompletedProfile ? 'Edit Profile' : 'Complete Profile'}
+                  {hasCompletedProfile ? 'Edit profile' : 'Complete profile'}
                 </Button>
               </CardActions>
             </Card>
@@ -170,7 +166,7 @@ function DashboardContent() {
               </CardContent>
               <CardActions>
                 <Button size="small" onClick={() => router.push('/documents')}>
-                  Manage Documents
+                  Manage documents
                 </Button>
               </CardActions>
             </Card>
@@ -198,11 +194,11 @@ function DashboardContent() {
               </CardContent>
               <CardActions>
                 <Button size="small" onClick={() => router.push('/universities')}>
-                  Browse Universities
+                  Browse universities
                 </Button>
                 {applications.length > 0 && (
                   <Button size="small" onClick={() => router.push('/cart')}>
-                    View Cart
+                    View cart
                   </Button>
                 )}
               </CardActions>
@@ -213,7 +209,7 @@ function DashboardContent() {
         {hasAPS && profile && profile.subjectResults && (
           <Paper sx={{ p: 3, mt: 4 }}>
             <Typography variant="h6" gutterBottom color="primary">
-              Your Matric Results
+              Your matric results
             </Typography>
             <Grid container spacing={2}>
               {profile.subjectResults.map((result) => (
@@ -235,7 +231,7 @@ function DashboardContent() {
         {applications.length > 0 && (
           <Paper sx={{ p: 3, mt: 4 }}>
             <Typography variant="h6" gutterBottom color="primary">
-              Your Applications
+              Your applications
             </Typography>
             <Stack spacing={2} sx={{ mt: 2 }}>
               {applications.map((app) => {
@@ -271,7 +267,8 @@ function DashboardContent() {
                           label={statusConfig.label}
                           color={statusConfig.color}
                           size="small"
-                          {...('icon' in statusConfig && { icon: statusConfig.icon })}
+                          icon={statusConfig.icon}
+                          sx={statusConfig.sx}
                         />
                       </Box>
 
@@ -288,7 +285,7 @@ function DashboardContent() {
                       {app.status === 'submission_failed' && app.notes && (
                         <Alert severity="error" sx={{ mt: 2 }}>
                           <Typography variant="body2" fontWeight={600}>
-                            Submission Error
+                            Submission error
                           </Typography>
                           <Typography variant="body2">{app.notes}</Typography>
                         </Alert>

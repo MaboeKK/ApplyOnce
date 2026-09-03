@@ -22,7 +22,7 @@ export default function PaymentSuccessPage() {
         <Paper sx={{ p: 5, textAlign: 'center' }}>
           <CheckCircleIcon color="success" sx={{ fontSize: 64, mb: 2 }} />
           <Typography variant="h4" gutterBottom>
-            Payment Successful
+            Payment successful
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
             Your applications are being submitted to each university now. This usually takes a few

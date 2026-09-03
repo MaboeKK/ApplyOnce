@@ -32,7 +32,7 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
   return (
     <Box>
       <Typography variant="h6" gutterBottom>
-        Review Your Profile
+        Review your profile
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
         Check everything before submitting. You can edit any section later from your dashboard.
@@ -47,7 +47,7 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
 
       <Paper sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" gutterBottom color="primary">
-          Personal Information
+          Personal information
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={6}>
@@ -110,7 +110,7 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
 
       <Paper sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" gutterBottom color="primary">
-          Guardian / Parent
+          Guardian / parent
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={6}>
@@ -146,7 +146,7 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
           {typeof data.guardian.annualIncome === 'number' && (
             <Grid item xs={6}>
               <Typography variant="body2" color="text.secondary">
-                Annual Income
+                Annual income
               </Typography>
               <Typography variant="body1">{formatZAR(data.guardian.annualIncome)}</Typography>
             </Grid>
@@ -156,7 +156,7 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
           <>
             <Divider sx={{ my: 2 }} />
             <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-              Emergency Contact
+              Emergency contact
             </Typography>
             <Grid container spacing={2}>
               <Grid item xs={6}>
@@ -183,7 +183,7 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
 
       <Paper sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" gutterBottom color="primary">
-          Matric School
+          Matric school
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={6}>
@@ -204,7 +204,7 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
       {data.results.subjects && data.results.subjects.length > 0 && (
         <Paper sx={{ p: 3, mb: 3 }}>
           <Typography variant="h6" gutterBottom color="primary">
-            Matric Results
+            Matric results
           </Typography>
           <Typography variant="h5" color="success.main" sx={{ mb: 2 }}>
             APS: {data.results.aps}
@@ -248,7 +248,7 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
           Back
         </Button>
         <Button onClick={onSubmit} variant="contained" size="large" disabled={loading}>
-          {loading ? 'Submitting...' : 'Complete Profile'}
+          {loading ? 'Submitting...' : 'Complete profile'}
         </Button>
       </Box>
     </Box>
