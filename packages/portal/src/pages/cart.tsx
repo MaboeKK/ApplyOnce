@@ -71,29 +71,45 @@ function CartContent() {
   const load = async () => {
     setLoading(true);
     try {
-      const [appsRes, uniRes, studentRes] = await Promise.all([
-        api.get('/applications'),
-        api.get('/universities'),
-        api.get('/students/me'),
-      ]);
-      if (!mountedRef.current) return;
-
-      const drafts = (appsRes.data.applications || []).filter(
-        (a: PortalApplication) => a.status === 'draft'
-      );
-      setApplications(drafts);
-
-      const fees: Record<string, number> = {};
-      for (const u of uniRes.data.universities || []) {
-        fees[u.id] = u.applicationFee;
+      // Fetched independently rather than via Promise.all: a transient failure
+      // fetching fees or document status must never hide applications that
+      // WERE successfully fetched — that would show "cart is empty" while a
+      // draft genuinely exists, and there'd be nothing to remove.
+      try {
+        const appsRes = await api.get('/applications');
+        if (!mountedRef.current) return;
+        const drafts = (appsRes.data.applications || []).filter(
+          (a: PortalApplication) => a.status === 'draft'
+        );
+        setApplications(drafts);
+      } catch (err) {
+        if (mountedRef.current) setError(getErrorMessage(err, 'Failed to load your cart'));
+        return;
       }
-      setFeeByUni(fees);
 
-      const student = studentRes.data.student;
-      setHasMatricCert(
-        !!student?.documents?.some((d: { type: string }) => d.type === 'matric_certificate')
-      );
-      setHasIdDoc(!!student?.documents?.some((d: { type: string }) => d.type === 'id_document'));
+      try {
+        const uniRes = await api.get('/universities');
+        if (!mountedRef.current) return;
+        const fees: Record<string, number> = {};
+        for (const u of uniRes.data.universities || []) {
+          fees[u.id] = u.applicationFee;
+        }
+        setFeeByUni(fees);
+      } catch {
+        // Fees fall back to '—' in the UI — not worth blocking the cart over.
+      }
+
+      try {
+        const studentRes = await api.get('/students/me');
+        if (!mountedRef.current) return;
+        const student = studentRes.data.student;
+        setHasMatricCert(
+          !!student?.documents?.some((d: { type: string }) => d.type === 'matric_certificate')
+        );
+        setHasIdDoc(!!student?.documents?.some((d: { type: string }) => d.type === 'id_document'));
+      } catch {
+        // Document-status check failing shouldn't hide the cart either.
+      }
 
       try {
         const matchesRes = await api.get('/aps/matches');
@@ -106,8 +122,6 @@ function CartContent() {
       } catch {
         // Student hasn't uploaded results yet — skip strategy tagging
       }
-    } catch (err) {
-      if (mountedRef.current) setError(getErrorMessage(err, 'Failed to load your cart'));
     } finally {
       if (mountedRef.current) setLoading(false);
     }
