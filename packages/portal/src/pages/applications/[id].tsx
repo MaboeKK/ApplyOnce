@@ -95,7 +95,7 @@ function ApplicationDetailContent() {
       <PortalNav />
       <Container maxWidth="md" sx={{ py: 6 }}>
         <Button onClick={() => router.push('/dashboard')} sx={{ mb: 2 }}>
-          ← Back to Dashboard
+          ← Back to dashboard
         </Button>
 
         <Paper sx={{ p: 4, mb: 3 }}>
@@ -143,7 +143,7 @@ function ApplicationDetailContent() {
           {application.status === 'submission_failed' && application.notes && (
             <Alert severity="error" sx={{ mt: 3 }}>
               <Typography variant="body2" fontWeight={600}>
-                Submission Error
+                Submission error
               </Typography>
               <Typography variant="body2">{application.notes}</Typography>
             </Alert>
@@ -152,7 +152,7 @@ function ApplicationDetailContent() {
 
         <Paper sx={{ p: 4 }}>
           <Typography variant="h6" gutterBottom>
-            Status Timeline
+            Status timeline
           </Typography>
           <Divider sx={{ mb: 2 }} />
           <Stack spacing={2}>

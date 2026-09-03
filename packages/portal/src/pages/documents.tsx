@@ -28,9 +28,9 @@ import { getErrorMessage } from '@/utils/error-message';
 import type { PortalDocument } from '@/types';
 
 const documentTypeLabels: Record<string, string> = {
-  matric_certificate: 'Matric Certificate',
-  id_document: 'ID Document',
-  proof_of_residence: 'Proof of Residence',
+  matric_certificate: 'Matric certificate',
+  id_document: 'ID document',
+  proof_of_residence: 'Proof of residence',
 };
 
 export default function DocumentsPage() {
@@ -143,7 +143,7 @@ function DocumentsContent() {
       <Container maxWidth="lg" sx={{ py: 6 }}>
         <Box sx={{ mb: 4 }}>
           <Typography variant="h4" gutterBottom>
-            Document Vault
+            Document vault
           </Typography>
           <Typography variant="body1" color="text.secondary">
             Your uploaded documents. You need your matric certificate and ID to apply.
@@ -274,7 +274,7 @@ function DocumentsContent() {
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <DescriptionIcon color="primary" />
-                    <Typography variant="h6">Proof of Residence</Typography>
+                    <Typography variant="h6">Proof of residence</Typography>
                   </Box>
                   <Chip label="Optional" size="small" />
                 </Box>
@@ -339,7 +339,7 @@ function DocumentsContent() {
 
         <Box sx={{ mt: 4 }}>
           <Button variant="outlined" onClick={() => router.push('/dashboard')}>
-            Back to Dashboard
+            Back to dashboard
           </Button>
         </Box>
       </Container>

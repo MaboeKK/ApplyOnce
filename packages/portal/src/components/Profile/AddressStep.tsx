@@ -112,7 +112,7 @@ export default function AddressStep({ data, onNext, onBack }: Props) {
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)}>
       <Typography variant="h6" gutterBottom>
-        Residential Address
+        Residential address
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
         Your current residential address.
@@ -126,7 +126,7 @@ export default function AddressStep({ data, onNext, onBack }: Props) {
             render={({ field }) => (
               <TextField
                 {...field}
-                label="Street Address"
+                label="Street address"
                 required
                 fullWidth
                 placeholder="e.g. 22 Voortrekker Road"
@@ -220,7 +220,7 @@ export default function AddressStep({ data, onNext, onBack }: Props) {
               <TextField
                 {...field}
                 onChange={(e) => field.onChange(digitsOnly(e.target.value).slice(0, 4))}
-                label="Postal Code"
+                label="Postal code"
                 required
                 fullWidth
                 placeholder="0001"

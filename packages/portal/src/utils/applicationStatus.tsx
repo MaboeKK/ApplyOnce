@@ -45,7 +45,7 @@ export function getStatusConfig(status: ApplicationStatus): StatusConfig {
     case 'submission_failed':
       return {
         color: 'default',
-        label: 'Submission Failed',
+        label: 'Submission failed',
         icon: <ErrorIcon fontSize="small" sx={{ color: '#FFFFFF !important' }} />,
         sx: { bgcolor: '#DA1A23', color: '#FFFFFF' },
       };

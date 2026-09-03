@@ -39,7 +39,7 @@ export default function LoginPage() {
   };
 
   return (
-    <AuthLayout title="Admin Login" subtitle="Log in to manage applications for your university">
+    <AuthLayout title="Admin login" subtitle="Log in to manage applications for your university">
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
@@ -88,7 +88,7 @@ export default function LoginPage() {
           size="large"
           disabled={isSubmitting || !email || !password}
         >
-          {isSubmitting ? 'Logging In...' : 'Log In'}
+          {isSubmitting ? 'Logging in...' : 'Log in'}
         </Button>
       </Box>
     </AuthLayout>

@@ -126,7 +126,7 @@ function PaymentCheckoutContent() {
             </Typography>
           </Stack>
           <Typography variant="h5" gutterBottom>
-            Confirm Your Payment
+            Confirm your payment
           </Typography>
 
           <Stack spacing={1} sx={{ my: 3 }}>

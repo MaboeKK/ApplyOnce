@@ -135,7 +135,7 @@ function DashboardContent() {
               </CardContent>
               <CardActions>
                 <Button size="small" onClick={() => router.push('/profile/setup')}>
-                  {hasCompletedProfile ? 'Edit Profile' : 'Complete Profile'}
+                  {hasCompletedProfile ? 'Edit profile' : 'Complete profile'}
                 </Button>
               </CardActions>
             </Card>
@@ -166,7 +166,7 @@ function DashboardContent() {
               </CardContent>
               <CardActions>
                 <Button size="small" onClick={() => router.push('/documents')}>
-                  Manage Documents
+                  Manage documents
                 </Button>
               </CardActions>
             </Card>
@@ -194,11 +194,11 @@ function DashboardContent() {
               </CardContent>
               <CardActions>
                 <Button size="small" onClick={() => router.push('/universities')}>
-                  Browse Universities
+                  Browse universities
                 </Button>
                 {applications.length > 0 && (
                   <Button size="small" onClick={() => router.push('/cart')}>
-                    View Cart
+                    View cart
                   </Button>
                 )}
               </CardActions>
@@ -209,7 +209,7 @@ function DashboardContent() {
         {hasAPS && profile && profile.subjectResults && (
           <Paper sx={{ p: 3, mt: 4 }}>
             <Typography variant="h6" gutterBottom color="primary">
-              Your Matric Results
+              Your matric results
             </Typography>
             <Grid container spacing={2}>
               {profile.subjectResults.map((result) => (
@@ -231,7 +231,7 @@ function DashboardContent() {
         {applications.length > 0 && (
           <Paper sx={{ p: 3, mt: 4 }}>
             <Typography variant="h6" gutterBottom color="primary">
-              Your Applications
+              Your applications
             </Typography>
             <Stack spacing={2} sx={{ mt: 2 }}>
               {applications.map((app) => {
@@ -285,7 +285,7 @@ function DashboardContent() {
                       {app.status === 'submission_failed' && app.notes && (
                         <Alert severity="error" sx={{ mt: 2 }}>
                           <Typography variant="body2" fontWeight={600}>
-                            Submission Error
+                            Submission error
                           </Typography>
                           <Typography variant="body2">{app.notes}</Typography>
                         </Alert>

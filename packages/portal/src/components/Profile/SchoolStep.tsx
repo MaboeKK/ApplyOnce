@@ -41,7 +41,7 @@ export default function SchoolStep({ data, onNext, onBack }: Props) {
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)}>
       <Typography variant="h6" gutterBottom>
-        Matric School
+        Matric school
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
         When did you complete your matric (NSC)?
@@ -55,7 +55,7 @@ export default function SchoolStep({ data, onNext, onBack }: Props) {
             render={({ field }) => (
               <TextField
                 {...field}
-                label="Matric Year"
+                label="Matric year"
                 fullWidth
                 type="number"
                 error={!!errors.matricYear}
@@ -73,7 +73,7 @@ export default function SchoolStep({ data, onNext, onBack }: Props) {
             render={({ field }) => (
               <TextField
                 {...field}
-                label="School Name"
+                label="School name"
                 fullWidth
                 placeholder="e.g. Pretoria High School for Girls"
                 error={!!errors.school}
