@@ -156,7 +156,7 @@ function DocumentsContent() {
           </Alert>
         )}
 
-        <Grid container spacing={3}>
+        <Grid container spacing={2}>
           {requiredTypes.map((type) => {
             const doc = getDocumentByType(type);
 
