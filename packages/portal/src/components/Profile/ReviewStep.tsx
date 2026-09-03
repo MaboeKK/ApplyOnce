@@ -1,7 +1,7 @@
 // packages/portal/src/components/Profile/ReviewStep.tsx
 // Final review before submission
 
-import { Box, Button, Typography, Paper, Grid, Divider, Alert, Chip } from '@mui/material';
+import { Box, Button, Typography, Paper, Grid, Divider, Alert, Chip, Tooltip } from '@mui/material';
 import { subjectLabel } from '@/utils/subject-labels';
 import { formatZAR } from '@/utils/formatters';
 import type { User } from '@/store/auth';
@@ -222,12 +222,14 @@ export default function ReviewStep({ data, onBack, onSubmit, loading, user }: Pr
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Typography variant="body2">{subjectLabel(subject.subject)}</Typography>
                       {isLifeOrientation && (
-                        <Chip
-                          label="Not Considered"
-                          size="small"
-                          color="default"
-                          sx={{ fontSize: '0.7rem', height: 20 }}
-                        />
+                        <Tooltip title="Excluded from this standard APS, which most universities use. A few universities (like Wits) count Life Orientation too — your APS is recalculated for each university's own rule when you browse programmes.">
+                          <Chip
+                            label="Excluded here"
+                            size="small"
+                            color="default"
+                            sx={{ fontSize: '0.7rem', height: 20 }}
+                          />
+                        </Tooltip>
                       )}
                     </Box>
                     <Typography variant="body2" fontWeight={600}>

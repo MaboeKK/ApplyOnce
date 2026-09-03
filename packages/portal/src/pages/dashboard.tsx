@@ -26,6 +26,7 @@ import api from '@/config/api';
 import PortalNav from '@/components/Layout/PortalNav';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { getStatusConfig } from '@/utils/applicationStatus';
+import { subjectLabel } from '@/utils/subject-labels';
 import type { StudentProfile, PortalApplication } from '@/types';
 
 export default function DashboardPage() {
@@ -220,7 +221,7 @@ function DashboardContent() {
                   <Box
                     sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                   >
-                    <Typography variant="body2">{result.subject}</Typography>
+                    <Typography variant="body2">{subjectLabel(result.subject)}</Typography>
                     <Typography variant="body2" fontWeight={600}>
                       {result.mark}% (Level {result.level})
                     </Typography>

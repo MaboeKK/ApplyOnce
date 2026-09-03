@@ -6,7 +6,12 @@ import { AuthRequest } from '../types/express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { prisma } from '../utils/prisma';
 import { NotFoundError, ConflictError } from '../utils/errors';
-import { markToAPS, normalizeSubjectName } from '@applyonce/shared';
+import {
+  markToAPS,
+  normalizeSubjectName,
+  calculateStandardAPS,
+  NSCSubject,
+} from '@applyonce/shared';
 import { parseSAIdNumber } from '../utils/saId';
 import { Prisma } from '@prisma/client';
 import { UpdateSubjectsInput } from '../schemas/student';
@@ -48,9 +53,21 @@ export const getMyProfile = asyncHandler(async (req: AuthRequest, res: Response)
     ...studentData
   } = student;
 
+  // Headline APS (best 6 subjects, excluding Life Orientation) — a preview
+  // shown before a specific university is chosen. Per-university matching
+  // (GET /aps/matches) recalculates this correctly for universities that
+  // include Life Orientation in their own apsRule.
+  const aps =
+    student.subjectResults.length >= 6
+      ? calculateStandardAPS(
+          student.subjectResults.map((r) => ({ ...r, subject: r.subject as NSCSubject }))
+        )
+      : null;
+
   res.json({
     student: {
       ...studentData,
+      aps,
       dateOfBirth: student.dateOfBirth ? student.dateOfBirth.toISOString().split('T')[0] : null,
       createdAt: student.createdAt.toISOString(),
       updatedAt: student.updatedAt.toISOString(),

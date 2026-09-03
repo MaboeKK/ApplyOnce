@@ -496,14 +496,14 @@ export default function ResultsStep({ data, onNext, onBack, profileData, userId 
             <Typography variant="h5" align="center" color="success.dark">
               Your APS: <strong>{aps}</strong>
             </Typography>
-            <Tooltip title="APS is the sum of your best 6 subjects' achievement levels (1–7 each), excluding Life Orientation. It's the primary score universities use to check what you qualify for.">
+            <Tooltip title="APS is the sum of your best 6 subjects' achievement levels (1–7 each). Shown here using the standard calculation most universities use, which excludes Life Orientation. A few universities (like Wits) count Life Orientation too — when you browse programmes, we recalculate your APS for each university's own rule.">
               <IconButton size="small" aria-label="How APS is calculated">
                 <InfoOutlinedIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           </Box>
           <Typography variant="body2" align="center" color="text.secondary">
-            Best 6 Subjects (excluding Life Orientation)
+            Best 6 Subjects (standard calculation — varies by university)
           </Typography>
           <Typography variant="caption" align="center" display="block" color="text.secondary">
             Last Updated: {lastUpdated ? lastUpdated.toLocaleTimeString() : '—'}
