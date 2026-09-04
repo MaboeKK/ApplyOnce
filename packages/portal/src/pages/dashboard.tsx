@@ -80,7 +80,7 @@ function DashboardContent() {
   return (
     <>
       <PortalNav />
-      <Box sx={{ bgcolor: 'secondary.main', color: '#FFFFFF', pt: 4, pb: hasAPS ? 5 : 4 }}>
+      <Box sx={{ bgcolor: 'secondary.main', color: '#FFFFFF', py: 4 }}>
         <Container maxWidth="lg">
           <Typography variant="h4" sx={{ color: '#FFFFFF' }} gutterBottom>
             Welcome, {user?.firstName}!
@@ -88,19 +88,6 @@ function DashboardContent() {
           <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.75)' }}>
             Your ApplyOnce dashboard
           </Typography>
-
-          {hasAPS && profile && (
-            <Box sx={{ mt: 3 }}>
-              <Typography
-                sx={{ fontSize: { xs: '1.75rem', sm: '2rem' }, fontWeight: 700, lineHeight: 1.15 }}
-              >
-                {profile.aps ?? 'Calculating...'}
-              </Typography>
-              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.75)', mt: 0.5 }}>
-                Admission Point Score (best 6 subjects)
-              </Typography>
-            </Box>
-          )}
         </Container>
       </Box>
 
