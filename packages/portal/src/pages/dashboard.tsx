@@ -177,7 +177,7 @@ function DashboardContent() {
                 </Box>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                   {hasCompletedProfile
-                    ? 'Your profile is complete'
+                    ? 'All set! You can update your details anytime.'
                     : 'Complete your personal information, address, guardian details, and school'}
                 </Typography>
                 <Box
@@ -208,7 +208,7 @@ function DashboardContent() {
                       color="secondary"
                       onClick={() => router.push('/profile/setup')}
                     >
-                      {hasCompletedProfile ? 'Edit profile' : 'Complete profile'}
+                      {hasCompletedProfile ? 'Edit' : 'Complete profile'}
                     </Button>
                   </Box>
                 </Box>
@@ -224,7 +224,9 @@ function DashboardContent() {
                   <Typography variant="h6">Documents</Typography>
                 </Box>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  Upload your matric certificate and ID document
+                  {hasMatricCert && hasIdDoc
+                    ? "You're all set! You can replace either document anytime."
+                    : 'These are required before you can submit an application.'}
                 </Typography>
                 <Box
                   sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
@@ -234,10 +236,10 @@ function DashboardContent() {
                       label={
                         hasMatricCert ? (
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            Matric: <CheckCircleIcon sx={{ fontSize: 16 }} />
+                            Matric Certificate: <CheckCircleIcon sx={{ fontSize: 16 }} />
                           </Box>
                         ) : (
-                          'Matric: no'
+                          'Matric Certificate: no'
                         )
                       }
                       color={hasMatricCert ? 'success' : 'default'}
@@ -247,10 +249,10 @@ function DashboardContent() {
                       label={
                         hasIdDoc ? (
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            ID: <CheckCircleIcon sx={{ fontSize: 16 }} />
+                            ID Document: <CheckCircleIcon sx={{ fontSize: 16 }} />
                           </Box>
                         ) : (
-                          'ID: no'
+                          'ID Document: no'
                         )
                       }
                       color={hasIdDoc ? 'success' : 'default'}
