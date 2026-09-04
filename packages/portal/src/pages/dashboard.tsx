@@ -193,14 +193,24 @@ function DashboardContent() {
                   ) : (
                     <Chip label="Incomplete" color="warning" size="small" />
                   )}
-                  <Button
-                    size="small"
-                    variant="text"
-                    color="secondary"
-                    onClick={() => router.push('/profile/setup')}
-                  >
-                    {hasCompletedProfile ? 'Edit profile' : 'Complete profile'}
-                  </Button>
+                  <Box sx={{ display: 'flex' }}>
+                    <Button
+                      size="small"
+                      variant="text"
+                      color="secondary"
+                      onClick={() => router.push('/profile/view')}
+                    >
+                      View
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="text"
+                      color="secondary"
+                      onClick={() => router.push('/profile/setup')}
+                    >
+                      {hasCompletedProfile ? 'Edit profile' : 'Complete profile'}
+                    </Button>
+                  </Box>
                 </Box>
               </CardContent>
             </Card>
@@ -214,19 +224,35 @@ function DashboardContent() {
                   <Typography variant="h6">Documents</Typography>
                 </Box>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  Upload your matric certificate and ID document (both required to apply)
+                  Upload your matric certificate and ID document
                 </Typography>
                 <Box
                   sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
                 >
                   <Box sx={{ display: 'flex', gap: 1 }}>
                     <Chip
-                      label={`Matric: ${hasMatricCert ? 'yes' : 'no'}`}
+                      label={
+                        hasMatricCert ? (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            Matric: <CheckCircleIcon sx={{ fontSize: 16 }} />
+                          </Box>
+                        ) : (
+                          'Matric: no'
+                        )
+                      }
                       color={hasMatricCert ? 'success' : 'default'}
                       size="small"
                     />
                     <Chip
-                      label={`ID: ${hasIdDoc ? 'yes' : 'no'}`}
+                      label={
+                        hasIdDoc ? (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            ID: <CheckCircleIcon sx={{ fontSize: 16 }} />
+                          </Box>
+                        ) : (
+                          'ID: no'
+                        )
+                      }
                       color={hasIdDoc ? 'success' : 'default'}
                       size="small"
                     />
