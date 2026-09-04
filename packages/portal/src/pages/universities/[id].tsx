@@ -29,9 +29,9 @@ import { getErrorMessage } from '@/utils/error-message';
 import type { PortalApplication, ProgrammeMatch } from '@/types';
 import type { University, Programme, ChoiceStrategy } from '@applyonce/shared';
 
-const strategyColor: Record<ChoiceStrategy, 'error' | 'success' | 'primary' | 'warning'> = {
+const strategyColor: Record<ChoiceStrategy, 'error' | 'success' | 'secondary' | 'warning'> = {
   reach: 'warning',
-  match: 'primary',
+  match: 'secondary',
   safety: 'success',
   not_qualified: 'error',
 };

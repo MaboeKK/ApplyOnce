@@ -8,6 +8,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import ErrorIcon from '@mui/icons-material/Error';
+import { themeTokens } from '@/theme';
 import type { ApplicationStatus } from '@/types';
 
 interface StatusConfig {
@@ -15,8 +16,9 @@ interface StatusConfig {
   label: string;
   icon: React.ReactElement;
   // Only set for statuses that need a look the palette's fixed color keys
-  // can't express (submission_failed uses the brand's reserved critical-alert
-  // red, distinct from the standard error red used for a routine "rejected").
+  // can't express (submission_failed uses a dedicated critical-alert red,
+  // distinct from both the primary brand red and the standard error red used
+  // for a routine "rejected").
   sx?: SxProps<Theme>;
 }
 
@@ -47,7 +49,7 @@ export function getStatusConfig(status: ApplicationStatus): StatusConfig {
         color: 'default',
         label: 'Submission failed',
         icon: <ErrorIcon fontSize="small" sx={{ color: '#FFFFFF !important' }} />,
-        sx: { bgcolor: '#DA1A23', color: '#FFFFFF' },
+        sx: { bgcolor: themeTokens.criticalAlert, color: '#FFFFFF' },
       };
     default:
       return {

@@ -6,19 +6,21 @@ import { createTheme } from '@mui/material/styles';
 
 // Design tokens
 const colors = {
-  primary: '#00A651', // Green — CTAs, positive indicators, progress
-  secondary: '#002E5B', // Navy — header bar, branding, high-emphasis headers
-  accent: '#00A651',
-  success: '#00A651',
+  primary: '#E51718', // Red — CTAs, branding, high-emphasis actions
+  secondary: '#002E5B', // Navy — header bar, secondary actions
+  success: '#00A651', // Green — reserved for positive/qualifies indicators only, never CTAs
   successSurface: '#00A6511F', // 12% alpha — positive pill/success banner backgrounds
-  error: '#D32F2F', // Alert / Money Out
+  error: '#D32F2F', // Alert / doesn't-qualify
   errorSurface: '#D32F2F1A', // 10% alpha — negative cashflow pill backgrounds
   warning: '#FFA000', // Warning / Pending
   warningSurface: '#FFA0001F', // 12% alpha, matching the success/error surface convention
-  // Brand accents distinct from the functional palette above: reserved for
-  // logo accents / critical alert badges (red) and promotional banners /
-  // onboarding illustrations (cyan) — never used for routine CTAs or errors.
-  brandRed: '#DA1A23',
+  // Distinct from primary red on purpose: a routine "submission failed" badge
+  // needs to read as more severe than a plain rejected/error state without
+  // being confused with a primary CTA button (both would otherwise be the
+  // same hue at similar lightness).
+  criticalAlert: '#7F1D1D',
+  // Cyan accent reserved for promotional banners / onboarding illustrations —
+  // never used for routine CTAs or errors.
   brandCyan: '#0091D2',
   neutral: {
     50: '#F8F9FA', // Main background
@@ -39,7 +41,7 @@ const STANDARD_CARD_SHADOW = '0px 2px 8px rgba(0,0,0,0.06)';
 const ELEVATED_SHADOW = '0px 8px 24px rgba(0,0,0,0.12)';
 
 export const themeTokens = {
-  brandRed: colors.brandRed,
+  criticalAlert: colors.criticalAlert,
   brandCyan: colors.brandCyan,
   successSurface: colors.successSurface,
   errorSurface: colors.errorSurface,
@@ -50,8 +52,8 @@ export const theme = createTheme({
   palette: {
     primary: {
       main: colors.primary,
-      light: '#33B96F',
-      dark: '#00863F',
+      light: '#EF4444',
+      dark: '#B91C1C',
       contrastText: '#FFFFFF',
     },
     secondary: {

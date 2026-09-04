@@ -82,15 +82,18 @@ const strategyLabel: Record<string, string> = {
 
 // Page-scoped colour tokens.
 const brand = {
-  purple: '#00A651', // Green (primary accent / CTA)
-  purpleDark: '#00863F',
+  accent: '#E51718', // Red (primary accent / CTA)
+  accentDark: '#B91C1C',
   navy: '#002E5B', // Navy (headline / strong text)
   secondaryText: '#4B5563',
   mutedText: '#6B7280',
   border: '#E2E8F0',
-  purpleSurface: '#E6F7EE', // light green surface
+  accentSurface: '#FBE1E1', // light red surface, for CTA/accent chips only
   pageBg: '#F8F9FA',
   success: '#00A651',
+  // Separate from accentSurface on purpose: this tints the "qualifies" card
+  // background and must stay green even though the CTA accent above is red.
+  successSurface: '#E6F7EE',
   error: '#D32F2F',
   cyan: '#0091D2', // Cyan accent — promotional banners only, not routine CTAs
   cyanDark: '#00729F',
@@ -277,7 +280,7 @@ function UniversitiesContent() {
                 sx={{ mt: 2.5, flexWrap: 'wrap', rowGap: 1 }}
               >
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <AccountBalanceIcon sx={{ color: brand.purple, fontSize: 20 }} />
+                  <AccountBalanceIcon sx={{ color: brand.accent, fontSize: 20 }} />
                   <Typography sx={{ fontSize: 14, color: brand.navy, fontWeight: 600 }}>
                     {universities.length}
                   </Typography>
@@ -287,7 +290,7 @@ function UniversitiesContent() {
                 </Stack>
                 <Box sx={{ width: '1px', height: 16, bgcolor: brand.border }} />
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <MenuBookIcon sx={{ color: brand.purple, fontSize: 20 }} />
+                  <MenuBookIcon sx={{ color: brand.accent, fontSize: 20 }} />
                   <Typography sx={{ fontSize: 14, color: brand.navy, fontWeight: 600 }}>
                     {totalProgrammes}
                   </Typography>
@@ -295,7 +298,7 @@ function UniversitiesContent() {
                 </Stack>
                 <Box sx={{ width: '1px', height: 16, bgcolor: brand.border }} />
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <CheckCircleOutlineIcon sx={{ color: brand.purple, fontSize: 20 }} />
+                  <CheckCircleOutlineIcon sx={{ color: brand.accent, fontSize: 20 }} />
                   <Typography sx={{ fontSize: 14, color: brand.mutedText }}>Apply once</Typography>
                 </Stack>
               </Stack>
@@ -326,14 +329,14 @@ function UniversitiesContent() {
                     width: 40,
                     height: 40,
                     borderRadius: '10px',
-                    bgcolor: brand.purpleSurface,
+                    bgcolor: brand.accentSurface,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0,
                   }}
                 >
-                  <AssignmentOutlinedIcon sx={{ color: brand.purple, fontSize: 20 }} />
+                  <AssignmentOutlinedIcon sx={{ color: brand.accent, fontSize: 20 }} />
                 </Box>
                 <Box sx={{ flex: 1 }}>
                   <Typography sx={{ fontSize: 14, fontWeight: 700, color: brand.navy }}>
@@ -354,9 +357,9 @@ function UniversitiesContent() {
                 onClick={() => router.push('/cart')}
                 sx={{
                   mt: 2,
-                  color: brand.purple,
-                  borderColor: brand.purple,
-                  '&:hover': { borderColor: brand.purpleDark, bgcolor: brand.purpleSurface },
+                  color: brand.accent,
+                  borderColor: brand.accent,
+                  '&:hover': { borderColor: brand.accentDark, bgcolor: brand.accentSurface },
                 }}
               >
                 View application
@@ -392,8 +395,8 @@ function UniversitiesContent() {
                     borderRadius: '10px',
                     '& fieldset': { borderColor: brand.border },
                     '&.Mui-focused fieldset': {
-                      borderColor: `${brand.purple} !important`,
-                      boxShadow: `0 0 0 3px ${alpha(brand.purple, 0.1)}`,
+                      borderColor: `${brand.accent} !important`,
+                      boxShadow: `0 0 0 3px ${alpha(brand.accent, 0.1)}`,
                     },
                   },
                 }}
@@ -489,9 +492,9 @@ function UniversitiesContent() {
                       onDelete={() => setSearch('')}
                       deleteIcon={<CloseIcon />}
                       sx={{
-                        bgcolor: brand.purpleSurface,
-                        color: brand.purple,
-                        border: '1px solid #9FE3BF',
+                        bgcolor: brand.accentSurface,
+                        color: brand.accent,
+                        border: '1px solid #F3B6B6',
                         fontWeight: 500,
                       }}
                     />
@@ -502,9 +505,9 @@ function UniversitiesContent() {
                     onDelete={() => setProvince('all')}
                     deleteIcon={<CloseIcon />}
                     sx={{
-                      bgcolor: brand.purpleSurface,
-                      color: brand.purple,
-                      border: '1px solid #9FE3BF',
+                      bgcolor: brand.accentSurface,
+                      color: brand.accent,
+                      border: '1px solid #F3B6B6',
                       fontWeight: 500,
                       textTransform: 'capitalize',
                     }}
@@ -579,11 +582,11 @@ function UniversitiesContent() {
                         'transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease',
                       '&:hover': {
                         transform: 'translateY(-2px)',
-                        borderColor: '#9FE3BF',
+                        borderColor: '#F3B6B6',
                         boxShadow: '0 8px 24px rgba(70,45,160,0.08)',
                       },
                       '&:hover .view-programmes-arrow': { transform: 'translateX(3px)' },
-                      '&:focus-visible': { outline: `2px solid ${brand.purple}`, outlineOffset: 2 },
+                      '&:focus-visible': { outline: `2px solid ${brand.accent}`, outlineOffset: 2 },
                     }}
                   >
                     {(uni.applyUrl || uni.website) && (
@@ -626,7 +629,7 @@ function UniversitiesContent() {
                           <Typography
                             role="img"
                             aria-label={`${uni.shortName} logo`}
-                            sx={{ fontWeight: 700, fontSize: 18, color: brand.purple }}
+                            sx={{ fontWeight: 700, fontSize: 18, color: brand.accent }}
                           >
                             {uni.shortName.slice(0, 3).toUpperCase()}
                           </Typography>
@@ -673,7 +676,7 @@ function UniversitiesContent() {
                         }}
                       >
                         <Typography
-                          sx={{ fontSize: 22, fontWeight: 700, color: brand.purple, lineHeight: 1 }}
+                          sx={{ fontSize: 22, fontWeight: 700, color: brand.accent, lineHeight: 1 }}
                         >
                           {uni.programmes?.length || 0}
                         </Typography>
@@ -691,7 +694,7 @@ function UniversitiesContent() {
                           justifyContent: 'center',
                           borderLeft: `1px solid ${brand.border}`,
                           bgcolor: qualifies
-                            ? brand.purpleSurface
+                            ? brand.successSurface
                             : doesNotQualify
                               ? alpha(brand.error, 0.05)
                               : 'transparent',
@@ -742,7 +745,7 @@ function UniversitiesContent() {
                       spacing={0.5}
                       alignItems="center"
                       justifyContent="center"
-                      sx={{ color: brand.purple, fontWeight: 600, fontSize: 14 }}
+                      sx={{ color: brand.accent, fontWeight: 600, fontSize: 14 }}
                     >
                       <span>View programmes</span>
                       <ArrowForwardIcon
@@ -892,7 +895,7 @@ function UniversitiesContent() {
           </Stack>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2.5 }}>
-          <Button onClick={() => setHowItWorksOpen(false)} sx={{ color: brand.purple }}>
+          <Button onClick={() => setHowItWorksOpen(false)} sx={{ color: brand.accent }}>
             Got it
           </Button>
         </DialogActions>

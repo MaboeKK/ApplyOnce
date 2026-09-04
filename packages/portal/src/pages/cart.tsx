@@ -25,9 +25,9 @@ import { getErrorMessage } from '@/utils/error-message';
 import { formatZAR } from '@/utils/formatters';
 import type { PortalApplication, ProgrammeMatch } from '@/types';
 
-const strategyColor: Record<string, 'error' | 'success' | 'primary' | 'warning'> = {
+const strategyColor: Record<string, 'error' | 'success' | 'secondary' | 'warning'> = {
   reach: 'warning',
-  match: 'primary',
+  match: 'secondary',
   safety: 'success',
 };
 
