@@ -29,6 +29,65 @@ import { getStatusConfig } from '@/utils/applicationStatus';
 import { subjectLabel } from '@/utils/subject-labels';
 import type { StudentProfile, PortalApplication } from '@/types';
 
+// Purely decorative campus line-art for the welcome header - not interactive,
+// so it's a plain SVG rather than an icon component. Anchored top-right and
+// capped at roughly 80% of the header's own rendered height (measured at
+// ~119px across breakpoints, since the greeting text never wraps), so it
+// sits behind/beside the greeting without ever clipping past the header.
+function CampusIllustration() {
+  return (
+    <Box
+      aria-hidden="true"
+      sx={{
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        height: { xs: 70, sm: 90, md: 95 },
+        width: 'auto',
+        zIndex: 0,
+        pointerEvents: 'none',
+      }}
+    >
+      <svg
+        viewBox="0 0 300 200"
+        height="100%"
+        width="auto"
+        preserveAspectRatio="xMidYMid meet"
+        fill="none"
+      >
+        {/* distant skyline */}
+        <g stroke="#FFFFFF" strokeOpacity="0.15" strokeWidth="2">
+          <rect x="10" y="110" width="20" height="48" />
+          <rect x="34" y="90" width="16" height="68" />
+          <rect x="255" y="100" width="18" height="58" />
+          <rect x="277" y="120" width="16" height="38" />
+        </g>
+        {/* campus building: pediment, entablature, columns, base */}
+        <g stroke="#FFFFFF" strokeOpacity="0.18" strokeWidth="2.5" strokeLinejoin="round">
+          <path d="M60 62 L150 22 L240 62" />
+          <line x1="55" y1="62" x2="245" y2="62" />
+          <line x1="70" y1="70" x2="70" y2="150" />
+          <line x1="110" y1="70" x2="110" y2="150" />
+          <line x1="190" y1="70" x2="190" y2="150" />
+          <line x1="230" y1="70" x2="230" y2="150" />
+          <line x1="50" y1="150" x2="250" y2="150" />
+          <line x1="42" y1="158" x2="258" y2="158" />
+        </g>
+        {/* accent column, brand green */}
+        <line
+          x1="150"
+          y1="70"
+          x2="150"
+          y2="150"
+          stroke="#00A651"
+          strokeOpacity="0.2"
+          strokeWidth="2.5"
+        />
+      </svg>
+    </Box>
+  );
+}
+
 export default function DashboardPage() {
   return (
     <ProtectedRoute>
@@ -81,8 +140,17 @@ function DashboardContent() {
   return (
     <>
       <PortalNav />
-      <Box sx={{ bgcolor: 'secondary.main', color: '#FFFFFF', py: 4 }}>
-        <Container maxWidth="lg">
+      <Box
+        sx={{
+          bgcolor: 'secondary.main',
+          color: '#FFFFFF',
+          py: 4,
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        <CampusIllustration />
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
           <Typography variant="h4" sx={{ color: '#FFFFFF' }} gutterBottom>
             Welcome, {user?.firstName}!
           </Typography>
@@ -115,11 +183,16 @@ function DashboardContent() {
                 <Box
                   sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
                 >
-                  <Chip
-                    label={hasCompletedProfile ? 'Complete' : 'Incomplete'}
-                    color={hasCompletedProfile ? 'success' : 'warning'}
-                    size="small"
-                  />
+                  {hasCompletedProfile ? (
+                    <Chip
+                      label="Completed"
+                      color="success"
+                      size="small"
+                      icon={<CheckCircleIcon />}
+                    />
+                  ) : (
+                    <Chip label="Incomplete" color="warning" size="small" />
+                  )}
                   <Box sx={{ display: 'flex' }}>
                     <Button
                       size="small"
