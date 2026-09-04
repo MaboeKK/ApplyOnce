@@ -12,7 +12,6 @@ import {
   Grid,
   Card,
   CardContent,
-  CardActions,
   Chip,
   Alert,
   Divider,
@@ -120,24 +119,29 @@ function DashboardContent() {
                   <PersonIcon color="primary" fontSize="large" />
                   <Typography variant="h6">Profile</Typography>
                 </Box>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                   {hasCompletedProfile
                     ? 'Your profile is complete'
                     : 'Complete your personal information, address, guardian details, and school'}
                 </Typography>
-                <Box sx={{ mt: 2 }}>
+                <Box
+                  sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                >
                   <Chip
                     label={hasCompletedProfile ? 'Complete' : 'Incomplete'}
                     color={hasCompletedProfile ? 'success' : 'warning'}
                     size="small"
                   />
+                  <Button
+                    size="small"
+                    variant="text"
+                    color="secondary"
+                    onClick={() => router.push('/profile/setup')}
+                  >
+                    {hasCompletedProfile ? 'Edit profile' : 'Complete profile'}
+                  </Button>
                 </Box>
               </CardContent>
-              <CardActions>
-                <Button size="small" onClick={() => router.push('/profile/setup')}>
-                  {hasCompletedProfile ? 'Edit profile' : 'Complete profile'}
-                </Button>
-              </CardActions>
             </Card>
           </Grid>
 
@@ -148,27 +152,34 @@ function DashboardContent() {
                   <DescriptionIcon color="primary" fontSize="large" />
                   <Typography variant="h6">Documents</Typography>
                 </Box>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                   Upload your matric certificate and ID document (both required to apply)
                 </Typography>
-                <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
-                  <Chip
-                    label={`Matric: ${hasMatricCert ? 'Yes' : 'No'}`}
-                    color={hasMatricCert ? 'success' : 'default'}
+                <Box
+                  sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                >
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Chip
+                      label={`Matric: ${hasMatricCert ? 'yes' : 'no'}`}
+                      color={hasMatricCert ? 'success' : 'default'}
+                      size="small"
+                    />
+                    <Chip
+                      label={`ID: ${hasIdDoc ? 'yes' : 'no'}`}
+                      color={hasIdDoc ? 'success' : 'default'}
+                      size="small"
+                    />
+                  </Box>
+                  <Button
                     size="small"
-                  />
-                  <Chip
-                    label={`ID: ${hasIdDoc ? 'Yes' : 'No'}`}
-                    color={hasIdDoc ? 'success' : 'default'}
-                    size="small"
-                  />
+                    variant="text"
+                    color="secondary"
+                    onClick={() => router.push('/documents')}
+                  >
+                    Manage
+                  </Button>
                 </Box>
               </CardContent>
-              <CardActions>
-                <Button size="small" onClick={() => router.push('/documents')}>
-                  Manage documents
-                </Button>
-              </CardActions>
             </Card>
           </Grid>
 
@@ -179,29 +190,41 @@ function DashboardContent() {
                   <SchoolIcon color="primary" fontSize="large" />
                   <Typography variant="h6">Applications</Typography>
                 </Box>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                   {applications.length > 0
                     ? `You have ${applications.length} application${applications.length > 1 ? 's' : ''}`
                     : 'Browse universities and programmes to apply'}
                 </Typography>
-                <Box sx={{ mt: 2 }}>
+                <Box
+                  sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                >
                   <Chip
-                    label={applications.length > 0 ? `${applications.length} Active` : 'None yet'}
+                    label={applications.length > 0 ? `${applications.length} active` : 'None yet'}
                     color={applications.length > 0 ? 'primary' : 'default'}
                     size="small"
                   />
+                  <Box sx={{ display: 'flex' }}>
+                    <Button
+                      size="small"
+                      variant="text"
+                      color="secondary"
+                      onClick={() => router.push('/universities')}
+                    >
+                      Browse
+                    </Button>
+                    {applications.length > 0 && (
+                      <Button
+                        size="small"
+                        variant="text"
+                        color="secondary"
+                        onClick={() => router.push('/cart')}
+                      >
+                        View cart
+                      </Button>
+                    )}
+                  </Box>
                 </Box>
               </CardContent>
-              <CardActions>
-                <Button size="small" onClick={() => router.push('/universities')}>
-                  Browse universities
-                </Button>
-                {applications.length > 0 && (
-                  <Button size="small" onClick={() => router.push('/cart')}>
-                    View cart
-                  </Button>
-                )}
-              </CardActions>
             </Card>
           </Grid>
         </Grid>
